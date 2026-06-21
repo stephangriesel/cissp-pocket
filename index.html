@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f1117">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
 <title>CISSP Pocket Trainer</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
@@ -66,6 +68,15 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 1
 .end-title{font-size:20px;font-weight:700;margin-bottom:8px}
 .end-sub{font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.6}
 .restart-btn{padding:15px 32px;background:var(--accent);color:#0f1117;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
+#pwaBar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:50;background:var(--surface);border-top:1px solid var(--border);padding:14px 16px;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,0.4)}
+#pwaBar.visible{display:flex}
+.pwa-icon{width:40px;height:40px;border-radius:10px;background:#0f1117;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pwa-icon svg{width:24px;height:24px}
+.pwa-text{flex:1;min-width:0}
+.pwa-title{font-size:13px;font-weight:700;color:var(--text)}
+.pwa-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.pwa-install{padding:9px 16px;background:var(--accent);color:#0f1117;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.pwa-dismiss{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px;flex-shrink:0;line-height:1}
 #authOverlay{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px}
 .auth-box{width:100%;max-width:340px;text-align:center}
 .auth-title{font-size:22px;font-weight:700;margin-bottom:8px}
@@ -85,6 +96,17 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 1
     <button class="auth-btn" onclick="submitPassword()">Unlock</button>
     <div class="auth-error" id="authError"></div>
   </div>
+</div>
+<div id="pwaBar">
+  <div class="pwa-icon">
+    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" rx="96" fill="#0f1117"/><text x="256" y="350" font-family="system-ui,sans-serif" font-size="260" font-weight="700" fill="#f7c34f" text-anchor="middle">C</text></svg>
+  </div>
+  <div class="pwa-text">
+    <div class="pwa-title">CISSP Pocket Trainer</div>
+    <div class="pwa-sub">Add to Home Screen for offline access</div>
+  </div>
+  <button class="pwa-install" onclick="installPWA()">Install</button>
+  <button class="pwa-dismiss" onclick="dismissPWA()" aria-label="Dismiss">×</button>
 </div>
 <nav>
   <div class="nav-title">CISSP Pocket Trainer</div>
@@ -501,6 +523,30 @@ function unlockApp(){
 }
 
 checkAuth();
+
+// PWA
+let _pwaPrompt=null;
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
+}
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  _pwaPrompt=e;
+  if(!sessionStorage.getItem('pwa_dismissed')){
+    document.getElementById('pwaBar').classList.add('visible');
+  }
+});
+async function installPWA(){
+  if(!_pwaPrompt)return;
+  _pwaPrompt.prompt();
+  const{outcome}=await _pwaPrompt.userChoice;
+  if(outcome==='accepted')_pwaPrompt=null;
+  document.getElementById('pwaBar').classList.remove('visible');
+}
+function dismissPWA(){
+  document.getElementById('pwaBar').classList.remove('visible');
+  sessionStorage.setItem('pwa_dismissed','1');
+}
 </script>
 </body>
 </html>
