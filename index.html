@@ -433,7 +433,10 @@ function renderFlash(a){
 }
 
 function flip(){
-  if(!flipped){document.getElementById('fc').classList.add('flipped');document.getElementById('fh').style.display='none';document.getElementById('rb').style.display='grid';flipped=true;}
+  flipped=!flipped;
+  document.getElementById('fc').classList.toggle('flipped',flipped);
+  document.getElementById('fh').style.display=flipped?'none':'';
+  document.getElementById('rb').style.display=flipped?'grid':'none';
 }
 
 function rate(s){
