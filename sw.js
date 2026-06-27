@@ -18,6 +18,26 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   if (e.request.url.includes('supabase.co')) return;
+
+  const isHTML = e.request.destination === 'document'
+    || e.request.url.endsWith('/')
+    || e.request.url.endsWith('.html');
+
+  if (isHTML) {
+    // Network-first: always fetch fresh HTML, fall back to cache when offline
+    e.respondWith(
+      fetch(e.request)
+        .then(r => {
+          const clone = r.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+          return r;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Cache-first for static assets (icon, manifest)
   e.respondWith(
     caches.match(e.request).then(r => r || fetch(e.request))
   );
