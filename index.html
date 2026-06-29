@@ -551,10 +551,8 @@ function dismissPWA(){
   sessionStorage.setItem('pwa_dismissed','1');
 }
 </script>
-<div id="versionBar" style="text-align:center;padding:8px 16px 20px;font-size:10px;color:var(--muted);letter-spacing:0.4px"></div>
-<script>
-  const d=new Date(document.lastModified);
-  document.getElementById('versionBar').textContent='Updated '+d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-</script>
+<div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px">
+  <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 29 Jun 2026 · view changelog</a>
+</div>
 </body>
 </html>

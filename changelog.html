@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f1117">
+<title>Changelog · CISSP Pocket Trainer</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2f45;--text:#e8eaf0;--muted:#6b7394;--accent:#f7c34f}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0}
+nav{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10}
+.back{font-size:13px;color:var(--accent);text-decoration:none;font-weight:600}
+.nav-title{font-size:15px;font-weight:600}
+.content{padding:20px 16px 48px;max-width:600px;margin:0 auto}
+.entry{border-left:2px solid var(--border);padding:0 0 28px 16px;margin-bottom:4px;position:relative}
+.entry:last-child{padding-bottom:0}
+.entry::before{content:'';position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.entry-date{font-size:11px;color:var(--accent);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px}
+.entry-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px}
+.entry ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.entry li{font-size:13px;color:var(--muted);line-height:1.5;padding-left:12px;position:relative}
+.entry li::before{content:'·';position:absolute;left:0;color:var(--muted)}
+</style>
+</head>
+<body>
+<nav>
+  <a class="back" href="/">← Back</a>
+  <div class="nav-title">Changelog</div>
+</nav>
+<div class="content">
+
+  <div class="entry">
+    <div class="entry-date">29 Jun 2026</div>
+    <div class="entry-title">D1 — Security Control Types</div>
+    <ul>
+      <li>Added 3 questions on administrative, technical, and physical controls (annual training, highest-level control, background checks)</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-date">28 Jun 2026</div>
+    <div class="entry-title">D1 — Governance, Policy & Ethics (batch 2)</div>
+    <ul>
+      <li>Added 9 questions covering digital forensics, IP/trademark law, HIPAA, GDPR, and ISC2 ethics canons</li>
+      <li>Added 3 questions on mission statements, security policy purpose, and policy vs guidelines</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-date">27 Jun 2026</div>
+    <div class="entry-title">PWA — Flashcard & Offline Improvements</div>
+    <ul>
+      <li>Flashcards can now be flipped back by tapping again</li>
+      <li>Switched service worker to network-first for HTML — updates apply automatically on next open</li>
+      <li>Added version/changelog bar at bottom of screen</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-date">27 Jun 2026</div>
+    <div class="entry-title">D1 — Governance & Risk Management</div>
+    <ul>
+      <li>Added 3 questions on good governance indicators, proactive vs reactive security, and security management function</li>
+      <li>Added 3 questions on IAAA model, authentication vs authorization, and passphrase type</li>
+      <li>Added 3 questions on CIA triad — data deletion, pharmaceutical confidentiality, over-enforcing confidentiality</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-date">27 Jun 2026</div>
+    <div class="entry-title">PWA Support</div>
+    <ul>
+      <li>Added web app manifest and service worker for offline use</li>
+      <li>Added install banner on mobile devices</li>
+      <li>Added SVG icon for home screen</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-date">21 Jun 2026</div>
+    <div class="entry-title">Initial Release</div>
+    <ul>
+      <li>275 flashcards across all 8 CISSP domains</li>
+      <li>76 quiz questions across all 8 CISSP domains</li>
+      <li>Supabase sync for progress and study time</li>
+      <li>Password-protected via Edge Function</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
