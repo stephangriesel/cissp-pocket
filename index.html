@@ -429,14 +429,16 @@ function render(){
 
 function renderFlash(a){
   const c=deck[idx];
-  a.innerHTML='<div class="flashcard" id="fc" onclick="flip()"><div class="card-front"><div class="card-domain '+dc(c.domain)+'">'+c.domain+'</div><div class="card-label">Tap to reveal</div><div class="card-text">'+c.front+'</div></div><div class="card-back"><div class="card-domain '+dc(c.domain)+'">'+c.domain+'</div><div class="card-label">Tap card to flip back</div><div class="card-text" style="color:var(--muted)">↓ Answer below</div></div></div><div class="flip-hint" id="fh">Tap card to reveal answer</div><div class="q-explanation" id="flashExp" style="display:none">'+c.back+'</div><div class="rating-btns" id="rb" style="display:none"><button class="rating-btn btn-again" onclick="rate(-1)">Need to review</button><button class="rating-btn btn-got-it" onclick="rate(1)">Got it ✓</button></div>';
+  const expHtml=c.explanation?'<div class="q-explanation" id="flashExp" style="display:none">'+c.explanation+'</div>':'<div id="flashExp" style="display:none"></div>';
+  a.innerHTML='<div class="flashcard" id="fc" onclick="flip()"><div class="card-front"><div class="card-domain '+dc(c.domain)+'">'+c.domain+'</div><div class="card-label">Tap to reveal</div><div class="card-text">'+c.front+'</div></div><div class="card-back"><div class="card-domain '+dc(c.domain)+'">'+c.domain+'</div><div class="card-label">Tap card to flip back</div><div class="card-text">'+c.back+'</div></div></div><div class="flip-hint" id="fh">Tap card to reveal answer</div>'+expHtml+'<div class="rating-btns" id="rb" style="display:none"><button class="rating-btn btn-again" onclick="rate(-1)">Need to review</button><button class="rating-btn btn-got-it" onclick="rate(1)">Got it ✓</button></div>';
 }
 
 function flip(){
   flipped=!flipped;
   document.getElementById('fc').classList.toggle('flipped',flipped);
   document.getElementById('fh').style.display=flipped?'none':'';
-  document.getElementById('flashExp').style.display=flipped?'block':'none';
+  const exp=document.getElementById('flashExp');
+  if(exp&&exp.textContent.trim())exp.style.display=flipped?'block':'none';
   document.getElementById('rb').style.display=flipped?'grid':'none';
 }
 
