@@ -27,7 +27,9 @@ Deno.serve(async (req) => {
 
     // Path 1: verify an existing stored token (used on page load to confirm still-valid session)
     if (token) {
-      const [payload, sig] = token.split(".");
+      const lastDot = token.lastIndexOf(".");
+      const payload = token.slice(0, lastDot);
+      const sig = token.slice(lastDot + 1);
       if (payload && sig && sign(payload) === sig) {
         return new Response(JSON.stringify({ valid: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },

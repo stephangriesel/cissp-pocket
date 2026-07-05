@@ -483,8 +483,17 @@ function renderEnd(a){
 
 const EDGE_FN='https://qdcfdppcaoffbkjnfvzd.supabase.co/functions/v1/verify-password';
 
+function setAuthCookie(token){
+  const expires=new Date(Date.now()+30*864e5).toUTCString();
+  document.cookie='cissp_token='+encodeURIComponent(token)+';expires='+expires+';path=/;SameSite=Strict';
+}
+function getAuthCookie(){
+  const m=document.cookie.match(/(?:^|;\s*)cissp_token=([^;]+)/);
+  return m?decodeURIComponent(m[1]):null;
+}
+
 async function checkAuth(){
-  const token=localStorage.getItem('cissp_token');
+  const token=getAuthCookie();
   if(token){
     try{
       const r=await fetch(EDGE_FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})});
@@ -508,7 +517,7 @@ async function submitPassword(){
     const r=await fetch(EDGE_FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});
     const d=await r.json();
     if(d.valid&&d.token){
-      localStorage.setItem('cissp_token',d.token);
+      setAuthCookie(d.token);
       unlockApp();
     }else{
       err.textContent='Incorrect password.';
