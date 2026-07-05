@@ -309,19 +309,21 @@ window.addEventListener('beforeunload',()=>{
   saveLocalTime(totalSeconds+pendingSeconds); // best-effort local save; network flush may not complete in time
 });
 
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+
 function buildDeck(){
   const src=mode==='flash'?DATA.flashcards:DATA.questions;
   const filtered=domain==='all'?src:src.filter(c=>c.domain===domain);
   const prog=getP();
-  let w=[];
-  filtered.forEach(c=>{
+  const weighted=filtered.map(c=>{
     const score=prog[c.id]||0;
     const dr={'D1':3,'D2':1,'D3':2,'D4':3,'D5':2,'D6':3,'D7':1,'D8':1}[c.domain]||1;
     const br=score<0?2:score===0?1:0;
-    for(let i=0;i<dr+br;i++)w.push(c);
+    return{c,w:dr+br};
   });
-  for(let i=w.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[w[i],w[j]]=[w[j],w[i]];}
-  return w;
+  shuffle(weighted);
+  weighted.sort((a,b)=>b.w-a.w);
+  return weighted.map(x=>x.c);
 }
 
 function switchMode(m){
@@ -451,7 +453,10 @@ function rate(s){
 
 function renderQuiz(a){
   const c=deck[idx];
-  const opts=c.options.map((o,i)=>'<button class="q-option" id="o'+i+'" onclick="ans('+i+','+c.answer+',\''+c.id+'\')">'+String.fromCharCode(65+i)+'. '+o+'</button>').join('');
+  const correctText=c.options[c.answer];
+  const shuffled=shuffle([...c.options]);
+  const newCorrect=shuffled.indexOf(correctText);
+  const opts=shuffled.map((o,i)=>'<button class="q-option" id="o'+i+'" onclick="ans('+i+','+newCorrect+',\''+c.id+'\')">'+String.fromCharCode(65+i)+'. '+o+'</button>').join('');
   a.innerHTML='<div class="q-card"><div class="q-domain '+dc(c.domain)+'">'+c.domain+'</div><div class="q-text">'+c.question+'</div><div class="q-options">'+opts+'</div><div id="qe" style="display:none" class="q-explanation"></div></div><button class="q-next" id="qn" style="display:none" onclick="nextQ()">Next question →</button>';
   qAnswered=false;
 }
