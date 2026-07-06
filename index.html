@@ -31,7 +31,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 1
 .filter-btn.active-all{background:var(--surface2);color:var(--text);border-color:var(--muted)}
 .progress-bar{height:3px;background:var(--border);margin:0 16px}
 .progress-fill{height:3px;background:var(--accent);transition:width 0.4s ease;border-radius:2px}
-.progress-label{font-size:11px;color:var(--muted);padding:6px 16px 0;text-align:right}
+.progress-row{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 0}
+.progress-label{font-size:11px;color:var(--muted)}
+.shuffle-btn{font-size:11px;color:var(--accent);background:none;border:1px solid var(--border);border-radius:6px;padding:2px 8px;cursor:pointer;font-weight:600;letter-spacing:0.3px}
 .stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 16px}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
 .stat-num{font-size:22px;font-weight:700;color:var(--text)}.stat-label{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
@@ -135,7 +137,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 1
   <button class="filter-btn" id="filterD8" onclick="setDomain('D8')">D8 — SW Dev</button>
 </div>
 <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-<div class="progress-label" id="progressLabel">0 / 0</div>
+<div class="progress-row"><div class="progress-label" id="progressLabel">0 / 0</div><button class="shuffle-btn" onclick="reset()">⇄ Shuffle</button></div>
 <div class="stats-row">
   <div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Cards</div></div>
   <div class="stat-card"><div class="stat-num green" id="statGot">0</div><div class="stat-label">Got it</div></div>
