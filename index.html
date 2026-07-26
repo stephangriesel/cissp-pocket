@@ -509,13 +509,17 @@ async function checkAuth(){
       const r=await fetch(EDGE_FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})});
       const d=await r.json();
       if(d.valid){unlockApp();return;}
-    }catch(e){}
+    }catch(e){unlockApp();return;}
   }
   const overlay=document.getElementById('authOverlay');
   overlay.style.display='flex';
   setTimeout(()=>document.getElementById('authInput').focus(),100);
 }
 
+async function hashPw(pw){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
 async function submitPassword(){
   const pw=document.getElementById('authInput').value;
   const err=document.getElementById('authError');
@@ -527,6 +531,7 @@ async function submitPassword(){
     const r=await fetch(EDGE_FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});
     const d=await r.json();
     if(d.valid&&d.token){
+      hashPw(pw).then(h=>localStorage.setItem('cissp_pw_hash',h));
       setAuthCookie(d.token);
       unlockApp();
     }else{
@@ -534,7 +539,12 @@ async function submitPassword(){
       btn.disabled=false;btn.textContent='Unlock';
     }
   }catch(e){
-    err.textContent='Connection error. Try again.';
+    const stored=localStorage.getItem('cissp_pw_hash');
+    if(stored){
+      const h=await hashPw(pw);
+      if(h===stored){unlockApp();return;}
+    }
+    err.textContent='No connection. Try again when online.';
     btn.disabled=false;btn.textContent='Unlock';
   }
 }
