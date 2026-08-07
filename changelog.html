@@ -32,6 +32,41 @@ nav{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px
 
   <div class="entry">
     <div class="entry-date">07 Aug 2026</div>
+    <div class="entry-title">D7 — BCP highest priority, DRP key element, BCP NOT-a-component (d7_q_167–169)</div>
+    <ul>
+      <li>Added 3 questions: BCP highest priority = employee safety (not IT/data/assets); DRP key element = data backup (not training/fire prevention/IDS); legal and regulatory compliance is NOT a BCP component (backup+recovery, risk assessment, employee training are) (d7_q_167–169)</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-date">07 Aug 2026</div>
+    <div class="entry-title">D7 — BIA timeline: MTBF/MOR context, RPO backward window, WRT phases, full sequence</div>
+    <ul>
+      <li>Added 6 questions: MTBF for spare-parts planning, MOR definition (min environmental + connectivity requirements), MOR at DR sites = no need for full-spec system, RPO runs backward from disaster to last backup, WRT = restore backups + systems testing, correct timeline sequence (d7_q_161–166)</li>
+      <li>Added 2 flashcards: MTBF/MTTR/MOR BIA context with relationships; BIA recovery timeline — full sequence from Normal Business to Resume Production with span of each metric (d7_fc_070–071)</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-date">07 Aug 2026</div>
+    <div class="entry-title">D7 — MTD, RTO, WRT: definitions, formula (MTD ≥ RTO + WRT), exam aliases for MTD</div>
+    <ul>
+      <li>Added 6 questions: MTD = max tolerable downtime, RTO = hardware restore time, WRT = software config time, MTD ≥ RTO + WRT formula, RTO must not exceed MTD, exam term = MTD (not MAD/MTO/MAO/MTPoD), scenario: RTO+WRT=9h vs MTD=8h → plan fails (d7_q_155–160)</li>
+      <li>Added 1 flashcard: MTD/RTO/WRT definitions, formula, calculation example, exam aliases, and link to RPO for complete recovery picture (d7_fc_069)</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-date">07 Aug 2026</div>
+    <div class="entry-title">D7 — BIA and RPO: criticality classification, two BIA values, RPO drives backup frequency</div>
+    <ul>
+      <li>Added 6 questions: BIA = identifies critical/non-critical systems; critical = disruption unacceptable / cost of recovery / law; RPO = max tolerable data loss; weekly backup → RPO = up to 1 week; BIA assigns 2 values per critical system (RPO + RTO); legal mandate → critical + near-zero RPO (d7_q_149–154)</li>
+      <li>Added 1 flashcard: BIA — what it is, criticality criteria (unacceptable disruption / cost / law), RPO definition, backup frequency link, and cross-reference to RTO (d7_fc_068)</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-date">07 Aug 2026</div>
     <div class="entry-title">D7 — BCP sub-teams: Rescue (activation), Recovery (failover), Salvage (failback) — roles and system priority</div>
     <ul>
       <li>Added 6 questions: 3 sub-team names, Rescue Team = during disaster (evacuate/notify/shut down/damage assessment), Recovery Team = most critical systems first at alternate site, Salvage Team = least critical first when returning to primary site, Recovery vs Salvage priority distinction, scenario — failback to rebuilt primary site = Salvage Team (d7_q_143–148)</li>
