@@ -31,6 +31,28 @@ nav{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px
 <div class="content">
 
   <div class="entry">
+    <div class="entry-date">07 Aug 2026</div>
+    <div class="entry-title">D7 — Continuity of Operations: RAID (0, 1, 5), disk mirroring vs striping, MTBF, MTTR</div>
+    <ul>
+      <li>Added 9 questions: RAID acronym, RAID 0 (striping/no redundancy/2 disks), RAID 1 (mirroring/identical data/writes simultaneously), RAID 5 (block striping + distributed parity/3 disks/speed + redundancy), striping alone has no redundancy (need parity + 3 disks), same-manufacturer disk MTBF risk, MTBF definition, MTTR + SLA (4–8 hour vendor response), scenario: 2 disks fail before rebuild → tape restore (d7_q_119–127)</li>
+      <li>Added 2 flashcards: RAID 0/1/5 comparison with mirroring vs striping basics; MTBF vs MTTR definitions, same-manufacturer risk, and SLA context (d7_fc_062–063)</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-date">07 Aug 2026</div>
+    <div class="entry-title">D7 — Continuity of Operations: full, incremental, and differential backups</div>
+    <ul>
+      <li>Added 6 questions: full backup = backs everything up, clears all archive bits, infrequent on large datasets, 1-tape restore; Thursday restore from Wednesday full = 1 tape; completeness vs time trade-off (d7_q_101–106)</li>
+      <li>Added 1 flashcard: full backup — scope, archive bits, 1-tape restore, weekly strategy (d7_fc_059)</li>
+      <li>Added 6 questions: incremental = backs up since last backup (any type), clears archive bits, fast to create; Thursday restore from Sunday full + daily incrementals = 4 tapes; restore disadvantage vs differential (d7_q_107–112)</li>
+      <li>Added 1 flashcard: incremental backup — scope, archive bits, 4-tape Thursday restore, fast create / slow restore (d7_fc_060)</li>
+      <li>Added 6 questions: differential = backs up since last FULL, does NOT clear archive bits, grows larger daily, always 2-tape restore; Thursday restore = Sunday full + Wednesday differential = 2 tapes; never mix incremental and differential on same data (d7_q_113–118)</li>
+      <li>Added 1 flashcard: differential backup — scope, archive bits NOT cleared, 2-tape restore, comparison table vs incremental (d7_fc_061)</li>
+    </ul>
+  </div>
+
+  <div class="entry">
     <div class="entry-date">06 Aug 2026</div>
     <div class="entry-title">D7 — 0-day vulnerabilities, change management approval, configuration management (d7_q_098–100)</div>
     <ul>
