@@ -31,6 +31,20 @@ nav{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px
 <div class="content">
 
   <div class="entry">
+    <div class="entry-date">17 Aug 2026</div>
+    <div class="entry-title">Feature — Test Mode (Practice Exam Simulator)</div>
+    <ul>
+      <li>Added a new "Test" tab alongside Flashcards and Quiz — fully separate from existing modes, no changes to existing behaviour</li>
+      <li>Setup screen: choose question count (25 / 50 / 75 / 100 / 125), select which domains to include (D1–D8 checkboxes with per-domain question counts), and optionally enable a countdown timer</li>
+      <li>Exam screen: one question at a time, options shuffled, no right/wrong feedback shown during the test — simulates real CISSP exam conditions</li>
+      <li>Flag questions for review with ⚑ button; navigation shows answered/flagged counters</li>
+      <li>Timer auto-submits when time expires; warns at &lt;5 minutes remaining</li>
+      <li>Results screen: percentage score with PASS/FAIL verdict (70% threshold), domain-by-domain breakdown with progress bars</li>
+      <li>Review Incorrect button loads missed questions directly into Quiz mode for immediate study</li>
+    </ul>
+  </div>
+
+  <div class="entry">
     <div class="entry-date">07 Aug 2026</div>
     <div class="entry-title">D7 — BCP highest priority, DRP key element, BCP NOT-a-component (d7_q_167–169)</div>
     <ul>
