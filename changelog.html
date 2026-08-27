@@ -31,6 +31,17 @@ nav{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px
 <div class="content">
 
   <div class="entry">
+    <div class="entry-date">27 Aug 2026</div>
+    <div class="entry-title">Feature — Adjustable study priority per domain</div>
+    <ul>
+      <li>Added a settings screen (⚙ button in the nav bar) to view and change how strongly each domain is weighted in the spaced-repetition ordering used by Flashcards &amp; Quiz</li>
+      <li>Weights are stored locally and persist across sessions, with a "Reset to Defaults" option</li>
+      <li>D3 (Security Architecture &amp; Engineering) default weight raised from 2 to 3, matching D1/D4/D6, reflecting its growth to 201 questions this month</li>
+      <li>Fixed a race condition where the background progress sync could silently discard an open settings screen</li>
+    </ul>
+  </div>
+
+  <div class="entry">
     <div class="entry-date">26 Aug 2026</div>
     <div class="entry-title">Content — 20 new physical &amp; site security questions (Domain 3)</div>
     <ul>
