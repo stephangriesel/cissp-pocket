@@ -36,7 +36,7 @@
       --d8: #c9a227;
       --correct: #3dba7a;
       --wrong: #e85d75;
-      --accent: #f7c34f;
+      --accent: #5b8dd6;
     }
 
     body {
@@ -1111,7 +1111,7 @@
     <div class="pwa-icon">
       <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
         <rect width="512" height="512" rx="96" fill="#0f1117" /><text x="256" y="350" font-family="system-ui,sans-serif"
-          font-size="260" font-weight="700" fill="#f7c34f" text-anchor="middle">C</text>
+          font-size="260" font-weight="700" fill="#5b8dd6" text-anchor="middle">C</text>
       </svg>
     </div>
     <div class="pwa-text">
@@ -1809,7 +1809,10 @@
       <button class="test-nav-btn"${testIdx === total - 1 ? ' disabled' : ''} onclick="testNext()">Next →</button>
     </div>
     <div class="test-foot">
-      <span style="font-size:12px;color:var(--muted)">${ans}/${total} answered${testFlagged.size ? ' · ' + testFlagged.size + ' flagged' : ''}</span>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--muted)">${ans}/${total} answered${testFlagged.size ? ' · ' + testFlagged.size + ' flagged' : ''}</span>
+        ${testFlagged.size ? `<button class="test-flag-btn" onclick="jumpNextFlagged()">→ Next flagged</button>` : ''}
+      </div>
       <button class="test-submit-btn" onclick="confirmFinish()">Submit</button>
     </div>`;
     }
@@ -1827,6 +1830,17 @@
 
     function toggleFlag(qid) {
       if (testFlagged.has(qid)) testFlagged.delete(qid); else testFlagged.add(qid);
+      renderTestQ();
+    }
+
+    function jumpNextFlagged() {
+      if (testFlagged.size === 0) return;
+      const flaggedIdxs = [];
+      testQ.forEach((q, i) => { if (testFlagged.has(q.id)) flaggedIdxs.push(i); });
+      if (flaggedIdxs.length === 0) return;
+      let next = flaggedIdxs.find(i => i > testIdx);
+      if (next === undefined) next = flaggedIdxs[0];
+      testIdx = next;
       renderTestQ();
     }
 
@@ -1876,8 +1890,11 @@
       <thead><tr><th>Domain</th><th style="text-align:center">Score</th><th style="text-align:right">%</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    <div class="test-actions">
-      <button class="test-nav-btn" onclick="reviewWrong()">Review Incorrect</button>
+    <div class="test-actions" style="flex-direction:column">
+      <div style="display:flex;gap:8px">
+        <button class="test-nav-btn" onclick="reviewWrong()">Review Incorrect</button>
+        ${testFlagged.size ? `<button class="test-nav-btn" onclick="reviewFlagged()">Review Flagged (${testFlagged.size})</button>` : ''}
+      </div>
       <button class="test-start-btn" style="margin-top:0" onclick="enterTestMode()">New Test</button>
     </div>
   </div>`;
@@ -1897,9 +1914,20 @@
       mode = 'quiz'; deck = wrong; idx = 0; qAnswered = false;
       render();
     }
+
+    function reviewFlagged() {
+      const flagged = testQ.filter(q => testFlagged.has(q.id));
+      if (flagged.length === 0) return;
+      flagged.forEach(q => { delete q._shuf; delete q._cIdx; });
+      exitTestMode();
+      document.getElementById('tabTest').className = 'tab';
+      document.getElementById('tabQuiz').className = 'tab active';
+      mode = 'quiz'; deck = flagged; idx = 0; qAnswered = false;
+      render();
+    }
   </script>
   <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px">
-    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 29 Aug 2026 · view changelog</a>
+    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 30 Aug 2026 · view changelog</a>
   </div>
 </body>
 
