@@ -1184,6 +1184,11 @@
     let testUserAns = {}, testFlagged = new Set();
     let testTimer = null, testSecsLeft = 0, testTimerOn = false;
     let testCfg = { count: 75, domains: new Set(['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']) };
+    // Resumable exam session: testInProgress is true whenever an unfinished exam
+    // exists (even if you've switched to another tab); savedTestSession holds the
+    // last snapshot fetched from Supabase/localStorage so it can be resumed later
+    // or on another device.
+    let testInProgress = false, testStartedAt = null, savedTestSession = null;
 
 
     const SUPABASE_URL = 'https://qdcfdppcaoffbkjnfvzd.supabase.co';
@@ -1227,6 +1232,7 @@
       }
       updSyncBadge();
       await loadStudyTime();
+      await loadTestSession();
       // stats are computed live from last_action, no separate load needed
       startTimer();
       if (!settingsOpen) reset();
@@ -1349,6 +1355,50 @@
       saveLocalTime(totalSeconds + pendingSeconds); // best-effort local save; network flush may not complete in time
     });
 
+    // ---- Resumable exam session (persists an in-progress Test Mode exam) ----
+    function getLocalTestSession() { try { return JSON.parse(localStorage.getItem('cp_testSession') || 'null') } catch (e) { return null } }
+    function saveLocalTestSession(s) { try { if (s) localStorage.setItem('cp_testSession', JSON.stringify(s)); else localStorage.removeItem('cp_testSession'); } catch (e) { } }
+
+    async function loadTestSession() {
+      try {
+        const { data, error } = await sb.from('test_session').select('state').eq('id', 'active').maybeSingle();
+        if (error) throw error;
+        savedTestSession = data ? data.state : null;
+        saveLocalTestSession(savedTestSession);
+      } catch (e) {
+        savedTestSession = getLocalTestSession();
+      }
+    }
+
+    function buildTestSessionState() {
+      return {
+        cfg: { count: testCfg.count, domains: [...testCfg.domains] },
+        timerOn: testTimerOn,
+        endsAt: testTimerOn ? Date.now() + testSecsLeft * 1000 : null,
+        idx: testIdx,
+        userAns: testUserAns,
+        flagged: [...testFlagged],
+        questions: testQ.map(q => ({ id: q.id, shuf: q._shuf, cIdx: q._cIdx })),
+        startedAt: testStartedAt
+      };
+    }
+
+    async function saveTestSessionState() {
+      const state = buildTestSessionState();
+      savedTestSession = state;
+      saveLocalTestSession(state);
+      try {
+        const { error } = await sb.from('test_session').upsert({ id: 'active', state, updated_at: new Date().toISOString() });
+        if (error) throw error;
+      } catch (e) { /* offline: local copy already saved; next successful save will catch Supabase up */ }
+    }
+
+    async function clearTestSession() {
+      savedTestSession = null;
+      saveLocalTestSession(null);
+      try { await sb.from('test_session').delete().eq('id', 'active'); } catch (e) { }
+    }
+
     function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
 
     const DEFAULT_DOMAIN_WEIGHTS = { 'D1': 3, 'D2': 1, 'D3': 3, 'D4': 3, 'D5': 2, 'D6': 3, 'D7': 1, 'D8': 1 };
@@ -1390,7 +1440,7 @@
 
     function openSettings() {
       settingsOpen = true;
-      if (testActive || testSetup) exitTestMode();
+      if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
       renderSettings();
     }
@@ -1421,7 +1471,7 @@
     }
 
     function switchMode(m) {
-      if (testActive || testSetup) exitTestMode();
+      if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       settingsOpen = false;
       mode = m;
       reviewMode = false;
@@ -1681,10 +1731,21 @@
     function enterTestMode() {
       if (testTimer) { clearInterval(testTimer); testTimer = null; }
       settingsOpen = false;
-      testActive = false; testSetup = true;
       ['tabFlash', 'tabQuiz'].forEach(id => document.getElementById(id).className = 'tab');
       document.getElementById('tabTest').className = 'tab active';
-      renderTestSetup();
+      if (testInProgress) {
+        // exam still running in memory (just switched tabs and back) — pick up where it left off
+        testActive = true; testSetup = false;
+        startTestTimerInterval();
+        renderTestQ();
+      } else if (savedTestSession) {
+        // exam saved earlier (reload, or a different device) — ask before resuming
+        testActive = false; testSetup = false;
+        renderResumePrompt();
+      } else {
+        testActive = false; testSetup = true;
+        renderTestSetup();
+      }
     }
 
     function exitTestMode() {
@@ -1761,19 +1822,77 @@
         q._shuf = shuffle([...q.options]);
         q._cIdx = q._shuf.indexOf(ct);
       });
-      testIdx = 0; testUserAns = {}; testFlagged = new Set(); testActive = true; testSetup = false;
+      testIdx = 0; testUserAns = {}; testFlagged = new Set();
+      testActive = true; testSetup = false; testInProgress = true; testStartedAt = Date.now();
       if (testTimerOn) {
         const mins = testCfg.count <= 15 ? 20 : testCfg.count <= 30 ? 60 : testCfg.count <= 60 ? 120 : testCfg.count <= 100 ? 180 : 240;
         testSecsLeft = mins * 60;
-        testTimer = setInterval(() => {
-          testSecsLeft--;
-          const el = document.getElementById('testClock');
-          if (el) el.textContent = fmtSecs(testSecsLeft);
-          if (el && testSecsLeft < 300) el.classList.add('warn');
-          if (testSecsLeft <= 0) { clearInterval(testTimer); testTimer = null; finishTest(true); }
-        }, 1000);
       }
+      startTestTimerInterval();
+      saveTestSessionState();
       renderTestQ();
+    }
+
+    function startTestTimerInterval() {
+      if (!testTimerOn) return;
+      if (testTimer) clearInterval(testTimer);
+      testTimer = setInterval(() => {
+        testSecsLeft--;
+        const el = document.getElementById('testClock');
+        if (el) el.textContent = fmtSecs(testSecsLeft);
+        if (el && testSecsLeft < 300) el.classList.add('warn');
+        if (testSecsLeft <= 0) { clearInterval(testTimer); testTimer = null; finishTest(true); }
+      }, 1000);
+    }
+
+    function renderResumePrompt() {
+      const a = document.getElementById('cardArea');
+      const s = savedTestSession;
+      const total = s.questions.length;
+      const answered = Object.keys(s.userAns || {}).length;
+      const flaggedCt = (s.flagged || []).length;
+      const startedTxt = s.startedAt ? new Date(s.startedAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+      a.innerHTML = `<div class="test-setup">
+    <div class="test-setup-title">Resume Exam?</div>
+    <div class="test-setup-sub">You have an exam in progress — question ${Math.min((s.idx || 0) + 1, total)} of ${total}, ${answered} answered${flaggedCt ? ', ' + flaggedCt + ' flagged' : ''}.${startedTxt ? ' Started ' + startedTxt + '.' : ''}</div>
+    <button class="test-start-btn" onclick="resumeTestSession()">Resume Exam</button>
+    <button class="test-start-btn" style="margin-top:10px;background:var(--surface2);color:var(--muted)" onclick="discardTestSession()">Discard &amp; Start New</button>
+  </div>`;
+    }
+
+    function resumeTestSession() {
+      const s = savedTestSession;
+      if (!s) { renderTestSetup(); return; }
+      const rebuilt = s.questions.map(sq => {
+        const base = DATA.questions.find(q => q.id === sq.id);
+        return base ? Object.assign({}, base, { _shuf: sq.shuf, _cIdx: sq.cIdx }) : null;
+      });
+      if (!rebuilt.length || rebuilt.some(q => !q)) {
+        alert('The saved exam refers to questions that no longer exist — starting a new one instead.');
+        discardTestSession();
+        return;
+      }
+      testQ = rebuilt;
+      testUserAns = s.userAns || {};
+      testFlagged = new Set(s.flagged || []);
+      testIdx = Math.min(s.idx || 0, testQ.length - 1);
+      testCfg = { count: s.cfg.count, domains: new Set(s.cfg.domains) };
+      testTimerOn = !!s.timerOn;
+      testStartedAt = s.startedAt || Date.now();
+      testInProgress = true; testActive = true; testSetup = false;
+      if (testTimerOn) {
+        testSecsLeft = s.endsAt ? Math.max(0, Math.round((s.endsAt - Date.now()) / 1000)) : 0;
+        if (testSecsLeft <= 0) { finishTest(true); return; }
+      }
+      startTestTimerInterval();
+      renderTestQ();
+    }
+
+    function discardTestSession() {
+      testQ = []; testUserAns = {}; testFlagged = new Set(); testIdx = 0;
+      testInProgress = false; testActive = false; testSetup = true;
+      clearTestSession();
+      renderTestSetup();
     }
 
     function fmtSecs(s) {
@@ -1826,11 +1945,13 @@
       const ans = Object.keys(testUserAns).length;
       const lbl = document.querySelector('.test-foot span');
       if (lbl) lbl.textContent = ans + '/' + testQ.length + ' answered' + (testFlagged.size ? ' · ' + testFlagged.size + ' flagged' : '');
+      saveTestSessionState();
     }
 
     function toggleFlag(qid) {
       if (testFlagged.has(qid)) testFlagged.delete(qid); else testFlagged.add(qid);
       renderTestQ();
+      saveTestSessionState();
     }
 
     function jumpNextFlagged() {
@@ -1844,8 +1965,8 @@
       renderTestQ();
     }
 
-    function testPrev() { if (testIdx > 0) { testIdx--; renderTestQ(); } }
-    function testNext() { if (testIdx < testQ.length - 1) { testIdx++; renderTestQ(); } }
+    function testPrev() { if (testIdx > 0) { testIdx--; renderTestQ(); saveTestSessionState(); } }
+    function testNext() { if (testIdx < testQ.length - 1) { testIdx++; renderTestQ(); saveTestSessionState(); } }
 
     function confirmFinish() {
       const unanswered = testQ.length - Object.keys(testUserAns).length;
@@ -1855,6 +1976,8 @@
 
     function finishTest(timedOut) {
       if (testTimer) { clearInterval(testTimer); testTimer = null; }
+      testInProgress = false;
+      clearTestSession();
       let correct = 0;
       const ds = {};
       const p = getP();
