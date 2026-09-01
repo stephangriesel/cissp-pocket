@@ -1699,7 +1699,7 @@
       ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8'].forEach(d => { counts[d] = DATA.questions.filter(q => q.domain === d).length; });
       const available = DATA.questions.filter(q => testCfg.domains.has(q.domain)).length;
       const allChecked = testCfg.domains.size === 8;
-      const countBtns = [25, 50, 75, 100, 125].map(n => `<button class="test-count-btn${testCfg.count === n ? ' active' : ''}" onclick="setTestCount(${n})">${n}</button>`).join('');
+      const countBtns = [10, 25, 50, 75, 100, 125].map(n => `<button class="test-count-btn${testCfg.count === n ? ' active' : ''}" onclick="setTestCount(${n})">${n}</button>`).join('');
       const domainGrid = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8'].map(d => {
         const chk = testCfg.domains.has(d);
         return `<label class="test-domain-check${chk ? ' checked' : ''}" onclick="toggleTestDomain('${d}',this)">
@@ -1707,7 +1707,7 @@
       <div><div style="font-size:12px;font-weight:700;color:var(--accent)">${d}</div><div style="font-size:11px;color:var(--muted)">${DOMAIN_NAMES[d]} (${counts[d]})</div></div>
     </label>`;
       }).join('');
-      const suggestMins = testCfg.count <= 30 ? 60 : testCfg.count <= 60 ? 120 : testCfg.count <= 100 ? 180 : 240;
+      const suggestMins = testCfg.count <= 15 ? 20 : testCfg.count <= 30 ? 60 : testCfg.count <= 60 ? 120 : testCfg.count <= 100 ? 180 : 240;
       const ok = available >= testCfg.count;
       a.innerHTML = `<div class="test-setup">
     <div class="test-setup-title">Practice Exam</div>
@@ -1763,7 +1763,7 @@
       });
       testIdx = 0; testUserAns = {}; testFlagged = new Set(); testActive = true; testSetup = false;
       if (testTimerOn) {
-        const mins = testCfg.count <= 30 ? 60 : testCfg.count <= 60 ? 120 : testCfg.count <= 100 ? 180 : 240;
+        const mins = testCfg.count <= 15 ? 20 : testCfg.count <= 30 ? 60 : testCfg.count <= 60 ? 120 : testCfg.count <= 100 ? 180 : 240;
         testSecsLeft = mins * 60;
         testTimer = setInterval(() => {
           testSecsLeft--;
