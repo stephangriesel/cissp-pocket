@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const { data: sub } = await admin
       .from("cissp_subscriptions")
-      .select("stripe_customer_id")
+      .select("stripe_customer_id, stripe_subscription_id")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -51,10 +51,24 @@ Deno.serve(async (req) => {
       });
     }
 
-    const portal = await stripe.billingPortal.sessions.create({
+    let flow: string | undefined;
+    try {
+      const body = await req.json();
+      flow = body?.flow;
+    } catch (_e) { /* no body sent — default portal home */ }
+
+    const params: Stripe.BillingPortal.SessionCreateParams = {
       customer: sub.stripe_customer_id as string,
       return_url: `${SITE_URL}/`,
-    });
+    };
+    if (flow === "cancel" && sub.stripe_subscription_id) {
+      params.flow_data = {
+        type: "subscription_cancel",
+        subscription_cancel: { subscription: sub.stripe_subscription_id as string },
+      };
+    }
+
+    const portal = await stripe.billingPortal.sessions.create(params);
 
     return new Response(JSON.stringify({ url: portal.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

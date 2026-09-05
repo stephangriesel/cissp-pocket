@@ -1161,6 +1161,8 @@
         session</button>
       <button onclick="openSettings()" aria-label="Study priority settings"
         style="font-size:13px;padding:5px 9px;border-radius:14px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;line-height:1">⚙</button>
+      <button onclick="openProfile()" aria-label="Account"
+        style="font-size:13px;padding:5px 9px;border-radius:14px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;line-height:1">👤</button>
     </div>
   </nav>
   <div id="timeBar"
@@ -1266,7 +1268,7 @@
       await loadFlagged();
       // stats are computed live from last_action, no separate load needed
       startTimer();
-      if (!settingsOpen) reset();
+      if (!settingsOpen && !profileOpen) reset();
       retryPendingSyncs();
     }
 
@@ -1507,6 +1509,7 @@
 
     function openSettings() {
       settingsOpen = true;
+      profileOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
       renderSettings();
@@ -1529,13 +1532,6 @@
     </div>`;
       }).join('');
       a.innerHTML = `<div class="test-setup">
-    <div class="test-section" style="margin-bottom:16px">
-      <div class="test-section-label">Account</div>
-      <div style="font-size:13px;color:var(--text);margin-bottom:4px">${currentUser ? currentUser.email : ''}</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:12px">${subscriptionStatusLabel()}</div>
-      ${currentSub && !currentSub.is_admin ? `<button class="test-start-btn" id="settingsSubBtn" style="margin-bottom:8px" onclick="startCheckoutOrPortal()">${currentSub.stripe_subscription_id ? 'Manage Billing' : 'Subscribe — $9/mo'}</button>` : ''}
-      <button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="doSignOut()">Sign Out</button>
-    </div>
     <div class="test-setup-title">Study Priority</div>
     <div class="test-setup-sub">Higher weight surfaces a domain earlier and more often in Flashcards &amp; Quiz sessions. Default range is 1–3; use 4–5 to push a domain even harder.</div>
     ${rows}
@@ -1544,9 +1540,52 @@
   </div>`;
     }
 
+    let profileOpen = false;
+
+    function openProfile() {
+      profileOpen = true;
+      settingsOpen = false;
+      if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
+      reviewMode = false;
+      renderProfile();
+    }
+
+    function closeProfile() {
+      profileOpen = false;
+      reset();
+    }
+
+    function renderProfile() {
+      const a = document.getElementById('cardArea');
+      const sub = currentSub;
+      const canBill = sub && !sub.is_admin;
+      const hasStripeSub = sub && sub.stripe_subscription_id && sub.status !== 'canceled';
+      a.innerHTML = `<div class="test-setup">
+    <div class="test-setup-title">Account</div>
+    <div class="test-section" style="margin-bottom:16px">
+      <div style="font-size:14px;color:var(--text);margin-bottom:4px">${currentUser ? currentUser.email : ''}</div>
+      <div style="font-size:13px;color:var(--muted)">${subscriptionStatusLabel()}</div>
+    </div>
+    ${canBill ? `<div class="test-section" style="margin-bottom:16px">
+      <div class="test-section-label">Billing</div>
+      <button class="test-start-btn" id="profileManageBtn" style="margin-bottom:8px" onclick="startCheckoutOrPortal()">${hasStripeSub ? 'Manage Billing' : 'Subscribe — $9/mo'}</button>
+      ${hasStripeSub ? `<button class="test-start-btn" id="profileCancelBtn" style="background:transparent;border:1px solid var(--wrong);color:var(--wrong)" onclick="confirmCancelSubscription()">Cancel Subscription</button>` : ''}
+    </div>` : ''}
+    <button class="test-start-btn" style="margin-bottom:10px" onclick="closeProfile()">Done</button>
+    <button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="doSignOut()">Sign Out</button>
+  </div>`;
+    }
+
+    function confirmCancelSubscription() {
+      if (confirm('Cancel your subscription? You\'ll keep access until the end of the current billing period.')) {
+        startCheckoutOrPortal('cancel');
+      }
+    }
+
     function switchMode(m) {
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       settingsOpen = false;
+      profileOpen = false;
       mode = m;
       reviewMode = false;
       jumpedFromReview = false;
@@ -1560,6 +1599,7 @@
       reviewMode = false;
       jumpedFromReview = false;
       settingsOpen = false;
+      profileOpen = false;
       ['filterAll', 'filterD1', 'filterD2', 'filterD3', 'filterD4', 'filterD5', 'filterD6', 'filterD7', 'filterD8'].forEach(id => document.getElementById(id).className = 'filter-btn');
       const b = document.getElementById('navBadge');
       if (d === 'all') { document.getElementById('filterAll').className = 'filter-btn active-all'; b.className = 'nav-badge badge-all'; b.textContent = 'All Domains'; }
@@ -1847,8 +1887,8 @@
       sb.auth.signOut();
     }
 
-    async function startCheckoutOrPortal() {
-      const btn = document.querySelector('#authBox .auth-btn, #settingsSubBtn');
+    async function startCheckoutOrPortal(flow) {
+      const btn = document.querySelector('#authBox .auth-btn, #settingsSubBtn, #profileManageBtn, #profileCancelBtn');
       if (btn) { btn.disabled = true; btn.textContent = 'Redirecting…'; }
       try {
         const fn = (currentSub && currentSub.stripe_subscription_id) ? 'stripe-portal' : 'stripe-checkout';
@@ -1856,6 +1896,7 @@
         const r = await fetch(SUPABASE_URL + '/functions/v1/' + fn, {
           method: 'POST',
           headers: { 'Authorization': 'Bearer ' + session.access_token, 'Content-Type': 'application/json' },
+          body: fn === 'stripe-portal' ? JSON.stringify({ flow: flow || 'default' }) : undefined,
         });
         const d = await r.json();
         if (d.url) { window.location.href = d.url; return; }
