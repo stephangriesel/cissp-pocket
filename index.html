@@ -661,13 +661,66 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 32px
+      padding: 32px;
+      overflow-y: auto
     }
 
     .auth-box {
       width: 100%;
       max-width: 340px;
-      text-align: center
+      text-align: center;
+      margin: auto
+    }
+
+    .auth-box.welcome-box {
+      max-width: 380px
+    }
+
+    .welcome-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 24px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px
+    }
+
+    .welcome-mock {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 18px 16px;
+      margin-bottom: 14px;
+      text-align: left
+    }
+
+    .welcome-mock-hint {
+      margin-top: 14px;
+      text-align: right;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.5px
+    }
+
+    .welcome-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px
+    }
+
+    .welcome-domains {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 22px
     }
 
     .auth-title {
@@ -1811,6 +1864,28 @@
 
     function renderAuthView(view, msg) {
       const b = document.getElementById('authBox');
+      b.classList.toggle('welcome-box', view === 'welcome');
+      if (view === 'welcome') {
+        const domains = ['d1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8'];
+        const domainChips = domains.map(d => `<span class="nav-badge badge-${d}">${d.toUpperCase()}</span>`).join('');
+        b.innerHTML = `<div class="welcome-logo">C</div>
+      <div class="auth-title">CISSP Pocket Trainer</div>
+      <div class="auth-sub">Flashcards, quizzes, and timed practice tests covering all 8 CISSP domains — study anywhere, track every session.</div>
+      <div class="welcome-mock">
+        <div class="card-domain d5">IAM · Domain 5</div>
+        <div class="card-text">What is Key Stretching?</div>
+        <div class="welcome-mock-hint">TAP TO FLIP ↻</div>
+      </div>
+      <div class="welcome-stats">
+        <div class="stat-card"><div class="stat-num">1200+</div><div class="stat-label">Cards</div></div>
+        <div class="stat-card"><div class="stat-num green">3</div><div class="stat-label">Modes</div></div>
+        <div class="stat-card"><div class="stat-num">8</div><div class="stat-label">Domains</div></div>
+      </div>
+      <div class="welcome-domains">${domainChips}</div>
+      <button class="auth-btn" onclick="renderAuthView('signup')">Start Free Trial</button>
+      <div class="auth-links" style="margin-top:14px">7 days free, no card required · <a href="#" onclick="renderAuthView('signin');return false">Sign in</a></div>`;
+        return;
+      }
       if (view === 'signin') {
         b.innerHTML = `<div class="auth-title">CISSP Pocket Trainer</div>
       <div class="auth-sub">Sign in to continue.</div>
@@ -2007,7 +2082,7 @@
           // underneath the auth overlay instead of being replaced.
           settingsOpen = false; profileOpen = false;
           document.getElementById('trialBar').classList.remove('visible');
-          renderAuthView('signin'); showAuthOverlay();
+          renderAuthView('welcome'); showAuthOverlay();
         }
       });
 
@@ -2027,7 +2102,7 @@
 
       const { data: { session } } = await sb.auth.getSession();
       if (recoveryHandled) return; // PASSWORD_RECOVERY fired while awaiting getSession() above
-      if (!session) { renderAuthView('signin'); showAuthOverlay(); return; }
+      if (!session) { renderAuthView('welcome'); showAuthOverlay(); return; }
       await onSignedIn(session);
     }
 
