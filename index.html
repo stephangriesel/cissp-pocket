@@ -1237,13 +1237,15 @@
     function addPending(id) { const ids = getPendingIds(); if (!ids.includes(id)) { ids.push(id); savePendingIds(ids); } }
     function clearPending(id) { savePendingIds(getPendingIds().filter(x => x !== id)); }
 
-    async function loadProgress() {
+    async function loadProgress(gen) {
+      const myGen = gen !== undefined ? gen : sessionGen;
       const local = getLocalP();
       const localActions = getLocalActions();
       const pending = getPendingIds();
       try {
         const { data, error } = await sb.from('progress').select('card_id,score,last_action').eq('user_id', currentUserId);
         if (error) throw error;
+        if (myGen !== sessionGen) return; // a newer sign-in/out happened while this was in flight
         const remote = {};
         const remoteActions = {};
         data.forEach(row => { remote[row.card_id] = row.score; if (row.last_action) remoteActions[row.card_id] = row.last_action; });
@@ -1259,13 +1261,16 @@
         saveLocalP(merged);
         saveLocalActions(mergedActions);
       } catch (e) {
+        if (myGen !== sessionGen) return;
         progressCache = local;
         syncStatus = 'offline';
       }
+      if (myGen !== sessionGen) return;
       updSyncBadge();
-      await loadStudyTime();
-      await loadTestSession();
-      await loadFlagged();
+      await loadStudyTime(myGen);
+      await loadTestSession(myGen);
+      await loadFlagged(myGen);
+      if (myGen !== sessionGen) return;
       // stats are computed live from last_action, no separate load needed
       startTimer();
       if (!settingsOpen && !profileOpen) reset();
@@ -1334,15 +1339,19 @@
     function getLocalTime() { try { return parseInt(localStorage.getItem('studySeconds') || '0', 10) } catch (e) { return 0 } }
     function saveLocalTime(s) { try { localStorage.setItem('studySeconds', String(s)) } catch (e) { } }
 
-    async function loadStudyTime() {
+    async function loadStudyTime(gen) {
+      const myGen = gen !== undefined ? gen : sessionGen;
       try {
         const { data, error } = await sb.from('study_time').select('total_seconds').eq('user_id', currentUserId).single();
         if (error) throw error;
+        if (myGen !== sessionGen) return;
         totalSeconds = data.total_seconds;
         saveLocalTime(totalSeconds);
       } catch (e) {
+        if (myGen !== sessionGen) return;
         totalSeconds = getLocalTime();
       }
+      if (myGen !== sessionGen) return;
       renderTime();
     }
 
@@ -1392,13 +1401,16 @@
     function getLocalTestSession() { try { return JSON.parse(localStorage.getItem('cp_testSession') || 'null') } catch (e) { return null } }
     function saveLocalTestSession(s) { try { if (s) localStorage.setItem('cp_testSession', JSON.stringify(s)); else localStorage.removeItem('cp_testSession'); } catch (e) { } }
 
-    async function loadTestSession() {
+    async function loadTestSession(gen) {
+      const myGen = gen !== undefined ? gen : sessionGen;
       try {
         const { data, error } = await sb.from('test_session').select('state').eq('user_id', currentUserId).maybeSingle();
         if (error) throw error;
+        if (myGen !== sessionGen) return;
         savedTestSession = data ? data.state : null;
         saveLocalTestSession(savedTestSession);
       } catch (e) {
+        if (myGen !== sessionGen) return;
         savedTestSession = getLocalTestSession();
       }
     }
@@ -1438,13 +1450,16 @@
     function isFlagged(id) { return flaggedSet.has(id); }
     function flaggedQuestions() { return DATA.questions.filter(q => flaggedSet.has(q.id)); }
 
-    async function loadFlagged() {
+    async function loadFlagged(gen) {
+      const myGen = gen !== undefined ? gen : sessionGen;
       try {
         const { data, error } = await sb.from('flagged_questions').select('card_id').eq('user_id', currentUserId);
         if (error) throw error;
+        if (myGen !== sessionGen) return;
         flaggedSet = new Set(data.map(r => r.card_id));
         saveLocalFlagged();
       } catch (e) {
+        if (myGen !== sessionGen) return;
         flaggedSet = new Set(getLocalFlagged());
       }
     }
@@ -1760,6 +1775,21 @@
 
     // ── AUTH + SUBSCRIPTION ──────────────────────────────────────────────────
     let currentUser = null, currentUserId = null, currentSub = null;
+    // Bumped on every sign-in/sign-out so a slow in-flight load from a
+    // just-ended session can detect it's stale and discard its results
+    // instead of clobbering the newly-signed-in user's data.
+    let sessionGen = 0;
+
+    function clearAllLocalCaches() {
+      ['cp', 'cp_pending', 'cp_actions', 'studySeconds', 'cp_testSession', 'cp_flagged'].forEach(k => {
+        try { localStorage.removeItem(k); } catch (e) { }
+      });
+      progressCache = null;
+      flaggedSet = new Set();
+      savedTestSession = null;
+      totalSeconds = 0; pendingSeconds = 0;
+      deck = [];
+    }
 
     function showAuthOverlay() { document.getElementById('authOverlay').style.display = 'flex'; }
     function hideAuthOverlay() { document.getElementById('authOverlay').style.display = 'none'; }
@@ -1932,6 +1962,8 @@
     }
 
     async function onSignedIn(session) {
+      sessionGen++;
+      const myGen = sessionGen;
       currentUser = session.user;
       currentUserId = session.user.id;
       const { data, error } = await sb.rpc('ensure_cissp_subscription');
@@ -1945,15 +1977,17 @@
 
       const params = new URLSearchParams(window.location.search);
       if (params.get('billing') === 'success' && !hasAccess()) {
-        for (let i = 0; i < 5 && !hasAccess(); i++) {
+        for (let i = 0; i < 5 && !hasAccess() && myGen === sessionGen; i++) {
           await new Promise(r => setTimeout(r, 1500));
+          if (myGen !== sessionGen) break;
           const { data: fresh } = await sb.rpc('ensure_cissp_subscription');
           if (fresh) currentSub = fresh;
         }
-        history.replaceState(null, '', window.location.pathname);
+        if (myGen === sessionGen) history.replaceState(null, '', window.location.pathname);
       }
 
-      if (hasAccess()) { hideAuthOverlay(); unlockApp(); }
+      if (myGen !== sessionGen) return; // superseded by a newer sign-in/out
+      if (hasAccess()) { hideAuthOverlay(); unlockApp(myGen); }
       else { renderAuthView('paywall'); showAuthOverlay(); }
     }
 
@@ -1964,7 +1998,9 @@
           recoveryHandled = true;
           renderAuthView('resetPassword'); showAuthOverlay();
         } else if (event === 'SIGNED_OUT') {
+          sessionGen++;
           currentUser = null; currentUserId = null; currentSub = null;
+          clearAllLocalCaches();
           document.getElementById('trialBar').classList.remove('visible');
           renderAuthView('signin'); showAuthOverlay();
         }
@@ -1990,9 +2026,9 @@
       await onSignedIn(session);
     }
 
-    function unlockApp() {
+    function unlockApp(gen) {
       updateTrialBar();
-      loadProgress();
+      loadProgress(gen);
     }
 
     initAuth();

@@ -32,6 +32,15 @@ nav{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px
 
   <div class="entry">
     <div class="entry-date">5 Sep 2026</div>
+    <div class="entry-title">Fix — Data could leak between accounts on a shared device</div>
+    <ul>
+      <li>Signing out and into a different account could briefly (or, if a request was still in flight, persistently) show the previous account's progress, flags, study time, or in-progress exam, because cached data wasn't cleared or protected against slow-to-resolve requests from the account you just left</li>
+      <li>Signing out now wipes all locally cached study data, and every in-flight load is tagged to its session so a stale one can no longer overwrite the account you're actually signed into</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-date">5 Sep 2026</div>
     <div class="entry-title">Feature — Dedicated Account page</div>
     <ul>
       <li>Account info (email, subscription status, billing) moved out of Settings into its own screen, opened via a new 👤 button in the top nav</li>
