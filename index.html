@@ -1583,7 +1583,7 @@
     </div>
     ${canBill ? `<div class="test-section" style="margin-bottom:16px">
       <div class="test-section-label">Billing</div>
-      <button class="test-start-btn" id="profileManageBtn" style="margin-bottom:8px" onclick="startCheckoutOrPortal()">${hasStripeSub ? 'Manage Billing' : 'Subscribe — $9/mo'}</button>
+      <button class="test-start-btn" id="profileManageBtn" style="margin-bottom:8px" onclick="startCheckoutOrPortal()">${hasStripeSub ? 'Manage Billing' : 'Subscribe — €9/mo'}</button>
       ${hasStripeSub ? `<button class="test-start-btn" id="profileCancelBtn" style="background:transparent;border:1px solid var(--wrong);color:var(--wrong)" onclick="confirmCancelSubscription()">Cancel Subscription</button>` : ''}
     </div>` : ''}
     <button class="test-start-btn" style="margin-bottom:10px" onclick="closeProfile()">Done</button>
@@ -1853,13 +1853,13 @@
     function renderPaywall(msg) {
       const b = document.getElementById('authBox');
       const sub = currentSub;
-      let headline = 'Subscribe to continue', sub2 = '$9/mo after your free trial — cancel anytime.', cta = 'Subscribe — $9/mo';
+      let headline = 'Subscribe to continue', sub2 = '€9/mo after your free trial — cancel anytime.', cta = 'Subscribe — €9/mo';
       if (sub && sub.status === 'past_due') {
         headline = 'Payment failed'; sub2 = 'Update your payment method to keep access.'; cta = 'Update Payment Method';
       } else if (sub && sub.status === 'canceled') {
-        headline = 'Your subscription has ended'; sub2 = 'Resubscribe for $9/mo to keep studying.';
+        headline = 'Your subscription has ended'; sub2 = 'Resubscribe for €9/mo to keep studying.';
       } else if (sub && sub.status === 'trialing') {
-        headline = 'Your free trial has ended'; sub2 = 'Subscribe for $9/mo to keep studying.';
+        headline = 'Your free trial has ended'; sub2 = 'Subscribe for €9/mo to keep studying.';
       }
       b.innerHTML = `<div class="auth-title">${headline}</div>
       <div class="auth-sub">${msg || sub2}</div>
@@ -1944,7 +1944,7 @@
         const days = Math.max(0, Math.ceil((new Date(currentSub.trial_ends_at) - new Date()) / 86400000));
         return 'Free trial — ' + days + ' day' + (days === 1 ? '' : 's') + ' left.';
       }
-      if (currentSub.status === 'active') return 'Active subscription — $9/mo.';
+      if (currentSub.status === 'active') return 'Active subscription — €9/mo.';
       if (currentSub.status === 'past_due') return 'Payment failed — please update your card.';
       return 'No active subscription.';
     }
@@ -2138,8 +2138,8 @@
       <div class="test-section-label">Or test your flagged questions</div>
       <button class="test-start-btn" style="margin-top:0;background:var(--surface2);color:var(--text)"${flaggedCount ? '' : ' disabled'} onclick="startFlaggedTest()">Test ${flaggedCount} Flagged Question${flaggedCount === 1 ? '' : 's'}</button>
       ${flaggedCount
-        ? '<div style="text-align:center;margin-top:8px"><button onclick="confirmClearFlags()" style="background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer">Clear all flags</button></div>'
-        : '<div style="font-size:12px;color:var(--muted);margin-top:8px">Tap ⚑ Flag on any question in a quiz or exam to build a set, then test just those. Uses the timer setting above.</div>'}
+          ? '<div style="text-align:center;margin-top:8px"><button onclick="confirmClearFlags()" style="background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer">Clear all flags</button></div>'
+          : '<div style="font-size:12px;color:var(--muted);margin-top:8px">Tap ⚑ Flag on any question in a quiz or exam to build a set, then test just those. Uses the timer setting above.</div>'}
     </div>
   </div>`;
     }

@@ -1,1245 +1,1737 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0f1117">
-<title>Changelog · CISSP Pocket Trainer</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2f45;--text:#e8eaf0;--muted:#6b7394;--accent:#5b8dd6}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0}
-nav{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10}
-.back{font-size:13px;color:var(--accent);text-decoration:none;font-weight:600}
-.nav-title{font-size:15px;font-weight:600}
-.content{padding:20px 16px 48px;max-width:600px;margin:0 auto}
-.entry{border-left:2px solid var(--border);padding:0 0 28px 16px;margin-bottom:4px;position:relative}
-.entry:last-child{padding-bottom:0}
-.entry::before{content:'';position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
-.entry-date{font-size:11px;color:var(--accent);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px}
-.entry-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px}
-.entry ul{list-style:none;display:flex;flex-direction:column;gap:5px}
-.entry li{font-size:13px;color:var(--muted);line-height:1.5;padding-left:12px;position:relative}
-.entry li::before{content:'·';position:absolute;left:0;color:var(--muted)}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f1117">
+  <title>Changelog · CISSP Pocket Trainer</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2a2f45;
+      --text: #e8eaf0;
+      --muted: #6b7394;
+      --accent: #5b8dd6
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10
+    }
+
+    .back {
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600
+    }
+
+    .nav-title {
+      font-size: 15px;
+      font-weight: 600
+    }
+
+    .content {
+      padding: 20px 16px 48px;
+      max-width: 600px;
+      margin: 0 auto
+    }
+
+    .entry {
+      border-left: 2px solid var(--border);
+      padding: 0 0 28px 16px;
+      margin-bottom: 4px;
+      position: relative
+    }
+
+    .entry:last-child {
+      padding-bottom: 0
+    }
+
+    .entry::before {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: 4px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent)
+    }
+
+    .entry-date {
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px
+    }
+
+    .entry-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px
+    }
+
+    .entry ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px
+    }
+
+    .entry li {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      padding-left: 12px;
+      position: relative
+    }
+
+    .entry li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--muted)
+    }
+  </style>
 </head>
+
 <body>
-<nav>
-  <a class="back" href="/">← Back</a>
-  <div class="nav-title">Changelog</div>
-</nav>
-<div class="content">
-
-  <div class="entry">
-    <div class="entry-date">5 Sep 2026</div>
-    <div class="entry-title">Fix — Data could leak between accounts on a shared device</div>
-    <ul>
-      <li>Signing out and into a different account could briefly (or, if a request was still in flight, persistently) show the previous account's progress, flags, study time, or in-progress exam, because cached data wasn't cleared or protected against slow-to-resolve requests from the account you just left</li>
-      <li>Signing out now wipes all locally cached study data, and every in-flight load is tagged to its session so a stale one can no longer overwrite the account you're actually signed into</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">5 Sep 2026</div>
-    <div class="entry-title">Feature — Dedicated Account page</div>
-    <ul>
-      <li>Account info (email, subscription status, billing) moved out of Settings into its own screen, opened via a new 👤 button in the top nav</li>
-      <li>Added an explicit "Cancel Subscription" button that jumps straight to Stripe's cancellation flow, separate from "Manage Billing" (update card, view invoices)</li>
-      <li>Fixed password-reset links unlocking the app immediately instead of showing the "set a new password" form</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">5 Sep 2026</div>
-    <div class="entry-title">Feature — Accounts and subscriptions</div>
-    <ul>
-      <li>Replaced the shared access password with individual accounts (email + password) — sign up, sign in, and reset your password from the app</li>
-      <li>New accounts get a 7-day free trial, no card required; after that a $9/mo subscription (via Stripe) is needed to continue</li>
-      <li>Manage or cancel billing anytime from Settings</li>
-      <li>Progress, flagged questions, study time, and in-progress exams are now private to your account instead of shared</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">2 Sep 2026</div>
-    <div class="entry-title">Feature — Test your flagged questions</div>
-    <ul>
-      <li>Flagged questions now persist and sync across devices instead of resetting when an exam ends</li>
-      <li>Added a ⚑ Flag toggle to Quiz Mode cards, so you can build a flagged set during normal study, not just during an exam</li>
-      <li>The Test Mode setup screen has a new "Test N Flagged Questions" button that runs an exam built only from everything you've flagged (respects the timer toggle), plus a "Clear all flags" link</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">1 Sep 2026</div>
-    <div class="entry-title">Feature — Resumable exam sessions</div>
-    <ul>
-      <li>An in-progress practice exam is now saved automatically as you go (answers, flags, current question, timer) and synced to Supabase</li>
-      <li>Leave mid-exam and come back — on this device or another — and Test Mode offers "Resume Exam" or "Discard &amp; Start New" instead of losing your progress</li>
-      <li>The saved exam is cleared automatically once you submit</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">1 Sep 2026</div>
-    <div class="entry-title">Feature — 10-question option in Test Mode</div>
-    <ul>
-      <li>Added a 10 button to the practice exam question-count selector for quick short sessions</li>
-      <li>Timer suggestion for exams of 15 or fewer questions is now 20 minutes instead of 60</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">1 Sep 2026</div>
-    <div class="entry-title">Feature — Wrong Test answers feed the Again review list</div>
-    <ul>
-      <li>When you submit a practice exam, every question you got wrong or left unanswered is now marked "Again" — the same as missing it in Quiz mode</li>
-      <li>Those questions show up in the "Again (tap to review)" list (and the red Again counter), in addition to the existing post-test "Review Incorrect" screen</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">30 Aug 2026</div>
-    <div class="entry-title">Design — Muted accent color</div>
-    <ul>
-      <li>Replaced the bright yellow accent color (#f7c34f) with a more subtle muted blue (#5b8dd6) across buttons, progress bars, selected states, links, and the app icon</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">30 Aug 2026</div>
-    <div class="entry-title">Feature — Flag review in Test Mode</div>
-    <ul>
-      <li>Added a "→ Next flagged" button so you can jump directly between flagged questions during a test instead of paging through with Prev/Next</li>
-      <li>Added a "Review Flagged" button on the results screen (next to Review Incorrect) that opens all flagged questions in quiz mode for a second pass</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 125 new questions for Domain 8</div>
-    <ul>
-      <li>D8 (Software Development Security): +125 questions covering the ACID model, database integrity types (referential/semantic/entity), SDLC &amp; security integration, Agile/Scrum/SAFe/DevOps/DevSecOps, CI/CD pipeline security, OWASP-style vulnerabilities (SQL injection, XSS, XXE, SSRF, buffer overflow), CMM/SAMM/BSIMM maturity models, open-source licensing, and secure coding practices</li>
-      <li>D8 grows from 119 to 244 questions, now comfortably ahead of its 11% exam weight</li>
-      <li>1 multi-select source question was rewritten as single-best-answer to match the app's format</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 125 new questions for Domain 2</div>
-    <ul>
-      <li>D2 (Asset Security): +125 questions covering data states (in use/at rest/in transit), data classification &amp; labeling, data retention &amp; de-identification, media/SSD/tape disposal and data remanence, CASB &amp; cloud data security, memory types (ROM/PROM/EPROM/EEPROM/RAM/SRAM/DRAM), asset ownership &amp; inventory management, data owner/custodian roles, and intellectual property protection</li>
-      <li>D2 grows from 91 to 216 questions, closing most of the gap versus its 10% exam weight</li>
-      <li>2 multi-select source questions were rewritten as single-best-answer to match the app's format</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 125 new questions for Domain 5</div>
-    <ul>
-      <li>D5 (Identity &amp; Access Management): +125 questions covering DAC/MAC/RBAC/ABAC/rule-based access control, the IAAA model, biometric error rates (FAR/FRR/CER/FTER), SSO &amp; federated identity (SAML), Kerberos/RADIUS/TACACS+/Diameter/SESAME/LDAP/CHAP/PEAP, smart cards &amp; OTP tokens, password policy, PKI/CRL/registration authorities, access control types, account de-provisioning, and IDaaS</li>
-      <li>D5 grows from 117 to 242 questions, now comfortably ahead of its 13% exam weight</li>
-      <li>2 multi-select source questions were rewritten as single-best-answer to match the app's format</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 123 new questions for Domain 6</div>
-    <ul>
-      <li>D6 (Security Assessment &amp; Testing): +123 questions covering red/blue teaming, penetration testing types (white/gray/black box), SOC 1/2/3 reports, CVSS/CWE/CWSS scoring, phishing &amp; social engineering variants, audit types (structured/unstructured/compliance/internal/external), chaos engineering, continuous monitoring, and security control assessments</li>
-      <li>D6 grows from 57 to 180 questions, closing most of the gap versus its 12% exam weight</li>
-      <li>2 near-duplicate questions from the source set were dropped rather than risk fabricating content not present in the original material</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 125 new scenario-based questions across all 8 domains</div>
-    <ul>
-      <li>Added a large batch of longer, judgment-based scenario questions (executive/CISO decision-making style) spanning every domain: D1 +20, D2 +12, D3 +17, D4 +16, D5 +16, D6 +15, D7 +17, D8 +12</li>
-      <li>Question bank now totals 1,301 questions plus 527 flashcards</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 20 more software development security questions (Domain 8)</div>
-    <ul>
-      <li>D8 (Software Development Security): +20 questions on UEBA/EDR/MDR, ransomware response, APT zero-days, buffer overflow &amp; TOC/TOU vulnerabilities, error-handling constructs, directory traversal, logic bombs, SQL injection (characters, parametrized queries, defences), cryptomalware, cross-site scripting, IP spoofing firewall rules, and malware classification (d8_q_088–107)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 20 new software development security questions (Domain 8)</div>
-    <ul>
-      <li>D8 (Software Development Security): +20 questions on DevOps/DevSecOps, input validation, change management (request/release/configuration control), fail-secure vs. fail-open, SDLC models (iterative waterfall, Agile, SW-CMM), SAMM, database keys &amp; referential integrity, aggregation/inference/polyinstantiation/contamination, ODBC, static vs. black-box testing, Gantt charts, COTS software, and transaction ACID properties (d8_q_068–087)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 20 new investigations &amp; ethics questions (Domain 7)</div>
-    <ul>
-      <li>D7 (Security Operations): +20 questions on computer crime categories (military/intelligence, financial, terrorist, grudge, thrill attacks), evidence handling &amp; types (documentary, testimonial, best evidence, parol evidence), investigation standards, root cause analysis, the Electronic Discovery Reference Model (EDRM), log retention, search warrants, and the (ISC)² Code of Ethics &amp; RFC 1087 (d7_q_296–315)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 20 new disaster recovery questions (Domain 7)</div>
-    <ul>
-      <li>D7 (Security Operations): +20 questions on DRP vs. BCP scope, RPO/RTO/MTD/MTBF metrics, fault tolerance (RAID, load balancing), alternate site types (hot/warm/cold), remote mirroring &amp; electronic vaulting, UPS/generators, DR test types (parallel, simulation, full-interruption), backup strategies (full/differential/incremental), software escrow, and restoration prioritisation (d7_q_276–295)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 20 more security operations questions (Domain 7)</div>
-    <ul>
-      <li>D7 (Security Operations): +20 questions on incident management steps, basic security controls, audit trails &amp; logging, Fraggle/Smurf DoS attacks, zero-day exploits, false positives/negatives, signature- vs. anomaly-based IDS, HIDS/NIDS/NIPS placement, mirrored switch ports, SIEM/SOAR, DLP egress monitoring, and threat hunting (d7_q_256–275)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 20 new security operations questions (Domain 7)</div>
-    <ul>
-      <li>D7 (Security Operations): +20 questions on need-to-know vs. least privilege, privileged account management, segregation of duties, job rotation &amp; mandatory vacations, SLAs, cloud service models (IaaS/PaaS/SaaS), system imaging, and change/patch/vulnerability management (d7_q_236–255)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 20 new security assessment &amp; testing questions (Domain 6)</div>
-    <ul>
-      <li>D6 (Security Assessment &amp; Testing): +20 questions on network/vulnerability/web scanning tools (Nmap, Nessus, Metasploit, Nikto), port scan result triage, security assessment scope &amp; reporting, TCP SYN scans, authenticated vs. unauthenticated scans, tabletop/red-blue-purple team exercises, fuzzing (mutation) &amp; misuse case testing, interface testing, white-box pentesting, and SOC report types (d6_q_023–042)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 20 more identity &amp; access management questions (Domain 5)</div>
-    <ul>
-      <li>D5 (Identity &amp; Access Management): +20 questions on access control models (DAC, MAC, RBAC, rule-based, risk-based, ABAC), the MAC lattice &amp; environment types, access control matrices, OIDC/SSO, Kerberos &amp; NTP time sync, RADIUS architecture, Linux root privilege management, and pass-the-hash/golden ticket attacks (d5_q_082–101)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 20 new identity &amp; access management questions (Domain 5)</div>
-    <ul>
-      <li>D5 (Identity &amp; Access Management): +20 questions on federated identity, subjects vs. objects, password policy (NIST SP 800-63B), passphrases, synchronous authenticators, biometric accuracy (CER/false rejection/false acceptance), fingerprint minutiae, accountability &amp; logging, Linux privilege roles, and account lifecycle management (termination, leave of absence, service accounts, access review) (d5_q_062–081)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 20 more networking &amp; communications security questions (Domain 4)</div>
-    <ul>
-      <li>D4 (Communication &amp; Network Security): +20 questions on transparency vs. security controls, EAP methods, PBX/phreaking, multimedia collaboration, screened subnet DNS/NAT, remote access authentication protocols, QoS troubleshooting, RFC 1918 addressing, VPN linking, VLANs, port security, IPSec modes, and email security/retention (d4_q_142–161)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Content — 20 new networking &amp; communications security questions (Domain 4)</div>
-    <ul>
-      <li>D4 (Communication &amp; Network Security): +20 questions on TCP/UDP fundamentals, IPv4/IPv6 coexistence, TLS, VoIP network design, micro-segmentation, IoT wireless (Zigbee/cellular), CDN, ARP/MAC attacks, SAN deduplication, switches/bridges/routers, screened subnets, Faraday cages, NAC, EDR, and firewall types (d4_q_122–141)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Aug 2026</div>
-    <div class="entry-title">Feature — Adjustable study priority per domain</div>
-    <ul>
-      <li>Added a settings screen (⚙ button in the nav bar) to view and change how strongly each domain is weighted in the spaced-repetition ordering used by Flashcards &amp; Quiz</li>
-      <li>Weights are stored locally and persist across sessions, with a "Reset to Defaults" option</li>
-      <li>D3 (Security Architecture &amp; Engineering) default weight raised from 2 to 3, matching D1/D4/D6, reflecting its growth to 201 questions this month</li>
-      <li>Fixed a race condition where the background progress sync could silently discard an open settings screen</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">26 Aug 2026</div>
-    <div class="entry-title">Content — 20 new physical &amp; site security questions (Domain 3)</div>
-    <ul>
-      <li>D3 (Security Architecture &amp; Engineering): +20 questions on CPTED, facility/site design, security cameras, server room environmentals, media storage, cable plant management, fire suppression, physical access controls, and motion detectors (d3_q_182–201)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">26 Aug 2026</div>
-    <div class="entry-title">Content — 20 new vulnerabilities, threats &amp; countermeasures questions (Domain 3)</div>
-    <ul>
-      <li>D3 (Security Architecture &amp; Engineering): +20 questions on shared responsibility, mobile code, grid/cloud/distributed computing, SCADA/ICS, memory security, virtualisation &amp; containerisation, embedded systems, edge/fog computing, and mobile device strategy (d3_q_162–181)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">26 Aug 2026</div>
-    <div class="entry-title">Content — 20 new security models &amp; TCB questions (Domain 3)</div>
-    <ul>
-      <li>D3 (Security Architecture &amp; Engineering): +20 questions on security models (Bell–LaPadula, Biba, Clark–Wilson), trusted computing base, reference monitor, security perimeter, Common Criteria, and authorisation to operate (d3_q_142–161)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">25 Aug 2026</div>
-    <div class="entry-title">Content — 20 new asymmetric cryptography &amp; PKI questions (Domain 3)</div>
-    <ul>
-      <li>D3 (Cryptography): +20 questions on asymmetric cryptosystems (RSA, ElGamal, ECC), hashing, digital signatures, X.509/PKI, certificate formats, and cryptographic attacks (d3_q_122–141)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">25 Aug 2026</div>
-    <div class="entry-title">Content — 100 new review questions across Domains 1–3</div>
-    <ul>
-      <li>D1 (Security &amp; Risk Management): +80 questions covering security concepts, personnel security, third-party/supply chain risk, risk assessment &amp; response, threat modelling, BCP planning &amp; BIA, and laws/regulations/compliance (d1_q_092–171)</li>
-      <li>D2 (Asset Security): +20 questions on data classification, data roles, data lifecycle &amp; destruction, and DRM (d2_q_060–079)</li>
-      <li>D3 (Cryptography): +20 questions on symmetric key management, cipher modes, and algorithm selection (d3_q_102–121)</li>
-      <li>Multi-select source questions (choose two/all that apply) were reframed as single-best-answer to match the quiz engine's one-correct-option format</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">19 Aug 2026</div>
-    <div class="entry-title">Content — Abbreviation expansions across all explanations and flashcard backs</div>
-    <ul>
-      <li>Added full name in brackets on first occurrence of every CISSP abbreviation across 354 question explanations and 255 flashcard backs</li>
-      <li>Covers 100+ abbreviations: ALE, ARO, SLE, EF, AV, BIA, BCP, DRP, RTO, RPO, MTD, MOR, CIA, DAD, STRIDE, DREAD, KPI, KRI, RACI, COBIT, NIST, ISO, SOX, HIPAA, GDPR, PII, PHI, TCSEC, EAL, IAAA, IAM, DAC, RBAC, ABAC, ACL, SSO, MFA, OTP, HOTP, TOTP, EAP, CHAP, PAP, RADIUS, TACACS, LDAP, SAML, OIDC, KDC, TGS, TGT, PAM, AES, DES, RSA, ECC, MD5, SHA, HMAC, PKI, CA, CRL, OCSP, PGP, IV, CBC, DSA, TCP, UDP, HTTP, HTTPS, FTP, SSH, SSL, TLS, DNS, DHCP, ARP, ICMP, SNMP, SMTP, BGP, OSPF, VPN, VLAN, LAN, WAN, DMZ, NAT, IPSec, IKE, ISAKMP, ESP, SA, SPI, WEP, WPA2, TKIP, CCMP, SSID, UTP, ASN, RIR, OSI, IDS, IPS, SIEM, SOAR, DLP, WAF, CDN, SCADA, ICS, PLC, RAID, UPS, HVAC, SDLC, CMM, BSIMM, RAD, SQL, DDL, XSS, CSRF, IDOR, ASLR, IGMP, IGRP, IPv4, IPv6, and many more</li>
-      <li>Context-aware handling for ambiguous terms: MAC expands to Mandatory Access Control, Media Access Control, or Message Authentication Code based on surrounding text; STP expands to Spanning Tree Protocol or Shielded Twisted Pair; AH only expands in IPSec context</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">17 Aug 2026</div>
-    <div class="entry-title">Feature — Test Mode (Practice Exam Simulator)</div>
-    <ul>
-      <li>Added a new "Test" tab alongside Flashcards and Quiz — fully separate from existing modes, no changes to existing behaviour</li>
-      <li>Setup screen: choose question count (25 / 50 / 75 / 100 / 125), select which domains to include (D1–D8 checkboxes with per-domain question counts), and optionally enable a countdown timer</li>
-      <li>Exam screen: one question at a time, options shuffled, no right/wrong feedback shown during the test — simulates real CISSP exam conditions</li>
-      <li>Flag questions for review with ⚑ button; navigation shows answered/flagged counters</li>
-      <li>Timer auto-submits when time expires; warns at &lt;5 minutes remaining</li>
-      <li>Results screen: percentage score with PASS/FAIL verdict (70% threshold), domain-by-domain breakdown with progress bars</li>
-      <li>Review Incorrect button loads missed questions directly into Quiz mode for immediate study</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Aug 2026</div>
-    <div class="entry-title">D7 — BCP highest priority, DRP key element, BCP NOT-a-component (d7_q_167–169)</div>
-    <ul>
-      <li>Added 3 questions: BCP highest priority = employee safety (not IT/data/assets); DRP key element = data backup (not training/fire prevention/IDS); legal and regulatory compliance is NOT a BCP component (backup+recovery, risk assessment, employee training are) (d7_q_167–169)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Aug 2026</div>
-    <div class="entry-title">D7 — BIA timeline: MTBF/MOR context, RPO backward window, WRT phases, full sequence</div>
-    <ul>
-      <li>Added 6 questions: MTBF for spare-parts planning, MOR definition (min environmental + connectivity requirements), MOR at DR sites = no need for full-spec system, RPO runs backward from disaster to last backup, WRT = restore backups + systems testing, correct timeline sequence (d7_q_161–166)</li>
-      <li>Added 2 flashcards: MTBF/MTTR/MOR BIA context with relationships; BIA recovery timeline — full sequence from Normal Business to Resume Production with span of each metric (d7_fc_070–071)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Aug 2026</div>
-    <div class="entry-title">D7 — MTD, RTO, WRT: definitions, formula (MTD ≥ RTO + WRT), exam aliases for MTD</div>
-    <ul>
-      <li>Added 6 questions: MTD = max tolerable downtime, RTO = hardware restore time, WRT = software config time, MTD ≥ RTO + WRT formula, RTO must not exceed MTD, exam term = MTD (not MAD/MTO/MAO/MTPoD), scenario: RTO+WRT=9h vs MTD=8h → plan fails (d7_q_155–160)</li>
-      <li>Added 1 flashcard: MTD/RTO/WRT definitions, formula, calculation example, exam aliases, and link to RPO for complete recovery picture (d7_fc_069)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Aug 2026</div>
-    <div class="entry-title">D7 — BIA and RPO: criticality classification, two BIA values, RPO drives backup frequency</div>
-    <ul>
-      <li>Added 6 questions: BIA = identifies critical/non-critical systems; critical = disruption unacceptable / cost of recovery / law; RPO = max tolerable data loss; weekly backup → RPO = up to 1 week; BIA assigns 2 values per critical system (RPO + RTO); legal mandate → critical + near-zero RPO (d7_q_149–154)</li>
-      <li>Added 1 flashcard: BIA — what it is, criticality criteria (unacceptable disruption / cost / law), RPO definition, backup frequency link, and cross-reference to RTO (d7_fc_068)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Aug 2026</div>
-    <div class="entry-title">D7 — BCP sub-teams: Rescue (activation), Recovery (failover), Salvage (failback) — roles and system priority</div>
-    <ul>
-      <li>Added 6 questions: 3 sub-team names, Rescue Team = during disaster (evacuate/notify/shut down/damage assessment), Recovery Team = most critical systems first at alternate site, Salvage Team = least critical first when returning to primary site, Recovery vs Salvage priority distinction, scenario — failback to rebuilt primary site = Salvage Team (d7_q_143–148)</li>
-      <li>Added 1 flashcard: all 3 BCP sub-teams with roles, triggers, and exam trap — Recovery (failover) = most critical first; Salvage (failback) = least critical first (d7_fc_067)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Aug 2026</div>
-    <div class="entry-title">D7 — DRP lifecycle: Mitigation, Preparation, Response, Recovery — definitions and pre/post-disaster</div>
-    <ul>
-      <li>Added 6 questions: DRP 4 phases in order, Mitigation = reduce impact/likelihood, Preparation = build programs/procedures/tools, Recovery = reestablish functionality, pre-disaster (Mitigation+Preparation) vs post-disaster (Response+Recovery), scenario question — flood contained → enter Recovery phase (d7_q_137–142)</li>
-      <li>Added 1 flashcard: DRP lifecycle — all 4 phases with definitions, pre/post-disaster split, supporting elements (Education/Plans/Training → Preparation; DR/BCP/EOP → Response/Recovery) (d7_fc_066)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Aug 2026</div>
-    <div class="entry-title">D7 — BCP: definition, scope, sub-plans (COOP/DRP/ISCP), statistics, lifecycle phases</div>
-    <ul>
-      <li>Added 6 questions: BCP definition, BCP scope = entire org not just IT, 43% never reopen / 29% close within 2 years, data classification NOT a BCP sub-plan, COOP = Continuity of Operations Plan, BCP lifecycle = Analysis → Solution Design → Implementation → Test &amp; Acceptance → Maintenance (d7_q_131–136)</li>
-      <li>Added 1 flashcard: BCP full summary — definition, scope, why it matters (statistics), all 7 sub-plans, and 5-phase lifecycle (d7_fc_065)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Aug 2026</div>
-    <div class="entry-title">D7 — e-vaulting, server CPU non-redundancy, RAID striping minimum disk count</div>
-    <ul>
-      <li>Added 3 questions: e-vaulting = automatic offsite incremental transfer for disaster recovery; CPUs are NOT commonly redundant in standard servers (vs power supplies, NICs, and hard drives which are); RAID striping minimum = 2 disks (d7_q_128–130)</li>
-      <li>Added 1 flashcard: e-vaulting — definition, how it works, key characteristics, and what distinguishes it from local backup (d7_fc_064)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Aug 2026</div>
-    <div class="entry-title">D7 — Continuity of Operations: RAID (0, 1, 5), disk mirroring vs striping, MTBF, MTTR</div>
-    <ul>
-      <li>Added 9 questions: RAID acronym, RAID 0 (striping/no redundancy/2 disks), RAID 1 (mirroring/identical data/writes simultaneously), RAID 5 (block striping + distributed parity/3 disks/speed + redundancy), striping alone has no redundancy (need parity + 3 disks), same-manufacturer disk MTBF risk, MTBF definition, MTTR + SLA (4–8 hour vendor response), scenario: 2 disks fail before rebuild → tape restore (d7_q_119–127)</li>
-      <li>Added 2 flashcards: RAID 0/1/5 comparison with mirroring vs striping basics; MTBF vs MTTR definitions, same-manufacturer risk, and SLA context (d7_fc_062–063)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Aug 2026</div>
-    <div class="entry-title">D7 — Continuity of Operations: full, incremental, and differential backups</div>
-    <ul>
-      <li>Added 6 questions: full backup = backs everything up, clears all archive bits, infrequent on large datasets, 1-tape restore; Thursday restore from Wednesday full = 1 tape; completeness vs time trade-off (d7_q_101–106)</li>
-      <li>Added 1 flashcard: full backup — scope, archive bits, 1-tape restore, weekly strategy (d7_fc_059)</li>
-      <li>Added 6 questions: incremental = backs up since last backup (any type), clears archive bits, fast to create; Thursday restore from Sunday full + daily incrementals = 4 tapes; restore disadvantage vs differential (d7_q_107–112)</li>
-      <li>Added 1 flashcard: incremental backup — scope, archive bits, 4-tape Thursday restore, fast create / slow restore (d7_fc_060)</li>
-      <li>Added 6 questions: differential = backs up since last FULL, does NOT clear archive bits, grows larger daily, always 2-tape restore; Thursday restore = Sunday full + Wednesday differential = 2 tapes; never mix incremental and differential on same data (d7_q_113–118)</li>
-      <li>Added 1 flashcard: differential backup — scope, archive bits NOT cleared, 2-tape restore, comparison table vs incremental (d7_fc_061)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — 0-day vulnerabilities, change management approval, configuration management (d7_q_098–100)</div>
-    <ul>
-      <li>Added 3 quiz questions: 0-day = unknown to vendor / no patch exists (distinguished from 1-day/n-day), change management = process for approving alterations, configuration management = process ensuring changes are implemented efficiently and securely (d7_q_098–100)</li>
-      <li>Added 2 flashcards: 0-day vs 1-day/n-day vulnerability distinctions; change management (approving changes) vs configuration management (implementing changes) — how they differ (d7_fc_057–058)</li>
-      <li>D7 milestone: 100 questions total</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — Change Management Process: PDCA cycle — Plan, Do, Check, Act phases and sub-steps</div>
-    <ul>
-      <li>Added 6 quiz questions: CAB = Change Advisory Board, Plan phase steps (Request→Analyse→Approve), Do phase steps (plan implementation/communicate/implement and test), Check failure = rollback, Act phase = acceptance + lessons learned, overall cycle = PDCA (d7_q_092–097)</li>
-      <li>Added 1 flashcard: full PDCA change management process — all 4 phases with sub-steps, success vs failure paths (communicate vs rollback), and how lessons learned feeds back into Plan (d7_fc_056)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — Change Management: board composition, submitter requirements, approval threshold</div>
-    <ul>
-      <li>Added 6 quiz questions: change management definition, board = IT + operational units, why non-IT included, submitter must provide reasons/pros/cons/related changes, board approval threshold with senior leadership escalation, scenario above threshold → recommend not approve (d7_q_086–091)</li>
-      <li>Added 1 flashcard: change management full breakdown — process, board composition, submitter requirements, approval threshold rule (d7_fc_055)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — Honeypot deployment levels, best honeypot use, application negative/positive list</div>
-    <ul>
-      <li>Added 3 quiz questions: honeynet = highest deployment level, best honeypot use = gather attacker TTPs, application negative list = blacklist of prohibited apps (d7_q_083–085)</li>
-      <li>Added 2 flashcards: honeypot deployment levels low→high (low-interaction, high-interaction, production, honeynet), application negative list vs positive list with risk comparison (d7_fc_053–054)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — SIEM vs SOAR: cost not a reliable difference, SOAR components, SOAR primary benefit</div>
-    <ul>
-      <li>Added 3 quiz questions: cost is NOT a reliable SIEM/SOAR difference, encryption is NOT a SOAR component (playbooks/case management/threat intel are), primary SOAR benefit = improved response times via automation (d7_q_080–082)</li>
-      <li>Added 1 flashcard: SOAR core components (playbooks, case management, threat intel, workflows) + what is NOT included (encryption) + primary benefit (d7_fc_052)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — SIEM inputs/outputs, SOAR AI response, integrations, defense-in-depth</div>
-    <ul>
-      <li>Added 6 quiz questions: SIEM centralises all logs for holistic view, SIEM input (event correlation) vs output (file integrity monitoring), SOAR adds AI auto-response, SOAR integrations (VM/ITSM/Threat Intel), combined = defense-in-depth (d7_q_074–079)</li>
-      <li>Added 2 flashcards: SIEM inputs vs outputs (full capability lists), SOAR breakdown (AI response, integrations, case management, defense-in-depth purpose) (d7_fc_050–051)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — IDS: False Positive prevents authorized traffic, IDS as best detective control, IDS primary function</div>
-    <ul>
-      <li>Added 3 quiz questions: False Positive = authorized traffic blocked, IDS = most effective detective control over firewall/ACL/virus scanner, IDS primary function = monitor and alert NOT prevent/encrypt/authenticate (d7_q_071–073)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — IDS alert states: True/False Positive/Negative scenarios and why false states matter</div>
-    <ul>
-      <li>Added 6 quiz questions: True Positive (brute-force detected), True Negative (clean download, no action), False Positive (200 alerts all legitimate), why we focus on false states, False Negative more dangerous than False Positive, encrypted exfiltration missed = False Negative (d7_q_065–070)</li>
-      <li>Added 1 flashcard: False Positive vs False Negative — severity comparison, why false states require action, memory hook (boy who cried wolf vs wolf got in) (d7_fc_049)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — IDS/IPS/SIEM: detection vs prevention, network vs host-based, signature vs heuristic</div>
-    <ul>
-      <li>Added 6 quiz questions: IDS alerts vs IPS blocks, network-based promiscuous mode, host-based on server/workstation, signature matching like antivirus, heuristic behavioral baseline, SIEM for full-picture correlation (d7_q_059–064)</li>
-      <li>No new flashcards — d7_fc_009–013 already cover all IDS/IPS/SIEM/SOAR concepts</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — IR lifecycle: last 3 phases in order, least critical immediate step, Detection phase activities</div>
-    <ul>
-      <li>Added 3 quiz questions: last 3 phases = Recovery→Remediation→Lessons Learned, post-incident review = least critical to immediate resolution, Detection phase = where events are analysed (d7_q_056–058)</li>
-      <li>Added 2 flashcards: Recovery vs Remediation distinction (restore service then fix root cause), Detection phase activities and goal (d7_fc_047–048)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — Lessons Learned: most overlooked phase, report to management, feeds Preparation</div>
-    <ul>
-      <li>Added 6 quiz questions: lessons learned most overlooked IR phase, report goes to senior management, management is in charge and liable, outcomes feed into Preparation, top-down shift after major incidents, evaluates response quality not just the incident (d7_q_050–055)</li>
-      <li>Added 1 flashcard: Lessons Learned — what it evaluates, report structure, IT Security suggests but management decides, feed-back into Preparation, post-incident top-down momentum (d7_fc_046)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — Incident severity: Inconvenience, Emergency, Disaster, Catastrophe</div>
-    <ul>
-      <li>Added 6 quiz questions: facility unusable 24h+ = disaster, server in cluster = inconvenience, loss of life/property = emergency, disaster vs catastrophe distinction, geographic diversity mitigates disasters, snowstorm = disaster by impact (d7_q_044–049)</li>
-      <li>Added 1 flashcard: severity ladder exam nuances — snowstorm trap (impact not cause), Disaster=unusable vs Catastrophe=destroyed, geographic redundancy mitigation (d7_fc_045)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — Event, Alert, Incident, Problem: definitions, thresholds, and examples</div>
-    <ul>
-      <li>Added 6 quiz questions: event definition, event examples (system power-on), alert threshold trigger (75% traffic, 90% memory), incident = multiple adverse events, problem = incident with unknown cause, internet outage = problem (d7_q_038–043)</li>
-      <li>Added 1 flashcard: Event→Alert→Incident→Problem chain with threshold examples, the unknown-cause chain, and exam-level detail (d7_fc_044)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — Incident Management: purpose, training, 3 incident classes (Natural/Human/Environmental)</div>
-    <ul>
-      <li>Added 6 quiz questions: incident management primary purpose, why ongoing training matters, power grid = environmental (not natural), human incidents = most common, intentional + unintentional both = human, natural vs environmental distinction (d7_q_032–037)</li>
-      <li>Added 2 flashcards: incident management definition and purpose, 3 incident classes with exam traps (power outage = environmental; accident and attack = both human) (d7_fc_042–043)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — Digital Forensics: purpose, imaging methods, Fourth Amendment and hack-back illegality</div>
-    <ul>
-      <li>Added 3 quiz questions: primary purpose of digital forensics (evidence preservation, not repair/prevention), live imaging = least effective method, Fourth Amendment prohibits accessing attacker's system without legal authority (d7_q_029–031)</li>
-      <li>Added 3 flashcards: forensics primary purpose vs IR/recovery/analysts, imaging methods from most to least effective, Fourth Amendment 4 legal bypass methods (subpoena, search warrant, voluntary surrender, exigent circumstances) (d7_fc_039–041)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — Digital Forensics: bit-stream imaging, real evidence, integrity hashing, chain of custody</div>
-    <ul>
-      <li>Added 6 quiz questions: forensic data sources, bit-stream vs file copy, real evidence = physical device not data, evidence integrity via hashing (before/after), why forensics on copies not originals, chain of custody purpose and 4 Ws (d7_q_023–028)</li>
-      <li>Added 4 flashcards: bit-stream imaging (what and why), real evidence vs digital evidence, evidence integrity hashing process (5-step), chain of custody 4 questions + admissibility implications (d7_fc_035–038)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — NDA scope, SoD as best fraud control, Least Privilege vs Need to Know distinction</div>
-    <ul>
-      <li>Added 3 quiz questions: NDA most important factor = scope, SoD most effective fraud control vs background checks/access controls/physical security, LP vs NtK definitional difference (d7_q_020–022)</li>
-      <li>Added 2 flashcards: NDA key elements (scope first, then duration/penalties/parties), why SoD beats other fraud controls (continuous vs one-time, internal vs physical) (d7_fc_033–034)</li>
-      <li>No LP/NtK flashcard added — d7_fc_030 already covers the distinction</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — Job rotation, mandatory vacations, insider threat combo (all 5 controls)</div>
-    <ul>
-      <li>Added 5 quiz questions: job rotation primary security benefit, non-security benefit (burnout + business understanding), cost-prohibitive limitation, mandatory vacation no-advance-notice rule, all 5 controls = minimize insider threats (d7_q_015–019)</li>
-      <li>Added 2 flashcards: Job Rotation exam breakdown (all benefits + cost limitation), Mandatory Vacations exam nuances (accounts locked, audit, no advance notice, 5-control summary) (d7_fc_031–032)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">06 Aug 2026</div>
-    <div class="entry-title">D7 — Administrative Personnel Security Controls: least privilege, need to know, separation of duties</div>
-    <ul>
-      <li>Added 6 quiz questions: administrative security purpose, least privilege definition, need-to-know vs granted access, separation of duties purpose, PO + cheque classic scenario, compensating controls for small orgs (d7_q_009–014)</li>
-      <li>Added 2 flashcards: Least Privilege (definition, exam tip, PAM link), Need to Know vs Least Privilege (access layer vs behavioural layer with nurse example) (d7_fc_029–030)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">05 Aug 2026</div>
-    <div class="entry-title">D2 — Large batch: scoping, memory types, data states, disposal, e-discovery, classification, EPROM, C-suite</div>
-    <ul>
-      <li>Added 27 quiz questions covering: scoping, EPROM erasure (UV light), PROM write-once, EEPROM/Flash, DRAM volatility, attacks by data state (physical theft, cryptanalysis, eavesdropping), data disposal goal (remanence), backup retention rule, clean desk policy, protecting data at rest (encryption) vs in use (physical controls), encryption gap at data-in-use, stolen backup tape protection, end-to-end encryption, SSD shredding, full-spectrum encryption, damaged SSD incineration, e-discovery, US Gov classification (Unclassified/Confidential levels), CFO financial day-to-day role, sensitivity factors, flash drive memory type (d2_q_033–059)</li>
-      <li>Added 4 flashcards: ROM subtypes (PROM/EPROM/EEPROM/Flash erasure methods), US Government classification harm levels, e-discovery definition and legal hold, data sensitivity assignment factors (d2_fc_030–033)</li>
-      <li>Skipped 3 questions as duplicates: SSD shredding (→ d2_q_002), custodian backups (→ d2_q_003), data-in-use multi-select (→ d2_q_037)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">05 Aug 2026</div>
-    <div class="entry-title">D2 — CASB benefits, DLP prerequisite, CASB vs DLP vs CSPM</div>
-    <ul>
-      <li>Added 3 quiz questions: CASB primary benefit = data protection and compliance, data classification must happen before DLP works, CASB best addresses unauthorised cloud access (d2_q_030–032)</li>
-      <li>Added 2 flashcards: DLP prerequisite (data identification/classification first), CASB vs DLP vs CSPM vs BYOD comparison (d2_fc_028–029)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">05 Aug 2026</div>
-    <div class="entry-title">D2 — Tailoring, certification, and accreditation</div>
-    <ul>
-      <li>Added 3 quiz questions: tailoring = customising a standard to the organisation, certification = evaluating security controls before go-live, accreditation = formal approval to operate (d2_q_027–029)</li>
-      <li>Added 1 flashcard: certification and accreditation distractor terms to avoid confusing (provisioning, validation, verification, authorization) (d2_fc_027)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">05 Aug 2026</div>
-    <div class="entry-title">D2 — Physical destruction levels, remanence, RAM volatility</div>
-    <ul>
-      <li>Added 3 quiz questions: incineration = highest destruction level, encryption is LEAST acceptable for remanence, RAM is volatile (d2_q_024–026)</li>
-      <li>Added 2 flashcards: degaussing (how it works, what media, drive unusable after), why encryption does not address remanence (d2_fc_025–026)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">05 Aug 2026</div>
-    <div class="entry-title">D2 — Data destruction: paper shredding, delete/format/overwrite, sanitization vs purge</div>
-    <ul>
-      <li>Added 5 quiz questions: cross shredding vs strip shredding, deleting only removes file table entry, sanitization vs purge difference, soft destruction methods, overwriting = writing 0s/random chars (d2_q_019–023)</li>
-      <li>Added 2 flashcards: data destruction strength hierarchy (delete→format→overwrite→sanitization→purge), paper disposal why cross shredding is required (d2_fc_023–024)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">05 Aug 2026</div>
-    <div class="entry-title">D2 — Business owner policies, custodian limits, vendor audit rights</div>
-    <ul>
-      <li>Added 3 quiz questions: business owner sets data access policies, designing security controls is NOT a custodian duty, right to audit outsourced data processors (d2_q_016–018)</li>
-      <li>Added 2 flashcards: custodian do vs don't, data processor audit rights and GDPR accountability (d2_fc_021–022)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">05 Aug 2026</div>
-    <div class="entry-title">D2 — Data ownership roles: mission owner, data owner, system owner, custodian, controller/processor</div>
-    <ul>
-      <li>Added 5 quiz questions: mission owner makes policies, data owner assigns labels + backup frequency, system owner manages infrastructure, HR=controller/vendor=processor, custodian follows data owner (d2_q_011–015)</li>
-      <li>Added 1 flashcard: mission/business owner vs system owner — levels and responsibilities (d2_fc_020)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">05 Aug 2026</div>
-    <div class="entry-title">D2 — Records retention, data classification hierarchy and sensitivity</div>
-    <ul>
-      <li>Added 3 quiz questions: most important factor for retention policy (legal requirements), lowest classification level (Public), most important factor for classification scheme (sensitivity) (d2_q_008–010)</li>
-      <li>Added 2 flashcards: records retention policy primary driver with regulatory examples, data classification hierarchy lowest to highest (d2_fc_018–019)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">05 Aug 2026</div>
-    <div class="entry-title">D2 — Data states: at rest, in motion, in use</div>
-    <ul>
-      <li>Added 3 quiz questions: matching activities to data states, shoulder surfing as attack on data in use, internal network encryption gap (d2_q_005–007)</li>
-      <li>Added 2 flashcards: attacks by data state (at rest/motion/use), why internal traffic also needs encryption (d2_fc_016–017)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">04 Aug 2026</div>
-    <div class="entry-title">D5 — Large batch: SIEM, MFA, tokens, access models, biometrics, CHAP, AD trusts (d5_q_034-061)</div>
-    <ul>
-      <li>Added 3 questions: TGS primary function, RADIUS primary function (centralised AAA), first step of Kerberos (d5_q_034–036)</li>
-      <li>Added 25 questions from large batch covering: SIEM for log management, cookie-based MFA, key stretching vs brute force, salting least effective vs brute force, Type 1 auth (PINs/passwords), rainbow table structure, SMS OTP = MFA, weakest auth factor, SESAME/PKI fix, access control policy reference, AD trust types, IAAA identification = usernames, HOTP = something you have, lowering biometric sensitivity → FAR, lock account first, client sends authenticator to TGS, non-repudiation for accountability, FRR definition, TRAC not a real model, biometric can't be reissued, TOTP 30-second, CRR not a biometric metric, salting definition, swipe card = magnetic stripe, CHAP server-side credential risk (d5_q_037–061)</li>
-      <li>Added 6 flashcards: RADIUS AAA primary function, Kerberos KDC (AS/TGS roles), Kerberos 6-step flow, SIEM definition, AD trust types (reflective not real), smart card types (magnetic/contact/contactless), non-repudiation for accountability, Type 3 biometrics reissuability risk (d5_fc_046–051)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">04 Aug 2026</div>
-    <div class="entry-title">D5 — Kerberos: KDC components and 6-step authentication flow</div>
-    <ul>
-      <li>Added 5 quiz questions: KDC = AS + TGS, step 1 sends plaintext user ID only, step 2 AS returns session key + TGT, TGT purpose, step 6 mutual authentication via timestamp (d5_q_029–033)</li>
-      <li>Added 2 flashcards: KDC structure (AS and TGS roles), Kerberos 6-step flow with key facts (d5_fc_044–045)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">04 Aug 2026</div>
-    <div class="entry-title">D5 — Identity provisioning lifecycle, entities, and IAM definition</div>
-    <ul>
-      <li>Added 3 quiz questions: manual provisioning not part of a good lifecycle, identities = entities, IAM = unique identifier + authentication requirement (d5_q_026–028)</li>
-      <li>Added 2 flashcards: provisioning lifecycle good vs bad practices, IAM definition and scope (d5_fc_042–043)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">03 Aug 2026</div>
-    <div class="entry-title">D5 — IAAA Access Management: biometrics, access models, passwords (slides batch)</div>
-    <ul>
-      <li>Added 3 quiz questions: software token trade-offs, most secure auth method, single-factor vs MFA (d5_q_013–015)</li>
-      <li>Added 10 quiz questions from slides: FAR vs FRR severity, CER definition, nonce purpose, clipping levels, offline hash bypass, DAC owner control, MAC labels/clearance, RBAC role transfer, ABAC attributes, username+password not MFA (d5_q_016–025)</li>
-      <li>Added 6 flashcards: software token risks, authentication strength ranking, DAC mechanics, MAC labels/clearance/dominance rule, offline hash attacks bypassing clipping, ABAC attribute categories and alternative names (d5_fc_036–041)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">02 Aug 2026</div>
-    <div class="entry-title">D3 — Cryptography, Hardware, Physical Security & Cloud (Large Batch)</div>
-    <ul>
-      <li>Added 26 quiz questions covering salting/rainbow tables, antivirus types, demarc, multiprocessing, RC4 deprecation, logic bombs, PKI technologies, IaaS responsibility, digital signatures, motion sensors, PIR detectors, frequency analysis, WORM media, bollards, RIPEMD-160, ASTM gate classes, ALU, Clipper/Skipjack, CPU 4-step cycle, key escrow, IDEA, DCS, MAC, IPv6 IPSec, and reference monitor (d3_q_076–101)</li>
-      <li>Added 13 flashcards: antivirus types, demarc, multiprocessing vs multitasking, deprecated ciphers, PKI technology stack, IaaS/PaaS/SaaS responsibility matrix, WORM media, ASTM gate classes, CPU internals, Clipper/Skipjack, IDEA, MAC, IPv6 vs IPv4 IPSec (d3_fc_080–092)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">02 Aug 2026</div>
-    <div class="entry-title">D3 — Emergency Response & Evacuation Planning</div>
-    <ul>
-      <li>Added 3 quiz questions: human life first in emergencies, employee safety first in disasters, evacuation plans must include disabled employees (d3_q_073–075)</li>
-      <li>Added 1 flashcard: emergency response priority order and evacuation planning requirements (d3_fc_079)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">02 Aug 2026</div>
-    <div class="entry-title">D3 — Fire Suppression, Smoke Detectors & HVAC</div>
-    <ul>
-      <li>Added 3 quiz questions: sprinklers for detection + suppression, photoelectric detectors detect smoke, HVAC proper airflow as primary indicator (d3_q_070–072)</li>
-      <li>Added 2 flashcards: fire detector types (photoelectric vs ionisation, heat, flame), HVAC function and data center indicators (d3_fc_077–078)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">02 Aug 2026</div>
-    <div class="entry-title">D3 — Power Surge, UPS Efficiency & CIA Triad Impact</div>
-    <ul>
-      <li>Added 3 quiz questions: power surge = increased voltage/current, UPS efficiency = runtime, power fluctuations primarily compromise Availability (d3_q_067–069)</li>
-      <li>Added 1 flashcard: UPS efficiency metric and CIA triad impact of power fluctuations (d3_fc_076)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">02 Aug 2026</div>
-    <div class="entry-title">D3 — Backup Strategies & Server Hardening</div>
-    <ul>
-      <li>Added 3 quiz questions: offsite backups for disaster recovery, FTP not part of hardening, auto-updates not suitable for production (d3_q_064–066)</li>
-      <li>Added 2 flashcards: backup strategies + 3-2-1 rule, server hardening checklist (d3_fc_074–075)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">02 Aug 2026</div>
-    <div class="entry-title">D3 — Site Threats, Flood Risk Analysis & UPS Load Balancing</div>
-    <ul>
-      <li>Added 3 quiz questions: threats as primary design factor, risk analysis for flood-prone data center, UPS load distribution preventing cascading failure (d3_q_061–063)</li>
-      <li>Added 2 flashcards: site/facility threat-first security design, UPS load balancing and power redundancy (d3_fc_072–073)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">02 Aug 2026</div>
-    <div class="entry-title">D3 — Physical Security: Perimeter Controls, Access Doors & Data Center Structure</div>
-    <ul>
-      <li>Added 3 quiz questions: fences/gates as primary perimeter barrier, secured door stays locked as functionality indicator, slab-to-slab fire-rated data center construction (d3_q_058–060)</li>
-      <li>Added 2 flashcards: preventative vs detective physical controls, data center secure box requirements (d3_fc_070–071)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">02 Aug 2026</div>
-    <div class="entry-title">D3 — SSL vs TLS, TCP 3-way Handshake & IPSec Tunnel Mode</div>
-    <ul>
-      <li>Added 3 quiz questions: SSL older/less secure than TLS, SYN/SYN-ACK/ACK handshake order, IPSec tunnel mode most common (d3_q_055–057)</li>
-      <li>Added 2 flashcards: SSL vs TLS versions and differences, TCP 3-way handshake steps (d3_fc_068–069)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">02 Aug 2026</div>
-    <div class="entry-title">D3 — IPSec: AH, ESP & VPNs</div>
-    <ul>
-      <li>Added 4 quiz questions: AH does not provide confidentiality, ESP for encryption, IPSec for VPNs, choosing AH vs ESP (d3_q_051–054)</li>
-      <li>Added 1 flashcard: IPSec VPN use, IPv4 bolt-on security, AH + ESP together vs separately (d3_fc_067)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">02 Aug 2026</div>
-    <div class="entry-title">D3 — MitM Attacks, Digital Signatures & Hash Collisions</div>
-    <ul>
-      <li>Added 3 quiz questions: MitM as session hijacking, digital signatures for non-repudiation, MD5 collision vulnerability vs SHA-1/SHA-256/PBKDF2 (d3_q_048–050)</li>
-      <li>Added 11 flashcards: cloud deployment models, malware types, logic bomb vs backdoor, CPU instruction cycle + interrupts, ICS/SCADA vulnerabilities, IoT vulnerabilities, VM intra-host traffic security, salt vs nonce, MitM variants &amp; mitigations, cryptanalysis techniques, mobile device security (d3_fc_056–066)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">31 Jul 2026</div>
-    <div class="entry-title">D3 — Virtualization, Cloud Types, Service Models & Hash Functions</div>
-    <ul>
-      <li>Added 12 quiz questions: hypervisor Ring -1, host vs guest, intra-host VM traffic, public/community/hybrid cloud models, IaaS/PaaS/SaaS definitions, salting passwords, nonces &amp; initialization vectors (d3_q_036–047)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">31 Jul 2026</div>
-    <div class="entry-title">D3 — Encryption, Malware, Systems, Side-Channel Attacks &amp; Cryptanalysis</div>
-    <ul>
-      <li>Added 24 quiz questions: asymmetric key counts, public key definition, symmetric vs asymmetric, ICS vulnerabilities, mobile malware, polyinstantiation, CPU instruction cycle, containerization, CPU interrupts, Trojans vs viruses, logic bombs, asymmetric vs symmetric benefits, acoustic/general/covert timing side-channel attacks, SaaS, Type 1 vs Type 2 hypervisors, IoT vulnerabilities, cryptanalysis, frequency analysis, transposition (d3_q_012–035)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">31 Jul 2026</div>
-    <div class="entry-title">D3 — Security Models &amp; Threat Modeling</div>
-    <ul>
-      <li>Added 3 quiz questions: Bell-LaPadula primary goal, Clark-Wilson model (separation of duties &amp; high-value transactions), STRIDE threat modeling (d3_q_009–011)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">31 Jul 2026</div>
-    <div class="entry-title">Fix — Offline Authentication</div>
-    <ul>
-      <li>App no longer shows login screen when offline and a valid session cookie exists — trusts the cookie instead of requiring a server round-trip</li>
-      <li>Password hash cached in localStorage after first online login so the app can be unlocked offline even if the cookie has expired</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">11 Aug 2026</div>
-    <div class="entry-title">D4 — Major batch: 30 questions covering VoIP/UDP, TCP, IP addresses, ports, protocols, topologies, OSI layers, QoS, IPv6, cables</div>
-    <ul>
-      <li>Added 30 quiz questions: VoIP=UDP, TCP connection-oriented, L3 broadcast (255.255.255.255), 172.32.0.0 public, SFTP over SSH, ARIN (North America), E3 speed (34.368 Mbps), port 23=Telnet, port 25=SMTP, 172.15.11.45 public, DHCP port 67, DORA process, TCP 3-way handshake, port 137=NetBIOS name, port 138=NetBIOS datagram, ARP spoofing=L2 threat, APNIC (Asia-Pacific), IPv6=128 bits, STP vs UTP (EMI), IMAP=L7 not L3, Telnet=cleartext, fiber optic near power cables, multi-mode fiber for data center, L3 isolates broadcast domains, MAC sticky on switch, QoS=VoIP priority, port 143=IMAP4, port 110=POP3, bus topology break=stops traffic, IPv6 fe80 link-local (d4_q_092–121, Q10/Q23 reformulated as single-answer)</li>
-      <li>Added 8 flashcards: VoIP/UDP vs TCP, five RIRs and regions, NetBIOS ports 137/138, OSI layer threats, STP vs UTP, IPv6 key features, QoS and VoIP priority, MAC sticky command (d4_fc_102–109)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">11 Aug 2026</div>
-    <div class="entry-title">D4 — CDN for large file delivery, IPSec suite overview, CHAP vs PAP authentication</div>
-    <ul>
-      <li>Added 3 quiz questions: CDN as most efficient large-file delivery, IPSec as full integrity/authenticity/confidentiality suite, CHAP three-way handshake with hashed password (d4_q_089–091)</li>
-      <li>Added 2 flashcards: CDN definition and use cases, CHAP vs PAP authentication comparison (d4_fc_100–101)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">11 Aug 2026</div>
-    <div class="entry-title">D4 — IPSec: Security Associations, SPI, Tunnel vs Transport mode, ISAKMP, IKE, ESP vs AH</div>
-    <ul>
-      <li>Added 7 quiz questions: SA as simplex one-way connection, ESP = 2 SAs, AH+ESP = 4 SAs, SPI as 32-bit SA identifier, Tunnel mode (full packet) vs Transport mode (payload only), ISAKMP manages SA creation, IKE negotiates algorithm selection (d4_q_082–088)</li>
-      <li>Added 4 flashcards: SA count for ESP and AH+ESP combinations, Tunnel vs Transport mode, ISAKMP vs IKE roles, ESP vs AH capabilities (d4_fc_096–099)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">11 Aug 2026</div>
-    <div class="entry-title">D4 — DCE vs DTE (modem), firewall as first external defence, fail-secure behaviour</div>
-    <ul>
-      <li>Added 3 quiz questions: modem = most common DCE, firewall = first control for external threats, firewall = fail-secure device (d4_q_079–081)</li>
-      <li>Added 2 flashcards: DCE vs DTE with examples, fail-secure vs fail-open and why firewalls must fail-secure (d4_fc_094–095)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">11 Aug 2026</div>
-    <div class="entry-title">D4 — Wireless security, Li-Fi, 802.11g frequency, ASN, switch vs router functions</div>
-    <ul>
-      <li>Added 6 quiz questions: WPA2-Enterprise most secure wireless, Li-Fi most secure transmission technology, 802.11g = 2.4 GHz, ASN = Autonomous System Number (BGP), wireless router for wireless access, switch primary function = Layer 2 MAC forwarding (d4_q_073–078)</li>
-      <li>Added 5 flashcards: WPA2-Enterprise vs Personal vs WEP, Li-Fi security, 802.11 standards and frequency bands, ASN and BGP, switch/router/hub/gateway OSI layers and functions (d4_fc_089–093)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">11 Aug 2026</div>
-    <div class="entry-title">D4 — SAN definition, network topologies (star/bus/ring/mesh), fiber optic primary disadvantage</div>
-    <ul>
-      <li>Added 3 quiz questions: SAN = Storage Area Network, star topology for enterprise LANs, fiber optic first disadvantage = cost (d4_q_070–072)</li>
-      <li>Added 2 flashcards: SAN definition and SAN vs NAS, four network topologies and characteristics (d4_fc_087–088)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">11 Aug 2026</div>
-    <div class="entry-title">D4 — Cables: fiber optic vs copper, single-mode vs multi-mode, WDM</div>
-    <ul>
-      <li>Added 7 quiz questions: fiber uses light vs copper electricity, 1 Petabit/sec speed, 150+ mile distance, passive sniffing security advantage, single-mode for long-distance IP backbone, WDM definition, fiber cons (cost/fragility) (d4_q_063–069)</li>
-      <li>Added 3 flashcards: fiber optic pros vs cons vs copper, single-mode vs multi-mode fiber, WDM definition and use (d4_fc_084–086)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">10 Aug 2026</div>
-    <div class="entry-title">D8 — Major batch: databases, SDLC methodologies, open source, acceptance testing, vulnerabilities (28 questions + 14 flashcards)</div>
-    <ul>
-      <li>Added 28 quiz questions covering: relational DB terms (tuple/attribute/relation/schema), e-vaulting vs shadowing, semantic integrity, OAT vs production acceptance testing, XP daily stand-up NOT XP (Scrum), CASE 3 categories, open source (code + software), Scrum core roles, injection mitigation, GUI builders = RAD, partial disclosure, pseudo-random session IDs as security feature, IDOR, pair programming = XP, SaaS customer responsibility after application, Spiral model phases (no Initiation), database shadowing real-time copy, XML = document-oriented DB, OOAD OOD phase for constraints, crippleware, Oracle NOT open-source licence, Agile characteristics, CASE references NOT a category, Product Owner role, Bottom-up NOT an SDLC methodology, buffer overflow overwrites adjacent memory (not hard disk) (d8_q_040–067, skipped Q17 dup and Q26 dup)</li>
-      <li>Added 14 flashcards: DB terms, e-vaulting vs log shipping vs shadowing, OAT vs production AT vs UAT, XP core practices, CASE categories, IDOR, crippleware vs shareware vs freeware, disclosure types, RAD and GUI builders, Scrum roles, Spiral phases, XML + document-oriented DB, OOA vs OOD, open-source licences (d8_fc_047–060)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">10 Aug 2026</div>
-    <div class="entry-title">D8 — AI/ML: ANN capabilities, AI-specific security protocols, machine learning in cybersecurity</div>
-    <ul>
-      <li>Added 3 quiz questions: ANNs cannot think independently, AI security via differential privacy and adversarial training, ML primary use as malware classification (d8_q_037–039)</li>
-      <li>Added 3 flashcards: ANN structure and limitations, differential privacy vs adversarial training, ML uses in cybersecurity (d8_fc_044–046)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">10 Aug 2026</div>
-    <div class="entry-title">D8 — Cloud service models, software procurement, and COTS vulnerability response</div>
-    <ul>
-      <li>Added 8 quiz questions: IaaS/PaaS/SaaS responsibility boundaries, SaaS examples, customer control levels, PaaS for custom apps, software licence review before purchase, cost not being primary concern in software evaluation, COTS vulnerability top priority (update/patch) (d8_q_029–036)</li>
-      <li>Added 6 flashcards: IaaS/PaaS/SaaS management boundaries, SaaS interaction modes, choosing service model by control level, software licence pre-purchase checklist, third-party software evaluation criteria, COTS definition and vulnerability response (d8_fc_038–043)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">10 Aug 2026</div>
-    <div class="entry-title">D8 — Cloud computing: 4 types (private/public/hybrid/community) and cloud outsourcing security rights</div>
-    <ul>
-      <li>Added 5 quiz questions: public cloud shared tenancy, hybrid cloud for sensitive vs non-sensitive data, community cloud definition, private cloud single-org ownership, cloud outsourcing security rights (d8_q_024–028)</li>
-      <li>Added 3 flashcards: 4 cloud computing types, community vs public vs private distinction, cloud outsourcing audit/pentest/VA/compliance rights (d8_fc_035–037)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">10 Aug 2026</div>
-    <div class="entry-title">D8 — Maturity models: CMM 5 levels, BSIMM software security benchmark, CMM vs CMMC vs BSIMM</div>
-    <ul>
-      <li>Added 3 quiz questions: CMM Level 2 Repeatable, BSIMM purpose (software security benchmarking), CMM as software development process framework (d8_q_021–023)</li>
-      <li>Added 3 flashcards: CMM 5-level model, BSIMM 4 domains and 12 practices, CMM vs CMMC vs BSIMM comparison (d8_fc_032–034)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">10 Aug 2026</div>
-    <div class="entry-title">D8 — Security: auth failures, XSS defence, broken access control, privilege escalation, backdoors, buffer overflows</div>
-    <ul>
-      <li>Added 6 quiz questions: most common auth failure (user error), XSS defence (input validation), broken access control indicator (unauthorised access), privilege escalation first step (least privilege), backdoor appropriate use (development only), buffer overflow mechanics (d8_q_015–020)</li>
-      <li>Added 6 flashcards: auth failure forms, XSS mechanism and defence, broken access control, least privilege vs privilege escalation, backdoor lifecycle, buffer overflow causes and defences (d8_fc_026–031)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Aug 2026</div>
-    <div class="entry-title">D8 — Databases: data normalisation best practices, database integrity types, SQL DDL statements</div>
-    <ul>
-      <li>Added 3 quiz questions: data normalisation (NOT allowing multiple formats), semantic integrity violation, SQL DDL commands CREATE/ALTER/DROP (d8_q_012–014)</li>
-      <li>Added 3 flashcards: normalisation best practices, four integrity types (semantic/entity/referential/user-defined), SQL DDL vs DML (d8_fc_023–025)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Aug 2026</div>
-    <div class="entry-title">D8 — SDLC methodologies: DevOps CI/CD deployment frequency, Sashimi overlapping phases, Waterfall for fixed requirements</div>
-    <ul>
-      <li>Added 3 quiz questions: DevOps continuous deployment, Sashimi linear-with-overlap model, Waterfall for stable fixed-scope projects (d8_q_009–011)</li>
-      <li>Added 3 flashcards: DevOps CI/CD cadence, Sashimi vs Waterfall distinction, Waterfall best-fit criteria (d8_fc_020–022)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Aug 2026</div>
-    <div class="entry-title">D8 — Software licensing and SDLC: freeware vs shareware, reverse engineering, security controls in design phase</div>
-    <ul>
-      <li>Added 3 quiz questions: freeware vs shareware distinction, assembly as hardest to reverse-engineer, SDLC design phase as first security control review (d8_q_006–008)</li>
-      <li>Added 3 flashcards: freeware vs shareware definitions, why assembly is hardest to reverse, SDLC security-by-design principle (d8_fc_017–019)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D7 — Practice test: DR site recovery times, MOU, hot site protection level</div>
-    <ul>
-      <li>Added 3 quiz questions: warm site 4hr–3 day RTO, MOU for staff disaster acknowledgement, hot site as highest DR protection (d7_q_205–207)</li>
-      <li>Added 2 flashcards: MOU definition and legal standing, warm vs hot site data migration gap (d7_fc_090–091)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Aug 2026</div>
-    <div class="entry-title">D7 — Practice test: 28 questions covering forensics, RAID, backups, incident management, IDS/IPS, EOC, 4th Amendment, and DR sites</div>
-    <ul>
-      <li>Added 28 quiz questions spanning: environmental vs natural vs man-made disasters, hashing for forensic integrity, RAID 5 striping with parity, backup loss calculation (20-hour window), RAID 1 minimum disks, server clustering for fault tolerance, geographically redundant sites, differential+incremental conflict, write blocker usage, IT security event definition, incremental vs differential backup speed, OEP evacuation plan, last 3 incident management phases, MOR hardware specs, DR restore priority (least critical last), IDS vs IPS, copy backup (no archive bit clear), evidence alteration, 4th Amendment warrant exceptions, EOC command centre, catch-as-you-can network forensics, voluntary disclosure to government, IAAR forensics order, containment/response phase, subscription site mechanics, server motherboard redundancy, 3-hour recovery window (hot+redundant), and COOP for day-to-day operations (d7_q_208–235)</li>
-      <li>Added 6 flashcards: three disaster categories (natural/man-made/environmental), EOC definition and deployment, IAAR forensics order, 7-phase incident management lifecycle, copy backup vs full backup archive bit behaviour, catch-as-you-can network forensics (d7_fc_092–097)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D7 — Improving the Plans: Review Cycle & Version Control</div>
-    <ul>
-      <li>Added 4 quiz questions: 12-month review cycle, out-of-cycle triggers, old copy destruction, real disaster as trigger (d7_q_201–204)</li>
-      <li>Added 2 flashcards: review frequency and triggers, old copy destruction policy (d7_fc_088–089)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D7 — Testing the Plans: Simulation, Parallel, Partial & Full Interruption</div>
-    <ul>
-      <li>Added 5 quiz questions: Simulation vs Tabletop distinction, Parallel Processing, Partial Interruption, Full Interruption, full test order least-to-most disruptive (d7_q_196–200)</li>
-      <li>Added 2 flashcards: three physical test types, full 7-step test progression (d7_fc_086–087)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D7 — Testing the Plans: DRP Review, Read-Through & Tabletop</div>
-    <ul>
-      <li>Added 4 quiz questions: DRP Review purpose, Read-Through checklist, Tabletop/Walk-through, living documents rationale (d7_q_192–195)</li>
-      <li>Added 2 flashcards: three simulated test types, Tabletop exercise (d7_fc_084–085)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D7 — BCP Sub-Plans: COOP, OEP & Cyber Incident Response</div>
-    <ul>
-      <li>Added 4 quiz questions: COOP purpose and timeframe, OEP focus, BCP as overarching plan, Cyber IRP scope (d7_q_188–191)</li>
-      <li>Added 3 flashcards: COOP, OEP, BCP containing sub-plans (d7_fc_081–083)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D7 — Recovery Strategies: Mobile Site, Subscription/Cloud Site & Comparison Matrix</div>
-    <ul>
-      <li>Added 5 quiz questions: mobile site definition, only non-fixed site, subscription/cloud model, mirrored site zero setup time, cold site hardware/telecom (d7_q_183–187)</li>
-      <li>Added 3 flashcards: mobile site, subscription/cloud site, full 5-site comparison matrix (d7_fc_078–080)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D7 — Recovery Strategies: Redundant & Hot Sites</div>
-    <ul>
-      <li>Added 5 quiz questions: redundant site definition, geographic separation rationale, hot vs redundant site differences, most expensive site type, hot site failover characteristics (d7_q_178–182)</li>
-      <li>Added 2 flashcards: redundant vs hot site comparison, full 4-site ranking by speed and cost (d7_fc_076–077)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D7 — Recovery Strategies: Warm, Cold & Reciprocal Agreement Sites</div>
-    <ul>
-      <li>Added 5 quiz questions: warm vs hot site, cold site characteristics, reciprocal agreement, cost ranking, warm site recovery steps (d7_q_173–177)</li>
-      <li>Added 3 flashcards: hot/warm/cold comparison, reciprocal agreement risks, warm site details (d7_fc_073–075)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D4 — IP Classes, LAN Devices, Wireless Security, Email Protocols & WAN Speeds</div>
-    <ul>
-      <li>Added 12 quiz questions: IP class ranges, bridge vs router layers, attenuation, DMZ/screened subnet, WPA2, WPA2 Enterprise/RADIUS, LDAP-S port 636, S/MIME, repeater at L1, T-1 speed, backup CIA properties, bridge forwarding (d4_q_051–062)</li>
-      <li>Added 6 flashcards: IP class ranges/masks, LAN devices by OSI layer, WEP/WPA/WPA2 comparison, email security protocols, WAN/cabling speeds, wireless network modes (d4_fc_078–083)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D4 — MAC Security Modes, Firewalls, IEEE 802 & SSH vs Telnet</div>
-    <ul>
-      <li>Added 8 quiz questions: MAC dedicated/system-high modes, 4 firewall types and layers, IEEE 802 standards, 802.11i/WPA2, SSH vs Telnet (d4_q_043–050)</li>
-      <li>Added 5 flashcards: MAC security modes, firewall types, IEEE 802 standards, 802.11 variants, circuit vs application proxy (d4_fc_073–077)</li>
-    </ul>
-  </div>
+  <nav>
+    <a class="back" href="/">← Back</a>
+    <div class="nav-title">Changelog</div>
+  </nav>
+  <div class="content">
+
+    <div class="entry">
+      <div class="entry-date">5 Sep 2026</div>
+      <div class="entry-title">Fix — Data could leak between accounts on a shared device</div>
+      <ul>
+        <li>Signing out and into a different account could briefly (or, if a request was still in flight, persistently)
+          show the previous account's progress, flags, study time, or in-progress exam, because cached data wasn't
+          cleared or protected against slow-to-resolve requests from the account you just left</li>
+        <li>Signing out now wipes all locally cached study data, and every in-flight load is tagged to its session so a
+          stale one can no longer overwrite the account you're actually signed into</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">5 Sep 2026</div>
+      <div class="entry-title">Feature — Dedicated Account page</div>
+      <ul>
+        <li>Account info (email, subscription status, billing) moved out of Settings into its own screen, opened via a
+          new 👤 button in the top nav</li>
+        <li>Added an explicit "Cancel Subscription" button that jumps straight to Stripe's cancellation flow, separate
+          from "Manage Billing" (update card, view invoices)</li>
+        <li>Fixed password-reset links unlocking the app immediately instead of showing the "set a new password" form
+        </li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">5 Sep 2026</div>
+      <div class="entry-title">Feature — Accounts and subscriptions</div>
+      <ul>
+        <li>Replaced the shared access password with individual accounts (email + password) — sign up, sign in, and
+          reset your password from the app</li>
+        <li>New accounts get a 7-day free trial, no card required; after that a €9/mo subscription (via Stripe) is
+          needed to continue</li>
+        <li>Manage or cancel billing anytime from Settings</li>
+        <li>Progress, flagged questions, study time, and in-progress exams are now private to your account instead of
+          shared</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">2 Sep 2026</div>
+      <div class="entry-title">Feature — Test your flagged questions</div>
+      <ul>
+        <li>Flagged questions now persist and sync across devices instead of resetting when an exam ends</li>
+        <li>Added a ⚑ Flag toggle to Quiz Mode cards, so you can build a flagged set during normal study, not just
+          during an exam</li>
+        <li>The Test Mode setup screen has a new "Test N Flagged Questions" button that runs an exam built only from
+          everything you've flagged (respects the timer toggle), plus a "Clear all flags" link</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">1 Sep 2026</div>
+      <div class="entry-title">Feature — Resumable exam sessions</div>
+      <ul>
+        <li>An in-progress practice exam is now saved automatically as you go (answers, flags, current question, timer)
+          and synced to Supabase</li>
+        <li>Leave mid-exam and come back — on this device or another — and Test Mode offers "Resume Exam" or "Discard
+          &amp; Start New" instead of losing your progress</li>
+        <li>The saved exam is cleared automatically once you submit</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">1 Sep 2026</div>
+      <div class="entry-title">Feature — 10-question option in Test Mode</div>
+      <ul>
+        <li>Added a 10 button to the practice exam question-count selector for quick short sessions</li>
+        <li>Timer suggestion for exams of 15 or fewer questions is now 20 minutes instead of 60</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">1 Sep 2026</div>
+      <div class="entry-title">Feature — Wrong Test answers feed the Again review list</div>
+      <ul>
+        <li>When you submit a practice exam, every question you got wrong or left unanswered is now marked "Again" — the
+          same as missing it in Quiz mode</li>
+        <li>Those questions show up in the "Again (tap to review)" list (and the red Again counter), in addition to the
+          existing post-test "Review Incorrect" screen</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">30 Aug 2026</div>
+      <div class="entry-title">Design — Muted accent color</div>
+      <ul>
+        <li>Replaced the bright yellow accent color (#f7c34f) with a more subtle muted blue (#5b8dd6) across buttons,
+          progress bars, selected states, links, and the app icon</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">30 Aug 2026</div>
+      <div class="entry-title">Feature — Flag review in Test Mode</div>
+      <ul>
+        <li>Added a "→ Next flagged" button so you can jump directly between flagged questions during a test instead of
+          paging through with Prev/Next</li>
+        <li>Added a "Review Flagged" button on the results screen (next to Review Incorrect) that opens all flagged
+          questions in quiz mode for a second pass</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 125 new questions for Domain 8</div>
+      <ul>
+        <li>D8 (Software Development Security): +125 questions covering the ACID model, database integrity types
+          (referential/semantic/entity), SDLC &amp; security integration, Agile/Scrum/SAFe/DevOps/DevSecOps, CI/CD
+          pipeline security, OWASP-style vulnerabilities (SQL injection, XSS, XXE, SSRF, buffer overflow),
+          CMM/SAMM/BSIMM maturity models, open-source licensing, and secure coding practices</li>
+        <li>D8 grows from 119 to 244 questions, now comfortably ahead of its 11% exam weight</li>
+        <li>1 multi-select source question was rewritten as single-best-answer to match the app's format</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 125 new questions for Domain 2</div>
+      <ul>
+        <li>D2 (Asset Security): +125 questions covering data states (in use/at rest/in transit), data classification
+          &amp; labeling, data retention &amp; de-identification, media/SSD/tape disposal and data remanence, CASB &amp;
+          cloud data security, memory types (ROM/PROM/EPROM/EEPROM/RAM/SRAM/DRAM), asset ownership &amp; inventory
+          management, data owner/custodian roles, and intellectual property protection</li>
+        <li>D2 grows from 91 to 216 questions, closing most of the gap versus its 10% exam weight</li>
+        <li>2 multi-select source questions were rewritten as single-best-answer to match the app's format</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 125 new questions for Domain 5</div>
+      <ul>
+        <li>D5 (Identity &amp; Access Management): +125 questions covering DAC/MAC/RBAC/ABAC/rule-based access control,
+          the IAAA model, biometric error rates (FAR/FRR/CER/FTER), SSO &amp; federated identity (SAML),
+          Kerberos/RADIUS/TACACS+/Diameter/SESAME/LDAP/CHAP/PEAP, smart cards &amp; OTP tokens, password policy,
+          PKI/CRL/registration authorities, access control types, account de-provisioning, and IDaaS</li>
+        <li>D5 grows from 117 to 242 questions, now comfortably ahead of its 13% exam weight</li>
+        <li>2 multi-select source questions were rewritten as single-best-answer to match the app's format</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 123 new questions for Domain 6</div>
+      <ul>
+        <li>D6 (Security Assessment &amp; Testing): +123 questions covering red/blue teaming, penetration testing types
+          (white/gray/black box), SOC 1/2/3 reports, CVSS/CWE/CWSS scoring, phishing &amp; social engineering variants,
+          audit types (structured/unstructured/compliance/internal/external), chaos engineering, continuous monitoring,
+          and security control assessments</li>
+        <li>D6 grows from 57 to 180 questions, closing most of the gap versus its 12% exam weight</li>
+        <li>2 near-duplicate questions from the source set were dropped rather than risk fabricating content not present
+          in the original material</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 125 new scenario-based questions across all 8 domains</div>
+      <ul>
+        <li>Added a large batch of longer, judgment-based scenario questions (executive/CISO decision-making style)
+          spanning every domain: D1 +20, D2 +12, D3 +17, D4 +16, D5 +16, D6 +15, D7 +17, D8 +12</li>
+        <li>Question bank now totals 1,301 questions plus 527 flashcards</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 20 more software development security questions (Domain 8)</div>
+      <ul>
+        <li>D8 (Software Development Security): +20 questions on UEBA/EDR/MDR, ransomware response, APT zero-days,
+          buffer overflow &amp; TOC/TOU vulnerabilities, error-handling constructs, directory traversal, logic bombs,
+          SQL injection (characters, parametrized queries, defences), cryptomalware, cross-site scripting, IP spoofing
+          firewall rules, and malware classification (d8_q_088–107)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 20 new software development security questions (Domain 8)</div>
+      <ul>
+        <li>D8 (Software Development Security): +20 questions on DevOps/DevSecOps, input validation, change management
+          (request/release/configuration control), fail-secure vs. fail-open, SDLC models (iterative waterfall, Agile,
+          SW-CMM), SAMM, database keys &amp; referential integrity,
+          aggregation/inference/polyinstantiation/contamination, ODBC, static vs. black-box testing, Gantt charts, COTS
+          software, and transaction ACID properties (d8_q_068–087)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 20 new investigations &amp; ethics questions (Domain 7)</div>
+      <ul>
+        <li>D7 (Security Operations): +20 questions on computer crime categories (military/intelligence, financial,
+          terrorist, grudge, thrill attacks), evidence handling &amp; types (documentary, testimonial, best evidence,
+          parol evidence), investigation standards, root cause analysis, the Electronic Discovery Reference Model
+          (EDRM), log retention, search warrants, and the (ISC)² Code of Ethics &amp; RFC 1087 (d7_q_296–315)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 20 new disaster recovery questions (Domain 7)</div>
+      <ul>
+        <li>D7 (Security Operations): +20 questions on DRP vs. BCP scope, RPO/RTO/MTD/MTBF metrics, fault tolerance
+          (RAID, load balancing), alternate site types (hot/warm/cold), remote mirroring &amp; electronic vaulting,
+          UPS/generators, DR test types (parallel, simulation, full-interruption), backup strategies
+          (full/differential/incremental), software escrow, and restoration prioritisation (d7_q_276–295)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 20 more security operations questions (Domain 7)</div>
+      <ul>
+        <li>D7 (Security Operations): +20 questions on incident management steps, basic security controls, audit trails
+          &amp; logging, Fraggle/Smurf DoS attacks, zero-day exploits, false positives/negatives, signature- vs.
+          anomaly-based IDS, HIDS/NIDS/NIPS placement, mirrored switch ports, SIEM/SOAR, DLP egress monitoring, and
+          threat hunting (d7_q_256–275)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 20 new security operations questions (Domain 7)</div>
+      <ul>
+        <li>D7 (Security Operations): +20 questions on need-to-know vs. least privilege, privileged account management,
+          segregation of duties, job rotation &amp; mandatory vacations, SLAs, cloud service models (IaaS/PaaS/SaaS),
+          system imaging, and change/patch/vulnerability management (d7_q_236–255)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 20 new security assessment &amp; testing questions (Domain 6)</div>
+      <ul>
+        <li>D6 (Security Assessment &amp; Testing): +20 questions on network/vulnerability/web scanning tools (Nmap,
+          Nessus, Metasploit, Nikto), port scan result triage, security assessment scope &amp; reporting, TCP SYN scans,
+          authenticated vs. unauthenticated scans, tabletop/red-blue-purple team exercises, fuzzing (mutation) &amp;
+          misuse case testing, interface testing, white-box pentesting, and SOC report types (d6_q_023–042)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 20 more identity &amp; access management questions (Domain 5)</div>
+      <ul>
+        <li>D5 (Identity &amp; Access Management): +20 questions on access control models (DAC, MAC, RBAC, rule-based,
+          risk-based, ABAC), the MAC lattice &amp; environment types, access control matrices, OIDC/SSO, Kerberos &amp;
+          NTP time sync, RADIUS architecture, Linux root privilege management, and pass-the-hash/golden ticket attacks
+          (d5_q_082–101)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 20 new identity &amp; access management questions (Domain 5)</div>
+      <ul>
+        <li>D5 (Identity &amp; Access Management): +20 questions on federated identity, subjects vs. objects, password
+          policy (NIST SP 800-63B), passphrases, synchronous authenticators, biometric accuracy (CER/false
+          rejection/false acceptance), fingerprint minutiae, accountability &amp; logging, Linux privilege roles, and
+          account lifecycle management (termination, leave of absence, service accounts, access review) (d5_q_062–081)
+        </li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 20 more networking &amp; communications security questions (Domain 4)</div>
+      <ul>
+        <li>D4 (Communication &amp; Network Security): +20 questions on transparency vs. security controls, EAP methods,
+          PBX/phreaking, multimedia collaboration, screened subnet DNS/NAT, remote access authentication protocols, QoS
+          troubleshooting, RFC 1918 addressing, VPN linking, VLANs, port security, IPSec modes, and email
+          security/retention (d4_q_142–161)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Content — 20 new networking &amp; communications security questions (Domain 4)</div>
+      <ul>
+        <li>D4 (Communication &amp; Network Security): +20 questions on TCP/UDP fundamentals, IPv4/IPv6 coexistence,
+          TLS, VoIP network design, micro-segmentation, IoT wireless (Zigbee/cellular), CDN, ARP/MAC attacks, SAN
+          deduplication, switches/bridges/routers, screened subnets, Faraday cages, NAC, EDR, and firewall types
+          (d4_q_122–141)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Aug 2026</div>
+      <div class="entry-title">Feature — Adjustable study priority per domain</div>
+      <ul>
+        <li>Added a settings screen (⚙ button in the nav bar) to view and change how strongly each domain is weighted in
+          the spaced-repetition ordering used by Flashcards &amp; Quiz</li>
+        <li>Weights are stored locally and persist across sessions, with a "Reset to Defaults" option</li>
+        <li>D3 (Security Architecture &amp; Engineering) default weight raised from 2 to 3, matching D1/D4/D6,
+          reflecting its growth to 201 questions this month</li>
+        <li>Fixed a race condition where the background progress sync could silently discard an open settings screen
+        </li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">26 Aug 2026</div>
+      <div class="entry-title">Content — 20 new physical &amp; site security questions (Domain 3)</div>
+      <ul>
+        <li>D3 (Security Architecture &amp; Engineering): +20 questions on CPTED, facility/site design, security
+          cameras, server room environmentals, media storage, cable plant management, fire suppression, physical access
+          controls, and motion detectors (d3_q_182–201)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">26 Aug 2026</div>
+      <div class="entry-title">Content — 20 new vulnerabilities, threats &amp; countermeasures questions (Domain 3)
+      </div>
+      <ul>
+        <li>D3 (Security Architecture &amp; Engineering): +20 questions on shared responsibility, mobile code,
+          grid/cloud/distributed computing, SCADA/ICS, memory security, virtualisation &amp; containerisation, embedded
+          systems, edge/fog computing, and mobile device strategy (d3_q_162–181)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">26 Aug 2026</div>
+      <div class="entry-title">Content — 20 new security models &amp; TCB questions (Domain 3)</div>
+      <ul>
+        <li>D3 (Security Architecture &amp; Engineering): +20 questions on security models (Bell–LaPadula, Biba,
+          Clark–Wilson), trusted computing base, reference monitor, security perimeter, Common Criteria, and
+          authorisation to operate (d3_q_142–161)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">25 Aug 2026</div>
+      <div class="entry-title">Content — 20 new asymmetric cryptography &amp; PKI questions (Domain 3)</div>
+      <ul>
+        <li>D3 (Cryptography): +20 questions on asymmetric cryptosystems (RSA, ElGamal, ECC), hashing, digital
+          signatures, X.509/PKI, certificate formats, and cryptographic attacks (d3_q_122–141)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">25 Aug 2026</div>
+      <div class="entry-title">Content — 100 new review questions across Domains 1–3</div>
+      <ul>
+        <li>D1 (Security &amp; Risk Management): +80 questions covering security concepts, personnel security,
+          third-party/supply chain risk, risk assessment &amp; response, threat modelling, BCP planning &amp; BIA, and
+          laws/regulations/compliance (d1_q_092–171)</li>
+        <li>D2 (Asset Security): +20 questions on data classification, data roles, data lifecycle &amp; destruction, and
+          DRM (d2_q_060–079)</li>
+        <li>D3 (Cryptography): +20 questions on symmetric key management, cipher modes, and algorithm selection
+          (d3_q_102–121)</li>
+        <li>Multi-select source questions (choose two/all that apply) were reframed as single-best-answer to match the
+          quiz engine's one-correct-option format</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">19 Aug 2026</div>
+      <div class="entry-title">Content — Abbreviation expansions across all explanations and flashcard backs</div>
+      <ul>
+        <li>Added full name in brackets on first occurrence of every CISSP abbreviation across 354 question explanations
+          and 255 flashcard backs</li>
+        <li>Covers 100+ abbreviations: ALE, ARO, SLE, EF, AV, BIA, BCP, DRP, RTO, RPO, MTD, MOR, CIA, DAD, STRIDE,
+          DREAD, KPI, KRI, RACI, COBIT, NIST, ISO, SOX, HIPAA, GDPR, PII, PHI, TCSEC, EAL, IAAA, IAM, DAC, RBAC, ABAC,
+          ACL, SSO, MFA, OTP, HOTP, TOTP, EAP, CHAP, PAP, RADIUS, TACACS, LDAP, SAML, OIDC, KDC, TGS, TGT, PAM, AES,
+          DES, RSA, ECC, MD5, SHA, HMAC, PKI, CA, CRL, OCSP, PGP, IV, CBC, DSA, TCP, UDP, HTTP, HTTPS, FTP, SSH, SSL,
+          TLS, DNS, DHCP, ARP, ICMP, SNMP, SMTP, BGP, OSPF, VPN, VLAN, LAN, WAN, DMZ, NAT, IPSec, IKE, ISAKMP, ESP, SA,
+          SPI, WEP, WPA2, TKIP, CCMP, SSID, UTP, ASN, RIR, OSI, IDS, IPS, SIEM, SOAR, DLP, WAF, CDN, SCADA, ICS, PLC,
+          RAID, UPS, HVAC, SDLC, CMM, BSIMM, RAD, SQL, DDL, XSS, CSRF, IDOR, ASLR, IGMP, IGRP, IPv4, IPv6, and many more
+        </li>
+        <li>Context-aware handling for ambiguous terms: MAC expands to Mandatory Access Control, Media Access Control,
+          or Message Authentication Code based on surrounding text; STP expands to Spanning Tree Protocol or Shielded
+          Twisted Pair; AH only expands in IPSec context</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">17 Aug 2026</div>
+      <div class="entry-title">Feature — Test Mode (Practice Exam Simulator)</div>
+      <ul>
+        <li>Added a new "Test" tab alongside Flashcards and Quiz — fully separate from existing modes, no changes to
+          existing behaviour</li>
+        <li>Setup screen: choose question count (25 / 50 / 75 / 100 / 125), select which domains to include (D1–D8
+          checkboxes with per-domain question counts), and optionally enable a countdown timer</li>
+        <li>Exam screen: one question at a time, options shuffled, no right/wrong feedback shown during the test —
+          simulates real CISSP exam conditions</li>
+        <li>Flag questions for review with ⚑ button; navigation shows answered/flagged counters</li>
+        <li>Timer auto-submits when time expires; warns at &lt;5 minutes remaining</li>
+        <li>Results screen: percentage score with PASS/FAIL verdict (70% threshold), domain-by-domain breakdown with
+          progress bars</li>
+        <li>Review Incorrect button loads missed questions directly into Quiz mode for immediate study</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Aug 2026</div>
+      <div class="entry-title">D7 — BCP highest priority, DRP key element, BCP NOT-a-component (d7_q_167–169)</div>
+      <ul>
+        <li>Added 3 questions: BCP highest priority = employee safety (not IT/data/assets); DRP key element = data
+          backup (not training/fire prevention/IDS); legal and regulatory compliance is NOT a BCP component
+          (backup+recovery, risk assessment, employee training are) (d7_q_167–169)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Aug 2026</div>
+      <div class="entry-title">D7 — BIA timeline: MTBF/MOR context, RPO backward window, WRT phases, full sequence</div>
+      <ul>
+        <li>Added 6 questions: MTBF for spare-parts planning, MOR definition (min environmental + connectivity
+          requirements), MOR at DR sites = no need for full-spec system, RPO runs backward from disaster to last backup,
+          WRT = restore backups + systems testing, correct timeline sequence (d7_q_161–166)</li>
+        <li>Added 2 flashcards: MTBF/MTTR/MOR BIA context with relationships; BIA recovery timeline — full sequence from
+          Normal Business to Resume Production with span of each metric (d7_fc_070–071)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Aug 2026</div>
+      <div class="entry-title">D7 — MTD, RTO, WRT: definitions, formula (MTD ≥ RTO + WRT), exam aliases for MTD</div>
+      <ul>
+        <li>Added 6 questions: MTD = max tolerable downtime, RTO = hardware restore time, WRT = software config time,
+          MTD ≥ RTO + WRT formula, RTO must not exceed MTD, exam term = MTD (not MAD/MTO/MAO/MTPoD), scenario:
+          RTO+WRT=9h vs MTD=8h → plan fails (d7_q_155–160)</li>
+        <li>Added 1 flashcard: MTD/RTO/WRT definitions, formula, calculation example, exam aliases, and link to RPO for
+          complete recovery picture (d7_fc_069)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Aug 2026</div>
+      <div class="entry-title">D7 — BIA and RPO: criticality classification, two BIA values, RPO drives backup frequency
+      </div>
+      <ul>
+        <li>Added 6 questions: BIA = identifies critical/non-critical systems; critical = disruption unacceptable / cost
+          of recovery / law; RPO = max tolerable data loss; weekly backup → RPO = up to 1 week; BIA assigns 2 values per
+          critical system (RPO + RTO); legal mandate → critical + near-zero RPO (d7_q_149–154)</li>
+        <li>Added 1 flashcard: BIA — what it is, criticality criteria (unacceptable disruption / cost / law), RPO
+          definition, backup frequency link, and cross-reference to RTO (d7_fc_068)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Aug 2026</div>
+      <div class="entry-title">D7 — BCP sub-teams: Rescue (activation), Recovery (failover), Salvage (failback) — roles
+        and system priority</div>
+      <ul>
+        <li>Added 6 questions: 3 sub-team names, Rescue Team = during disaster (evacuate/notify/shut down/damage
+          assessment), Recovery Team = most critical systems first at alternate site, Salvage Team = least critical
+          first when returning to primary site, Recovery vs Salvage priority distinction, scenario — failback to rebuilt
+          primary site = Salvage Team (d7_q_143–148)</li>
+        <li>Added 1 flashcard: all 3 BCP sub-teams with roles, triggers, and exam trap — Recovery (failover) = most
+          critical first; Salvage (failback) = least critical first (d7_fc_067)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Aug 2026</div>
+      <div class="entry-title">D7 — DRP lifecycle: Mitigation, Preparation, Response, Recovery — definitions and
+        pre/post-disaster</div>
+      <ul>
+        <li>Added 6 questions: DRP 4 phases in order, Mitigation = reduce impact/likelihood, Preparation = build
+          programs/procedures/tools, Recovery = reestablish functionality, pre-disaster (Mitigation+Preparation) vs
+          post-disaster (Response+Recovery), scenario question — flood contained → enter Recovery phase (d7_q_137–142)
+        </li>
+        <li>Added 1 flashcard: DRP lifecycle — all 4 phases with definitions, pre/post-disaster split, supporting
+          elements (Education/Plans/Training → Preparation; DR/BCP/EOP → Response/Recovery) (d7_fc_066)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Aug 2026</div>
+      <div class="entry-title">D7 — BCP: definition, scope, sub-plans (COOP/DRP/ISCP), statistics, lifecycle phases
+      </div>
+      <ul>
+        <li>Added 6 questions: BCP definition, BCP scope = entire org not just IT, 43% never reopen / 29% close within 2
+          years, data classification NOT a BCP sub-plan, COOP = Continuity of Operations Plan, BCP lifecycle = Analysis
+          → Solution Design → Implementation → Test &amp; Acceptance → Maintenance (d7_q_131–136)</li>
+        <li>Added 1 flashcard: BCP full summary — definition, scope, why it matters (statistics), all 7 sub-plans, and
+          5-phase lifecycle (d7_fc_065)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Aug 2026</div>
+      <div class="entry-title">D7 — e-vaulting, server CPU non-redundancy, RAID striping minimum disk count</div>
+      <ul>
+        <li>Added 3 questions: e-vaulting = automatic offsite incremental transfer for disaster recovery; CPUs are NOT
+          commonly redundant in standard servers (vs power supplies, NICs, and hard drives which are); RAID striping
+          minimum = 2 disks (d7_q_128–130)</li>
+        <li>Added 1 flashcard: e-vaulting — definition, how it works, key characteristics, and what distinguishes it
+          from local backup (d7_fc_064)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Aug 2026</div>
+      <div class="entry-title">D7 — Continuity of Operations: RAID (0, 1, 5), disk mirroring vs striping, MTBF, MTTR
+      </div>
+      <ul>
+        <li>Added 9 questions: RAID acronym, RAID 0 (striping/no redundancy/2 disks), RAID 1 (mirroring/identical
+          data/writes simultaneously), RAID 5 (block striping + distributed parity/3 disks/speed + redundancy), striping
+          alone has no redundancy (need parity + 3 disks), same-manufacturer disk MTBF risk, MTBF definition, MTTR + SLA
+          (4–8 hour vendor response), scenario: 2 disks fail before rebuild → tape restore (d7_q_119–127)</li>
+        <li>Added 2 flashcards: RAID 0/1/5 comparison with mirroring vs striping basics; MTBF vs MTTR definitions,
+          same-manufacturer risk, and SLA context (d7_fc_062–063)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Aug 2026</div>
+      <div class="entry-title">D7 — Continuity of Operations: full, incremental, and differential backups</div>
+      <ul>
+        <li>Added 6 questions: full backup = backs everything up, clears all archive bits, infrequent on large datasets,
+          1-tape restore; Thursday restore from Wednesday full = 1 tape; completeness vs time trade-off (d7_q_101–106)
+        </li>
+        <li>Added 1 flashcard: full backup — scope, archive bits, 1-tape restore, weekly strategy (d7_fc_059)</li>
+        <li>Added 6 questions: incremental = backs up since last backup (any type), clears archive bits, fast to create;
+          Thursday restore from Sunday full + daily incrementals = 4 tapes; restore disadvantage vs differential
+          (d7_q_107–112)</li>
+        <li>Added 1 flashcard: incremental backup — scope, archive bits, 4-tape Thursday restore, fast create / slow
+          restore (d7_fc_060)</li>
+        <li>Added 6 questions: differential = backs up since last FULL, does NOT clear archive bits, grows larger daily,
+          always 2-tape restore; Thursday restore = Sunday full + Wednesday differential = 2 tapes; never mix
+          incremental and differential on same data (d7_q_113–118)</li>
+        <li>Added 1 flashcard: differential backup — scope, archive bits NOT cleared, 2-tape restore, comparison table
+          vs incremental (d7_fc_061)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — 0-day vulnerabilities, change management approval, configuration management
+        (d7_q_098–100)</div>
+      <ul>
+        <li>Added 3 quiz questions: 0-day = unknown to vendor / no patch exists (distinguished from 1-day/n-day), change
+          management = process for approving alterations, configuration management = process ensuring changes are
+          implemented efficiently and securely (d7_q_098–100)</li>
+        <li>Added 2 flashcards: 0-day vs 1-day/n-day vulnerability distinctions; change management (approving changes)
+          vs configuration management (implementing changes) — how they differ (d7_fc_057–058)</li>
+        <li>D7 milestone: 100 questions total</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — Change Management Process: PDCA cycle — Plan, Do, Check, Act phases and sub-steps
+      </div>
+      <ul>
+        <li>Added 6 quiz questions: CAB = Change Advisory Board, Plan phase steps (Request→Analyse→Approve), Do phase
+          steps (plan implementation/communicate/implement and test), Check failure = rollback, Act phase = acceptance +
+          lessons learned, overall cycle = PDCA (d7_q_092–097)</li>
+        <li>Added 1 flashcard: full PDCA change management process — all 4 phases with sub-steps, success vs failure
+          paths (communicate vs rollback), and how lessons learned feeds back into Plan (d7_fc_056)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — Change Management: board composition, submitter requirements, approval threshold
+      </div>
+      <ul>
+        <li>Added 6 quiz questions: change management definition, board = IT + operational units, why non-IT included,
+          submitter must provide reasons/pros/cons/related changes, board approval threshold with senior leadership
+          escalation, scenario above threshold → recommend not approve (d7_q_086–091)</li>
+        <li>Added 1 flashcard: change management full breakdown — process, board composition, submitter requirements,
+          approval threshold rule (d7_fc_055)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — Honeypot deployment levels, best honeypot use, application negative/positive list
+      </div>
+      <ul>
+        <li>Added 3 quiz questions: honeynet = highest deployment level, best honeypot use = gather attacker TTPs,
+          application negative list = blacklist of prohibited apps (d7_q_083–085)</li>
+        <li>Added 2 flashcards: honeypot deployment levels low→high (low-interaction, high-interaction, production,
+          honeynet), application negative list vs positive list with risk comparison (d7_fc_053–054)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — SIEM vs SOAR: cost not a reliable difference, SOAR components, SOAR primary benefit
+      </div>
+      <ul>
+        <li>Added 3 quiz questions: cost is NOT a reliable SIEM/SOAR difference, encryption is NOT a SOAR component
+          (playbooks/case management/threat intel are), primary SOAR benefit = improved response times via automation
+          (d7_q_080–082)</li>
+        <li>Added 1 flashcard: SOAR core components (playbooks, case management, threat intel, workflows) + what is NOT
+          included (encryption) + primary benefit (d7_fc_052)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — SIEM inputs/outputs, SOAR AI response, integrations, defense-in-depth</div>
+      <ul>
+        <li>Added 6 quiz questions: SIEM centralises all logs for holistic view, SIEM input (event correlation) vs
+          output (file integrity monitoring), SOAR adds AI auto-response, SOAR integrations (VM/ITSM/Threat Intel),
+          combined = defense-in-depth (d7_q_074–079)</li>
+        <li>Added 2 flashcards: SIEM inputs vs outputs (full capability lists), SOAR breakdown (AI response,
+          integrations, case management, defense-in-depth purpose) (d7_fc_050–051)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — IDS: False Positive prevents authorized traffic, IDS as best detective control, IDS
+        primary function</div>
+      <ul>
+        <li>Added 3 quiz questions: False Positive = authorized traffic blocked, IDS = most effective detective control
+          over firewall/ACL/virus scanner, IDS primary function = monitor and alert NOT prevent/encrypt/authenticate
+          (d7_q_071–073)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — IDS alert states: True/False Positive/Negative scenarios and why false states matter
+      </div>
+      <ul>
+        <li>Added 6 quiz questions: True Positive (brute-force detected), True Negative (clean download, no action),
+          False Positive (200 alerts all legitimate), why we focus on false states, False Negative more dangerous than
+          False Positive, encrypted exfiltration missed = False Negative (d7_q_065–070)</li>
+        <li>Added 1 flashcard: False Positive vs False Negative — severity comparison, why false states require action,
+          memory hook (boy who cried wolf vs wolf got in) (d7_fc_049)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — IDS/IPS/SIEM: detection vs prevention, network vs host-based, signature vs heuristic
+      </div>
+      <ul>
+        <li>Added 6 quiz questions: IDS alerts vs IPS blocks, network-based promiscuous mode, host-based on
+          server/workstation, signature matching like antivirus, heuristic behavioral baseline, SIEM for full-picture
+          correlation (d7_q_059–064)</li>
+        <li>No new flashcards — d7_fc_009–013 already cover all IDS/IPS/SIEM/SOAR concepts</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — IR lifecycle: last 3 phases in order, least critical immediate step, Detection phase
+        activities</div>
+      <ul>
+        <li>Added 3 quiz questions: last 3 phases = Recovery→Remediation→Lessons Learned, post-incident review = least
+          critical to immediate resolution, Detection phase = where events are analysed (d7_q_056–058)</li>
+        <li>Added 2 flashcards: Recovery vs Remediation distinction (restore service then fix root cause), Detection
+          phase activities and goal (d7_fc_047–048)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — Lessons Learned: most overlooked phase, report to management, feeds Preparation
+      </div>
+      <ul>
+        <li>Added 6 quiz questions: lessons learned most overlooked IR phase, report goes to senior management,
+          management is in charge and liable, outcomes feed into Preparation, top-down shift after major incidents,
+          evaluates response quality not just the incident (d7_q_050–055)</li>
+        <li>Added 1 flashcard: Lessons Learned — what it evaluates, report structure, IT Security suggests but
+          management decides, feed-back into Preparation, post-incident top-down momentum (d7_fc_046)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — Incident severity: Inconvenience, Emergency, Disaster, Catastrophe</div>
+      <ul>
+        <li>Added 6 quiz questions: facility unusable 24h+ = disaster, server in cluster = inconvenience, loss of
+          life/property = emergency, disaster vs catastrophe distinction, geographic diversity mitigates disasters,
+          snowstorm = disaster by impact (d7_q_044–049)</li>
+        <li>Added 1 flashcard: severity ladder exam nuances — snowstorm trap (impact not cause), Disaster=unusable vs
+          Catastrophe=destroyed, geographic redundancy mitigation (d7_fc_045)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — Event, Alert, Incident, Problem: definitions, thresholds, and examples</div>
+      <ul>
+        <li>Added 6 quiz questions: event definition, event examples (system power-on), alert threshold trigger (75%
+          traffic, 90% memory), incident = multiple adverse events, problem = incident with unknown cause, internet
+          outage = problem (d7_q_038–043)</li>
+        <li>Added 1 flashcard: Event→Alert→Incident→Problem chain with threshold examples, the unknown-cause chain, and
+          exam-level detail (d7_fc_044)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — Incident Management: purpose, training, 3 incident classes
+        (Natural/Human/Environmental)</div>
+      <ul>
+        <li>Added 6 quiz questions: incident management primary purpose, why ongoing training matters, power grid =
+          environmental (not natural), human incidents = most common, intentional + unintentional both = human, natural
+          vs environmental distinction (d7_q_032–037)</li>
+        <li>Added 2 flashcards: incident management definition and purpose, 3 incident classes with exam traps (power
+          outage = environmental; accident and attack = both human) (d7_fc_042–043)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — Digital Forensics: purpose, imaging methods, Fourth Amendment and hack-back
+        illegality</div>
+      <ul>
+        <li>Added 3 quiz questions: primary purpose of digital forensics (evidence preservation, not repair/prevention),
+          live imaging = least effective method, Fourth Amendment prohibits accessing attacker's system without legal
+          authority (d7_q_029–031)</li>
+        <li>Added 3 flashcards: forensics primary purpose vs IR/recovery/analysts, imaging methods from most to least
+          effective, Fourth Amendment 4 legal bypass methods (subpoena, search warrant, voluntary surrender, exigent
+          circumstances) (d7_fc_039–041)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — Digital Forensics: bit-stream imaging, real evidence, integrity hashing, chain of
+        custody</div>
+      <ul>
+        <li>Added 6 quiz questions: forensic data sources, bit-stream vs file copy, real evidence = physical device not
+          data, evidence integrity via hashing (before/after), why forensics on copies not originals, chain of custody
+          purpose and 4 Ws (d7_q_023–028)</li>
+        <li>Added 4 flashcards: bit-stream imaging (what and why), real evidence vs digital evidence, evidence integrity
+          hashing process (5-step), chain of custody 4 questions + admissibility implications (d7_fc_035–038)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — NDA scope, SoD as best fraud control, Least Privilege vs Need to Know distinction
+      </div>
+      <ul>
+        <li>Added 3 quiz questions: NDA most important factor = scope, SoD most effective fraud control vs background
+          checks/access controls/physical security, LP vs NtK definitional difference (d7_q_020–022)</li>
+        <li>Added 2 flashcards: NDA key elements (scope first, then duration/penalties/parties), why SoD beats other
+          fraud controls (continuous vs one-time, internal vs physical) (d7_fc_033–034)</li>
+        <li>No LP/NtK flashcard added — d7_fc_030 already covers the distinction</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — Job rotation, mandatory vacations, insider threat combo (all 5 controls)</div>
+      <ul>
+        <li>Added 5 quiz questions: job rotation primary security benefit, non-security benefit (burnout + business
+          understanding), cost-prohibitive limitation, mandatory vacation no-advance-notice rule, all 5 controls =
+          minimize insider threats (d7_q_015–019)</li>
+        <li>Added 2 flashcards: Job Rotation exam breakdown (all benefits + cost limitation), Mandatory Vacations exam
+          nuances (accounts locked, audit, no advance notice, 5-control summary) (d7_fc_031–032)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">06 Aug 2026</div>
+      <div class="entry-title">D7 — Administrative Personnel Security Controls: least privilege, need to know,
+        separation of duties</div>
+      <ul>
+        <li>Added 6 quiz questions: administrative security purpose, least privilege definition, need-to-know vs granted
+          access, separation of duties purpose, PO + cheque classic scenario, compensating controls for small orgs
+          (d7_q_009–014)</li>
+        <li>Added 2 flashcards: Least Privilege (definition, exam tip, PAM link), Need to Know vs Least Privilege
+          (access layer vs behavioural layer with nurse example) (d7_fc_029–030)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">05 Aug 2026</div>
+      <div class="entry-title">D2 — Large batch: scoping, memory types, data states, disposal, e-discovery,
+        classification, EPROM, C-suite</div>
+      <ul>
+        <li>Added 27 quiz questions covering: scoping, EPROM erasure (UV light), PROM write-once, EEPROM/Flash, DRAM
+          volatility, attacks by data state (physical theft, cryptanalysis, eavesdropping), data disposal goal
+          (remanence), backup retention rule, clean desk policy, protecting data at rest (encryption) vs in use
+          (physical controls), encryption gap at data-in-use, stolen backup tape protection, end-to-end encryption, SSD
+          shredding, full-spectrum encryption, damaged SSD incineration, e-discovery, US Gov classification
+          (Unclassified/Confidential levels), CFO financial day-to-day role, sensitivity factors, flash drive memory
+          type (d2_q_033–059)</li>
+        <li>Added 4 flashcards: ROM subtypes (PROM/EPROM/EEPROM/Flash erasure methods), US Government classification
+          harm levels, e-discovery definition and legal hold, data sensitivity assignment factors (d2_fc_030–033)</li>
+        <li>Skipped 3 questions as duplicates: SSD shredding (→ d2_q_002), custodian backups (→ d2_q_003), data-in-use
+          multi-select (→ d2_q_037)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">05 Aug 2026</div>
+      <div class="entry-title">D2 — CASB benefits, DLP prerequisite, CASB vs DLP vs CSPM</div>
+      <ul>
+        <li>Added 3 quiz questions: CASB primary benefit = data protection and compliance, data classification must
+          happen before DLP works, CASB best addresses unauthorised cloud access (d2_q_030–032)</li>
+        <li>Added 2 flashcards: DLP prerequisite (data identification/classification first), CASB vs DLP vs CSPM vs BYOD
+          comparison (d2_fc_028–029)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">05 Aug 2026</div>
+      <div class="entry-title">D2 — Tailoring, certification, and accreditation</div>
+      <ul>
+        <li>Added 3 quiz questions: tailoring = customising a standard to the organisation, certification = evaluating
+          security controls before go-live, accreditation = formal approval to operate (d2_q_027–029)</li>
+        <li>Added 1 flashcard: certification and accreditation distractor terms to avoid confusing (provisioning,
+          validation, verification, authorization) (d2_fc_027)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">05 Aug 2026</div>
+      <div class="entry-title">D2 — Physical destruction levels, remanence, RAM volatility</div>
+      <ul>
+        <li>Added 3 quiz questions: incineration = highest destruction level, encryption is LEAST acceptable for
+          remanence, RAM is volatile (d2_q_024–026)</li>
+        <li>Added 2 flashcards: degaussing (how it works, what media, drive unusable after), why encryption does not
+          address remanence (d2_fc_025–026)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">05 Aug 2026</div>
+      <div class="entry-title">D2 — Data destruction: paper shredding, delete/format/overwrite, sanitization vs purge
+      </div>
+      <ul>
+        <li>Added 5 quiz questions: cross shredding vs strip shredding, deleting only removes file table entry,
+          sanitization vs purge difference, soft destruction methods, overwriting = writing 0s/random chars
+          (d2_q_019–023)</li>
+        <li>Added 2 flashcards: data destruction strength hierarchy (delete→format→overwrite→sanitization→purge), paper
+          disposal why cross shredding is required (d2_fc_023–024)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">05 Aug 2026</div>
+      <div class="entry-title">D2 — Business owner policies, custodian limits, vendor audit rights</div>
+      <ul>
+        <li>Added 3 quiz questions: business owner sets data access policies, designing security controls is NOT a
+          custodian duty, right to audit outsourced data processors (d2_q_016–018)</li>
+        <li>Added 2 flashcards: custodian do vs don't, data processor audit rights and GDPR accountability
+          (d2_fc_021–022)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">05 Aug 2026</div>
+      <div class="entry-title">D2 — Data ownership roles: mission owner, data owner, system owner, custodian,
+        controller/processor</div>
+      <ul>
+        <li>Added 5 quiz questions: mission owner makes policies, data owner assigns labels + backup frequency, system
+          owner manages infrastructure, HR=controller/vendor=processor, custodian follows data owner (d2_q_011–015)</li>
+        <li>Added 1 flashcard: mission/business owner vs system owner — levels and responsibilities (d2_fc_020)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">05 Aug 2026</div>
+      <div class="entry-title">D2 — Records retention, data classification hierarchy and sensitivity</div>
+      <ul>
+        <li>Added 3 quiz questions: most important factor for retention policy (legal requirements), lowest
+          classification level (Public), most important factor for classification scheme (sensitivity) (d2_q_008–010)
+        </li>
+        <li>Added 2 flashcards: records retention policy primary driver with regulatory examples, data classification
+          hierarchy lowest to highest (d2_fc_018–019)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">05 Aug 2026</div>
+      <div class="entry-title">D2 — Data states: at rest, in motion, in use</div>
+      <ul>
+        <li>Added 3 quiz questions: matching activities to data states, shoulder surfing as attack on data in use,
+          internal network encryption gap (d2_q_005–007)</li>
+        <li>Added 2 flashcards: attacks by data state (at rest/motion/use), why internal traffic also needs encryption
+          (d2_fc_016–017)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">04 Aug 2026</div>
+      <div class="entry-title">D5 — Large batch: SIEM, MFA, tokens, access models, biometrics, CHAP, AD trusts
+        (d5_q_034-061)</div>
+      <ul>
+        <li>Added 3 questions: TGS primary function, RADIUS primary function (centralised AAA), first step of Kerberos
+          (d5_q_034–036)</li>
+        <li>Added 25 questions from large batch covering: SIEM for log management, cookie-based MFA, key stretching vs
+          brute force, salting least effective vs brute force, Type 1 auth (PINs/passwords), rainbow table structure,
+          SMS OTP = MFA, weakest auth factor, SESAME/PKI fix, access control policy reference, AD trust types, IAAA
+          identification = usernames, HOTP = something you have, lowering biometric sensitivity → FAR, lock account
+          first, client sends authenticator to TGS, non-repudiation for accountability, FRR definition, TRAC not a real
+          model, biometric can't be reissued, TOTP 30-second, CRR not a biometric metric, salting definition, swipe card
+          = magnetic stripe, CHAP server-side credential risk (d5_q_037–061)</li>
+        <li>Added 6 flashcards: RADIUS AAA primary function, Kerberos KDC (AS/TGS roles), Kerberos 6-step flow, SIEM
+          definition, AD trust types (reflective not real), smart card types (magnetic/contact/contactless),
+          non-repudiation for accountability, Type 3 biometrics reissuability risk (d5_fc_046–051)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">04 Aug 2026</div>
+      <div class="entry-title">D5 — Kerberos: KDC components and 6-step authentication flow</div>
+      <ul>
+        <li>Added 5 quiz questions: KDC = AS + TGS, step 1 sends plaintext user ID only, step 2 AS returns session key +
+          TGT, TGT purpose, step 6 mutual authentication via timestamp (d5_q_029–033)</li>
+        <li>Added 2 flashcards: KDC structure (AS and TGS roles), Kerberos 6-step flow with key facts (d5_fc_044–045)
+        </li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">04 Aug 2026</div>
+      <div class="entry-title">D5 — Identity provisioning lifecycle, entities, and IAM definition</div>
+      <ul>
+        <li>Added 3 quiz questions: manual provisioning not part of a good lifecycle, identities = entities, IAM =
+          unique identifier + authentication requirement (d5_q_026–028)</li>
+        <li>Added 2 flashcards: provisioning lifecycle good vs bad practices, IAM definition and scope (d5_fc_042–043)
+        </li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">03 Aug 2026</div>
+      <div class="entry-title">D5 — IAAA Access Management: biometrics, access models, passwords (slides batch)</div>
+      <ul>
+        <li>Added 3 quiz questions: software token trade-offs, most secure auth method, single-factor vs MFA
+          (d5_q_013–015)</li>
+        <li>Added 10 quiz questions from slides: FAR vs FRR severity, CER definition, nonce purpose, clipping levels,
+          offline hash bypass, DAC owner control, MAC labels/clearance, RBAC role transfer, ABAC attributes,
+          username+password not MFA (d5_q_016–025)</li>
+        <li>Added 6 flashcards: software token risks, authentication strength ranking, DAC mechanics, MAC
+          labels/clearance/dominance rule, offline hash attacks bypassing clipping, ABAC attribute categories and
+          alternative names (d5_fc_036–041)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">02 Aug 2026</div>
+      <div class="entry-title">D3 — Cryptography, Hardware, Physical Security & Cloud (Large Batch)</div>
+      <ul>
+        <li>Added 26 quiz questions covering salting/rainbow tables, antivirus types, demarc, multiprocessing, RC4
+          deprecation, logic bombs, PKI technologies, IaaS responsibility, digital signatures, motion sensors, PIR
+          detectors, frequency analysis, WORM media, bollards, RIPEMD-160, ASTM gate classes, ALU, Clipper/Skipjack, CPU
+          4-step cycle, key escrow, IDEA, DCS, MAC, IPv6 IPSec, and reference monitor (d3_q_076–101)</li>
+        <li>Added 13 flashcards: antivirus types, demarc, multiprocessing vs multitasking, deprecated ciphers, PKI
+          technology stack, IaaS/PaaS/SaaS responsibility matrix, WORM media, ASTM gate classes, CPU internals,
+          Clipper/Skipjack, IDEA, MAC, IPv6 vs IPv4 IPSec (d3_fc_080–092)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">02 Aug 2026</div>
+      <div class="entry-title">D3 — Emergency Response & Evacuation Planning</div>
+      <ul>
+        <li>Added 3 quiz questions: human life first in emergencies, employee safety first in disasters, evacuation
+          plans must include disabled employees (d3_q_073–075)</li>
+        <li>Added 1 flashcard: emergency response priority order and evacuation planning requirements (d3_fc_079)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">02 Aug 2026</div>
+      <div class="entry-title">D3 — Fire Suppression, Smoke Detectors & HVAC</div>
+      <ul>
+        <li>Added 3 quiz questions: sprinklers for detection + suppression, photoelectric detectors detect smoke, HVAC
+          proper airflow as primary indicator (d3_q_070–072)</li>
+        <li>Added 2 flashcards: fire detector types (photoelectric vs ionisation, heat, flame), HVAC function and data
+          center indicators (d3_fc_077–078)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">02 Aug 2026</div>
+      <div class="entry-title">D3 — Power Surge, UPS Efficiency & CIA Triad Impact</div>
+      <ul>
+        <li>Added 3 quiz questions: power surge = increased voltage/current, UPS efficiency = runtime, power
+          fluctuations primarily compromise Availability (d3_q_067–069)</li>
+        <li>Added 1 flashcard: UPS efficiency metric and CIA triad impact of power fluctuations (d3_fc_076)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">02 Aug 2026</div>
+      <div class="entry-title">D3 — Backup Strategies & Server Hardening</div>
+      <ul>
+        <li>Added 3 quiz questions: offsite backups for disaster recovery, FTP not part of hardening, auto-updates not
+          suitable for production (d3_q_064–066)</li>
+        <li>Added 2 flashcards: backup strategies + 3-2-1 rule, server hardening checklist (d3_fc_074–075)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">02 Aug 2026</div>
+      <div class="entry-title">D3 — Site Threats, Flood Risk Analysis & UPS Load Balancing</div>
+      <ul>
+        <li>Added 3 quiz questions: threats as primary design factor, risk analysis for flood-prone data center, UPS
+          load distribution preventing cascading failure (d3_q_061–063)</li>
+        <li>Added 2 flashcards: site/facility threat-first security design, UPS load balancing and power redundancy
+          (d3_fc_072–073)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">02 Aug 2026</div>
+      <div class="entry-title">D3 — Physical Security: Perimeter Controls, Access Doors & Data Center Structure</div>
+      <ul>
+        <li>Added 3 quiz questions: fences/gates as primary perimeter barrier, secured door stays locked as
+          functionality indicator, slab-to-slab fire-rated data center construction (d3_q_058–060)</li>
+        <li>Added 2 flashcards: preventative vs detective physical controls, data center secure box requirements
+          (d3_fc_070–071)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">02 Aug 2026</div>
+      <div class="entry-title">D3 — SSL vs TLS, TCP 3-way Handshake & IPSec Tunnel Mode</div>
+      <ul>
+        <li>Added 3 quiz questions: SSL older/less secure than TLS, SYN/SYN-ACK/ACK handshake order, IPSec tunnel mode
+          most common (d3_q_055–057)</li>
+        <li>Added 2 flashcards: SSL vs TLS versions and differences, TCP 3-way handshake steps (d3_fc_068–069)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">02 Aug 2026</div>
+      <div class="entry-title">D3 — IPSec: AH, ESP & VPNs</div>
+      <ul>
+        <li>Added 4 quiz questions: AH does not provide confidentiality, ESP for encryption, IPSec for VPNs, choosing AH
+          vs ESP (d3_q_051–054)</li>
+        <li>Added 1 flashcard: IPSec VPN use, IPv4 bolt-on security, AH + ESP together vs separately (d3_fc_067)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">02 Aug 2026</div>
+      <div class="entry-title">D3 — MitM Attacks, Digital Signatures & Hash Collisions</div>
+      <ul>
+        <li>Added 3 quiz questions: MitM as session hijacking, digital signatures for non-repudiation, MD5 collision
+          vulnerability vs SHA-1/SHA-256/PBKDF2 (d3_q_048–050)</li>
+        <li>Added 11 flashcards: cloud deployment models, malware types, logic bomb vs backdoor, CPU instruction cycle +
+          interrupts, ICS/SCADA vulnerabilities, IoT vulnerabilities, VM intra-host traffic security, salt vs nonce,
+          MitM variants &amp; mitigations, cryptanalysis techniques, mobile device security (d3_fc_056–066)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">31 Jul 2026</div>
+      <div class="entry-title">D3 — Virtualization, Cloud Types, Service Models & Hash Functions</div>
+      <ul>
+        <li>Added 12 quiz questions: hypervisor Ring -1, host vs guest, intra-host VM traffic, public/community/hybrid
+          cloud models, IaaS/PaaS/SaaS definitions, salting passwords, nonces &amp; initialization vectors
+          (d3_q_036–047)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">31 Jul 2026</div>
+      <div class="entry-title">D3 — Encryption, Malware, Systems, Side-Channel Attacks &amp; Cryptanalysis</div>
+      <ul>
+        <li>Added 24 quiz questions: asymmetric key counts, public key definition, symmetric vs asymmetric, ICS
+          vulnerabilities, mobile malware, polyinstantiation, CPU instruction cycle, containerization, CPU interrupts,
+          Trojans vs viruses, logic bombs, asymmetric vs symmetric benefits, acoustic/general/covert timing side-channel
+          attacks, SaaS, Type 1 vs Type 2 hypervisors, IoT vulnerabilities, cryptanalysis, frequency analysis,
+          transposition (d3_q_012–035)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">31 Jul 2026</div>
+      <div class="entry-title">D3 — Security Models &amp; Threat Modeling</div>
+      <ul>
+        <li>Added 3 quiz questions: Bell-LaPadula primary goal, Clark-Wilson model (separation of duties &amp;
+          high-value transactions), STRIDE threat modeling (d3_q_009–011)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">31 Jul 2026</div>
+      <div class="entry-title">Fix — Offline Authentication</div>
+      <ul>
+        <li>App no longer shows login screen when offline and a valid session cookie exists — trusts the cookie instead
+          of requiring a server round-trip</li>
+        <li>Password hash cached in localStorage after first online login so the app can be unlocked offline even if the
+          cookie has expired</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">11 Aug 2026</div>
+      <div class="entry-title">D4 — Major batch: 30 questions covering VoIP/UDP, TCP, IP addresses, ports, protocols,
+        topologies, OSI layers, QoS, IPv6, cables</div>
+      <ul>
+        <li>Added 30 quiz questions: VoIP=UDP, TCP connection-oriented, L3 broadcast (255.255.255.255), 172.32.0.0
+          public, SFTP over SSH, ARIN (North America), E3 speed (34.368 Mbps), port 23=Telnet, port 25=SMTP,
+          172.15.11.45 public, DHCP port 67, DORA process, TCP 3-way handshake, port 137=NetBIOS name, port 138=NetBIOS
+          datagram, ARP spoofing=L2 threat, APNIC (Asia-Pacific), IPv6=128 bits, STP vs UTP (EMI), IMAP=L7 not L3,
+          Telnet=cleartext, fiber optic near power cables, multi-mode fiber for data center, L3 isolates broadcast
+          domains, MAC sticky on switch, QoS=VoIP priority, port 143=IMAP4, port 110=POP3, bus topology break=stops
+          traffic, IPv6 fe80 link-local (d4_q_092–121, Q10/Q23 reformulated as single-answer)</li>
+        <li>Added 8 flashcards: VoIP/UDP vs TCP, five RIRs and regions, NetBIOS ports 137/138, OSI layer threats, STP vs
+          UTP, IPv6 key features, QoS and VoIP priority, MAC sticky command (d4_fc_102–109)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">11 Aug 2026</div>
+      <div class="entry-title">D4 — CDN for large file delivery, IPSec suite overview, CHAP vs PAP authentication</div>
+      <ul>
+        <li>Added 3 quiz questions: CDN as most efficient large-file delivery, IPSec as full
+          integrity/authenticity/confidentiality suite, CHAP three-way handshake with hashed password (d4_q_089–091)
+        </li>
+        <li>Added 2 flashcards: CDN definition and use cases, CHAP vs PAP authentication comparison (d4_fc_100–101)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">11 Aug 2026</div>
+      <div class="entry-title">D4 — IPSec: Security Associations, SPI, Tunnel vs Transport mode, ISAKMP, IKE, ESP vs AH
+      </div>
+      <ul>
+        <li>Added 7 quiz questions: SA as simplex one-way connection, ESP = 2 SAs, AH+ESP = 4 SAs, SPI as 32-bit SA
+          identifier, Tunnel mode (full packet) vs Transport mode (payload only), ISAKMP manages SA creation, IKE
+          negotiates algorithm selection (d4_q_082–088)</li>
+        <li>Added 4 flashcards: SA count for ESP and AH+ESP combinations, Tunnel vs Transport mode, ISAKMP vs IKE roles,
+          ESP vs AH capabilities (d4_fc_096–099)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">11 Aug 2026</div>
+      <div class="entry-title">D4 — DCE vs DTE (modem), firewall as first external defence, fail-secure behaviour</div>
+      <ul>
+        <li>Added 3 quiz questions: modem = most common DCE, firewall = first control for external threats, firewall =
+          fail-secure device (d4_q_079–081)</li>
+        <li>Added 2 flashcards: DCE vs DTE with examples, fail-secure vs fail-open and why firewalls must fail-secure
+          (d4_fc_094–095)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">11 Aug 2026</div>
+      <div class="entry-title">D4 — Wireless security, Li-Fi, 802.11g frequency, ASN, switch vs router functions</div>
+      <ul>
+        <li>Added 6 quiz questions: WPA2-Enterprise most secure wireless, Li-Fi most secure transmission technology,
+          802.11g = 2.4 GHz, ASN = Autonomous System Number (BGP), wireless router for wireless access, switch primary
+          function = Layer 2 MAC forwarding (d4_q_073–078)</li>
+        <li>Added 5 flashcards: WPA2-Enterprise vs Personal vs WEP, Li-Fi security, 802.11 standards and frequency
+          bands, ASN and BGP, switch/router/hub/gateway OSI layers and functions (d4_fc_089–093)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">11 Aug 2026</div>
+      <div class="entry-title">D4 — SAN definition, network topologies (star/bus/ring/mesh), fiber optic primary
+        disadvantage</div>
+      <ul>
+        <li>Added 3 quiz questions: SAN = Storage Area Network, star topology for enterprise LANs, fiber optic first
+          disadvantage = cost (d4_q_070–072)</li>
+        <li>Added 2 flashcards: SAN definition and SAN vs NAS, four network topologies and characteristics
+          (d4_fc_087–088)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">11 Aug 2026</div>
+      <div class="entry-title">D4 — Cables: fiber optic vs copper, single-mode vs multi-mode, WDM</div>
+      <ul>
+        <li>Added 7 quiz questions: fiber uses light vs copper electricity, 1 Petabit/sec speed, 150+ mile distance,
+          passive sniffing security advantage, single-mode for long-distance IP backbone, WDM definition, fiber cons
+          (cost/fragility) (d4_q_063–069)</li>
+        <li>Added 3 flashcards: fiber optic pros vs cons vs copper, single-mode vs multi-mode fiber, WDM definition and
+          use (d4_fc_084–086)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">10 Aug 2026</div>
+      <div class="entry-title">D8 — Major batch: databases, SDLC methodologies, open source, acceptance testing,
+        vulnerabilities (28 questions + 14 flashcards)</div>
+      <ul>
+        <li>Added 28 quiz questions covering: relational DB terms (tuple/attribute/relation/schema), e-vaulting vs
+          shadowing, semantic integrity, OAT vs production acceptance testing, XP daily stand-up NOT XP (Scrum), CASE 3
+          categories, open source (code + software), Scrum core roles, injection mitigation, GUI builders = RAD, partial
+          disclosure, pseudo-random session IDs as security feature, IDOR, pair programming = XP, SaaS customer
+          responsibility after application, Spiral model phases (no Initiation), database shadowing real-time copy, XML
+          = document-oriented DB, OOAD OOD phase for constraints, crippleware, Oracle NOT open-source licence, Agile
+          characteristics, CASE references NOT a category, Product Owner role, Bottom-up NOT an SDLC methodology, buffer
+          overflow overwrites adjacent memory (not hard disk) (d8_q_040–067, skipped Q17 dup and Q26 dup)</li>
+        <li>Added 14 flashcards: DB terms, e-vaulting vs log shipping vs shadowing, OAT vs production AT vs UAT, XP core
+          practices, CASE categories, IDOR, crippleware vs shareware vs freeware, disclosure types, RAD and GUI
+          builders, Scrum roles, Spiral phases, XML + document-oriented DB, OOA vs OOD, open-source licences
+          (d8_fc_047–060)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">10 Aug 2026</div>
+      <div class="entry-title">D8 — AI/ML: ANN capabilities, AI-specific security protocols, machine learning in
+        cybersecurity</div>
+      <ul>
+        <li>Added 3 quiz questions: ANNs cannot think independently, AI security via differential privacy and
+          adversarial training, ML primary use as malware classification (d8_q_037–039)</li>
+        <li>Added 3 flashcards: ANN structure and limitations, differential privacy vs adversarial training, ML uses in
+          cybersecurity (d8_fc_044–046)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">10 Aug 2026</div>
+      <div class="entry-title">D8 — Cloud service models, software procurement, and COTS vulnerability response</div>
+      <ul>
+        <li>Added 8 quiz questions: IaaS/PaaS/SaaS responsibility boundaries, SaaS examples, customer control levels,
+          PaaS for custom apps, software licence review before purchase, cost not being primary concern in software
+          evaluation, COTS vulnerability top priority (update/patch) (d8_q_029–036)</li>
+        <li>Added 6 flashcards: IaaS/PaaS/SaaS management boundaries, SaaS interaction modes, choosing service model by
+          control level, software licence pre-purchase checklist, third-party software evaluation criteria, COTS
+          definition and vulnerability response (d8_fc_038–043)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">10 Aug 2026</div>
+      <div class="entry-title">D8 — Cloud computing: 4 types (private/public/hybrid/community) and cloud outsourcing
+        security rights</div>
+      <ul>
+        <li>Added 5 quiz questions: public cloud shared tenancy, hybrid cloud for sensitive vs non-sensitive data,
+          community cloud definition, private cloud single-org ownership, cloud outsourcing security rights
+          (d8_q_024–028)</li>
+        <li>Added 3 flashcards: 4 cloud computing types, community vs public vs private distinction, cloud outsourcing
+          audit/pentest/VA/compliance rights (d8_fc_035–037)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">10 Aug 2026</div>
+      <div class="entry-title">D8 — Maturity models: CMM 5 levels, BSIMM software security benchmark, CMM vs CMMC vs
+        BSIMM</div>
+      <ul>
+        <li>Added 3 quiz questions: CMM Level 2 Repeatable, BSIMM purpose (software security benchmarking), CMM as
+          software development process framework (d8_q_021–023)</li>
+        <li>Added 3 flashcards: CMM 5-level model, BSIMM 4 domains and 12 practices, CMM vs CMMC vs BSIMM comparison
+          (d8_fc_032–034)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">10 Aug 2026</div>
+      <div class="entry-title">D8 — Security: auth failures, XSS defence, broken access control, privilege escalation,
+        backdoors, buffer overflows</div>
+      <ul>
+        <li>Added 6 quiz questions: most common auth failure (user error), XSS defence (input validation), broken access
+          control indicator (unauthorised access), privilege escalation first step (least privilege), backdoor
+          appropriate use (development only), buffer overflow mechanics (d8_q_015–020)</li>
+        <li>Added 6 flashcards: auth failure forms, XSS mechanism and defence, broken access control, least privilege vs
+          privilege escalation, backdoor lifecycle, buffer overflow causes and defences (d8_fc_026–031)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Aug 2026</div>
+      <div class="entry-title">D8 — Databases: data normalisation best practices, database integrity types, SQL DDL
+        statements</div>
+      <ul>
+        <li>Added 3 quiz questions: data normalisation (NOT allowing multiple formats), semantic integrity violation,
+          SQL DDL commands CREATE/ALTER/DROP (d8_q_012–014)</li>
+        <li>Added 3 flashcards: normalisation best practices, four integrity types
+          (semantic/entity/referential/user-defined), SQL DDL vs DML (d8_fc_023–025)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Aug 2026</div>
+      <div class="entry-title">D8 — SDLC methodologies: DevOps CI/CD deployment frequency, Sashimi overlapping phases,
+        Waterfall for fixed requirements</div>
+      <ul>
+        <li>Added 3 quiz questions: DevOps continuous deployment, Sashimi linear-with-overlap model, Waterfall for
+          stable fixed-scope projects (d8_q_009–011)</li>
+        <li>Added 3 flashcards: DevOps CI/CD cadence, Sashimi vs Waterfall distinction, Waterfall best-fit criteria
+          (d8_fc_020–022)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Aug 2026</div>
+      <div class="entry-title">D8 — Software licensing and SDLC: freeware vs shareware, reverse engineering, security
+        controls in design phase</div>
+      <ul>
+        <li>Added 3 quiz questions: freeware vs shareware distinction, assembly as hardest to reverse-engineer, SDLC
+          design phase as first security control review (d8_q_006–008)</li>
+        <li>Added 3 flashcards: freeware vs shareware definitions, why assembly is hardest to reverse, SDLC
+          security-by-design principle (d8_fc_017–019)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D7 — Practice test: DR site recovery times, MOU, hot site protection level</div>
+      <ul>
+        <li>Added 3 quiz questions: warm site 4hr–3 day RTO, MOU for staff disaster acknowledgement, hot site as highest
+          DR protection (d7_q_205–207)</li>
+        <li>Added 2 flashcards: MOU definition and legal standing, warm vs hot site data migration gap (d7_fc_090–091)
+        </li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Aug 2026</div>
+      <div class="entry-title">D7 — Practice test: 28 questions covering forensics, RAID, backups, incident management,
+        IDS/IPS, EOC, 4th Amendment, and DR sites</div>
+      <ul>
+        <li>Added 28 quiz questions spanning: environmental vs natural vs man-made disasters, hashing for forensic
+          integrity, RAID 5 striping with parity, backup loss calculation (20-hour window), RAID 1 minimum disks, server
+          clustering for fault tolerance, geographically redundant sites, differential+incremental conflict, write
+          blocker usage, IT security event definition, incremental vs differential backup speed, OEP evacuation plan,
+          last 3 incident management phases, MOR hardware specs, DR restore priority (least critical last), IDS vs IPS,
+          copy backup (no archive bit clear), evidence alteration, 4th Amendment warrant exceptions, EOC command centre,
+          catch-as-you-can network forensics, voluntary disclosure to government, IAAR forensics order,
+          containment/response phase, subscription site mechanics, server motherboard redundancy, 3-hour recovery window
+          (hot+redundant), and COOP for day-to-day operations (d7_q_208–235)</li>
+        <li>Added 6 flashcards: three disaster categories (natural/man-made/environmental), EOC definition and
+          deployment, IAAR forensics order, 7-phase incident management lifecycle, copy backup vs full backup archive
+          bit behaviour, catch-as-you-can network forensics (d7_fc_092–097)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D7 — Improving the Plans: Review Cycle & Version Control</div>
+      <ul>
+        <li>Added 4 quiz questions: 12-month review cycle, out-of-cycle triggers, old copy destruction, real disaster as
+          trigger (d7_q_201–204)</li>
+        <li>Added 2 flashcards: review frequency and triggers, old copy destruction policy (d7_fc_088–089)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D7 — Testing the Plans: Simulation, Parallel, Partial & Full Interruption</div>
+      <ul>
+        <li>Added 5 quiz questions: Simulation vs Tabletop distinction, Parallel Processing, Partial Interruption, Full
+          Interruption, full test order least-to-most disruptive (d7_q_196–200)</li>
+        <li>Added 2 flashcards: three physical test types, full 7-step test progression (d7_fc_086–087)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D7 — Testing the Plans: DRP Review, Read-Through & Tabletop</div>
+      <ul>
+        <li>Added 4 quiz questions: DRP Review purpose, Read-Through checklist, Tabletop/Walk-through, living documents
+          rationale (d7_q_192–195)</li>
+        <li>Added 2 flashcards: three simulated test types, Tabletop exercise (d7_fc_084–085)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D7 — BCP Sub-Plans: COOP, OEP & Cyber Incident Response</div>
+      <ul>
+        <li>Added 4 quiz questions: COOP purpose and timeframe, OEP focus, BCP as overarching plan, Cyber IRP scope
+          (d7_q_188–191)</li>
+        <li>Added 3 flashcards: COOP, OEP, BCP containing sub-plans (d7_fc_081–083)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D7 — Recovery Strategies: Mobile Site, Subscription/Cloud Site & Comparison Matrix</div>
+      <ul>
+        <li>Added 5 quiz questions: mobile site definition, only non-fixed site, subscription/cloud model, mirrored site
+          zero setup time, cold site hardware/telecom (d7_q_183–187)</li>
+        <li>Added 3 flashcards: mobile site, subscription/cloud site, full 5-site comparison matrix (d7_fc_078–080)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D7 — Recovery Strategies: Redundant & Hot Sites</div>
+      <ul>
+        <li>Added 5 quiz questions: redundant site definition, geographic separation rationale, hot vs redundant site
+          differences, most expensive site type, hot site failover characteristics (d7_q_178–182)</li>
+        <li>Added 2 flashcards: redundant vs hot site comparison, full 4-site ranking by speed and cost (d7_fc_076–077)
+        </li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D7 — Recovery Strategies: Warm, Cold & Reciprocal Agreement Sites</div>
+      <ul>
+        <li>Added 5 quiz questions: warm vs hot site, cold site characteristics, reciprocal agreement, cost ranking,
+          warm site recovery steps (d7_q_173–177)</li>
+        <li>Added 3 flashcards: hot/warm/cold comparison, reciprocal agreement risks, warm site details (d7_fc_073–075)
+        </li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D4 — IP Classes, LAN Devices, Wireless Security, Email Protocols & WAN Speeds</div>
+      <ul>
+        <li>Added 12 quiz questions: IP class ranges, bridge vs router layers, attenuation, DMZ/screened subnet, WPA2,
+          WPA2 Enterprise/RADIUS, LDAP-S port 636, S/MIME, repeater at L1, T-1 speed, backup CIA properties, bridge
+          forwarding (d4_q_051–062)</li>
+        <li>Added 6 flashcards: IP class ranges/masks, LAN devices by OSI layer, WEP/WPA/WPA2 comparison, email security
+          protocols, WAN/cabling speeds, wireless network modes (d4_fc_078–083)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D4 — MAC Security Modes, Firewalls, IEEE 802 & SSH vs Telnet</div>
+      <ul>
+        <li>Added 8 quiz questions: MAC dedicated/system-high modes, 4 firewall types and layers, IEEE 802 standards,
+          802.11i/WPA2, SSH vs Telnet (d4_q_043–050)</li>
+        <li>Added 5 flashcards: MAC security modes, firewall types, IEEE 802 standards, 802.11 variants, circuit vs
+          application proxy (d4_fc_073–077)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D4 — IPv4 bits, DHCP port, IPv6 benefits</div>
+      <ul>
+        <li>Added 3 quiz questions from practice test: IPv4 address size, DHCP server port, IPv6 NOT a benefit
+          (d4_q_040–042)</li>
+        <li>Added 2 flashcards: IPv4 vs IPv6 bit sizes, IPv6 key benefits (d4_fc_071–072)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D4 — Email Protocols: MUA, MSA, MTA, MDA & MX Records</div>
+      <ul>
+        <li>Added 4 quiz questions: DNS MX records, email delivery order, MTA role, POP3 vs IMAP retrieval
+          (d4_q_036–039)</li>
+        <li>Added 3 flashcards: four email agent types, end-to-end email flow, DNS MX records (d4_fc_068–070)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D4 — BOOTP, DHCP & DORA Process</div>
+      <ul>
+        <li>Added 4 quiz questions: BOOTP purpose, DHCP DORA sequence, BOOTP/DHCP ports, DHCP Discovery broadcast
+          reasoning (d4_q_032–035)</li>
+        <li>Added 3 flashcards: BOOTP vs DHCP, DORA process, why DHCP uses UDP (d4_fc_065–067)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">09 Jul 2026</div>
+      <div class="entry-title">D4 — HTTP, HTTPS & HTML</div>
+      <ul>
+        <li>Added 3 quiz questions: HTTP vs HTTPS security difference, alternate ports (8443), HTML vs HTTP distinction
+          (d4_q_029–031)</li>
+        <li>Added 2 flashcards: HTTP/HTTPS ports including alternates, HTML vs HTTP/HTTPS (d4_fc_063–064)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">08 Jul 2026</div>
+      <div class="entry-title">D4 — IPv4 Header Fields & MTU</div>
+      <ul>
+        <li>Added 4 quiz questions: TTL purpose, fragmentation fields, MTU size, MTU exceeded behaviour (d4_q_025–028)
+        </li>
+        <li>Added 3 flashcards: IPv4 header fields, TTL, MTU (d4_fc_060–062)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">08 Jul 2026</div>
+      <div class="entry-title">D4 — IPv4/IPv6 Address Management & RIRs</div>
+      <ul>
+        <li>Added 4 quiz questions: IANA role, IANA/ICANN relationship, AFRINIC region, RIPE NCC region (d4_q_021–024)
+        </li>
+        <li>Added 3 flashcards: IANA/ICANN, all 5 RIRs and their regions, IP address management hierarchy
+          (d4_fc_057–059)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">08 Jul 2026</div>
+      <div class="entry-title">D4 — Ports, TCP vs UDP, Attacks & TCP/IP Model</div>
+      <ul>
+        <li>Added 8 quiz questions: SSH/Telnet ports, FTP ports, UDP characteristics, Fraggle attack, SYN flood, TCP
+          3-way handshake, TCP/IP↔OSI mapping, port identification (d4_q_013–020)</li>
+        <li>Added 8 flashcards: SSH vs Telnet, FTP ports, email protocol ports, HTTP/HTTPS/RDP ports, TCP vs UDP, SYN
+          flood, Fraggle attack, TCP/IP to OSI mapping (d4_fc_049–056)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">07 Jul 2026</div>
+      <div class="entry-title">D4 — OSI Layers & TCP/IP PDUs</div>
+      <ul>
+        <li>Added 3 quiz questions: physical security at OSI L1, SSL at presentation layer L6, frames/bits as TCP/IP
+          link layer PDUs (d4_q_010–012)</li>
+        <li>Added 3 flashcards covering the same concepts (d4_fc_046–048)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">05 Jul 2026</div>
+      <div class="entry-title">D1 — Large practice test batch: 29 questions + 5 flashcards</div>
+      <ul>
+        <li>Added 29 quiz questions covering: least privilege, CIA triad, encryption attacks, ECPA, qualitative
+          analysis, integrity factors, DDoS, COSO, IP protection, ALE, CIA opposites, risk appetite, MFA, ISC2 ethics,
+          breach notification, liability, risk rejection, availability factors, ISO27799, real evidence, biometrics,
+          integrity tradeoffs, risk matrix, due diligence, code injection, criminal court, physical controls, HIPAA
+          rules (d1_q_063–091)</li>
+        <li>Added 5 flashcards: ECPA 1986, ISO27799, US breach notification laws, HIPAA three rules, risk appetite
+          (d1_fc_041–045)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">04 Jul 2026</div>
+      <div class="entry-title">D1 — BCP/DRP, Compliance, Risk Assessment & More</div>
+      <ul>
+        <li>Added 12 questions: RPO, RTO, WRT, MTD formula, MTD scenario, MTBF, MTTR, MOR, MTD synonyms, weekly backup
+          RPO, and BIA criticality (d1_q_051–062)</li>
+        <li>Added 6 questions: hacker types, DDoS vs CIA triad, phishing, BIA, BCP focus, and most critical BCP process
+          (d1_q_045–050)</li>
+        <li>Added 3 questions: compliance definition, compliance as top governance principle, risk assessment vs risk
+          management (d1_q_042–044)</li>
+        <li>Added 3 questions: risk transference, first step in risk management, SLE calculation (d1_q_039–041)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">30 Jun 2026</div>
+      <div class="entry-title">D1 — Quantitative Risk Analysis Calculations</div>
+      <ul>
+        <li>Added 6 calculation-based questions on AV, EF, SLE, ARO, and ALE (d1_q_033–038)</li>
+        <li>Scenarios include laptop theft, data center flooding, DDoS, data breach, and fire with ROI analysis</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">29 Jun 2026</div>
+      <div class="entry-title">D1 — Security Control Types</div>
+      <ul>
+        <li>Added 3 questions on administrative, technical, and physical controls (annual training, highest-level
+          control, background checks)</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">28 Jun 2026</div>
+      <div class="entry-title">D1 — Governance, Policy & Ethics (batch 2)</div>
+      <ul>
+        <li>Added 9 questions covering digital forensics, IP/trademark law, HIPAA, GDPR, and ISC2 ethics canons</li>
+        <li>Added 3 questions on mission statements, security policy purpose, and policy vs guidelines</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">27 Jun 2026</div>
+      <div class="entry-title">PWA — Flashcard & Offline Improvements</div>
+      <ul>
+        <li>Flashcards can now be flipped back by tapping again</li>
+        <li>Switched service worker to network-first for HTML — updates apply automatically on next open</li>
+        <li>Added version/changelog bar at bottom of screen</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">27 Jun 2026</div>
+      <div class="entry-title">D1 — Governance & Risk Management</div>
+      <ul>
+        <li>Added 3 questions on good governance indicators, proactive vs reactive security, and security management
+          function</li>
+        <li>Added 3 questions on IAAA model, authentication vs authorization, and passphrase type</li>
+        <li>Added 3 questions on CIA triad — data deletion, pharmaceutical confidentiality, over-enforcing
+          confidentiality</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">27 Jun 2026</div>
+      <div class="entry-title">PWA Support</div>
+      <ul>
+        <li>Added web app manifest and service worker for offline use</li>
+        <li>Added install banner on mobile devices</li>
+        <li>Added SVG icon for home screen</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">21 Jun 2026</div>
+      <div class="entry-title">Initial Release</div>
+      <ul>
+        <li>275 flashcards across all 8 CISSP domains</li>
+        <li>76 quiz questions across all 8 CISSP domains</li>
+        <li>Supabase sync for progress and study time</li>
+        <li>Password-protected via Edge Function</li>
+      </ul>
+    </div>
 
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D4 — IPv4 bits, DHCP port, IPv6 benefits</div>
-    <ul>
-      <li>Added 3 quiz questions from practice test: IPv4 address size, DHCP server port, IPv6 NOT a benefit (d4_q_040–042)</li>
-      <li>Added 2 flashcards: IPv4 vs IPv6 bit sizes, IPv6 key benefits (d4_fc_071–072)</li>
-    </ul>
   </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D4 — Email Protocols: MUA, MSA, MTA, MDA & MX Records</div>
-    <ul>
-      <li>Added 4 quiz questions: DNS MX records, email delivery order, MTA role, POP3 vs IMAP retrieval (d4_q_036–039)</li>
-      <li>Added 3 flashcards: four email agent types, end-to-end email flow, DNS MX records (d4_fc_068–070)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D4 — BOOTP, DHCP & DORA Process</div>
-    <ul>
-      <li>Added 4 quiz questions: BOOTP purpose, DHCP DORA sequence, BOOTP/DHCP ports, DHCP Discovery broadcast reasoning (d4_q_032–035)</li>
-      <li>Added 3 flashcards: BOOTP vs DHCP, DORA process, why DHCP uses UDP (d4_fc_065–067)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">09 Jul 2026</div>
-    <div class="entry-title">D4 — HTTP, HTTPS & HTML</div>
-    <ul>
-      <li>Added 3 quiz questions: HTTP vs HTTPS security difference, alternate ports (8443), HTML vs HTTP distinction (d4_q_029–031)</li>
-      <li>Added 2 flashcards: HTTP/HTTPS ports including alternates, HTML vs HTTP/HTTPS (d4_fc_063–064)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">08 Jul 2026</div>
-    <div class="entry-title">D4 — IPv4 Header Fields & MTU</div>
-    <ul>
-      <li>Added 4 quiz questions: TTL purpose, fragmentation fields, MTU size, MTU exceeded behaviour (d4_q_025–028)</li>
-      <li>Added 3 flashcards: IPv4 header fields, TTL, MTU (d4_fc_060–062)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">08 Jul 2026</div>
-    <div class="entry-title">D4 — IPv4/IPv6 Address Management & RIRs</div>
-    <ul>
-      <li>Added 4 quiz questions: IANA role, IANA/ICANN relationship, AFRINIC region, RIPE NCC region (d4_q_021–024)</li>
-      <li>Added 3 flashcards: IANA/ICANN, all 5 RIRs and their regions, IP address management hierarchy (d4_fc_057–059)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">08 Jul 2026</div>
-    <div class="entry-title">D4 — Ports, TCP vs UDP, Attacks & TCP/IP Model</div>
-    <ul>
-      <li>Added 8 quiz questions: SSH/Telnet ports, FTP ports, UDP characteristics, Fraggle attack, SYN flood, TCP 3-way handshake, TCP/IP↔OSI mapping, port identification (d4_q_013–020)</li>
-      <li>Added 8 flashcards: SSH vs Telnet, FTP ports, email protocol ports, HTTP/HTTPS/RDP ports, TCP vs UDP, SYN flood, Fraggle attack, TCP/IP to OSI mapping (d4_fc_049–056)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">07 Jul 2026</div>
-    <div class="entry-title">D4 — OSI Layers & TCP/IP PDUs</div>
-    <ul>
-      <li>Added 3 quiz questions: physical security at OSI L1, SSL at presentation layer L6, frames/bits as TCP/IP link layer PDUs (d4_q_010–012)</li>
-      <li>Added 3 flashcards covering the same concepts (d4_fc_046–048)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">05 Jul 2026</div>
-    <div class="entry-title">D1 — Large practice test batch: 29 questions + 5 flashcards</div>
-    <ul>
-      <li>Added 29 quiz questions covering: least privilege, CIA triad, encryption attacks, ECPA, qualitative analysis, integrity factors, DDoS, COSO, IP protection, ALE, CIA opposites, risk appetite, MFA, ISC2 ethics, breach notification, liability, risk rejection, availability factors, ISO27799, real evidence, biometrics, integrity tradeoffs, risk matrix, due diligence, code injection, criminal court, physical controls, HIPAA rules (d1_q_063–091)</li>
-      <li>Added 5 flashcards: ECPA 1986, ISO27799, US breach notification laws, HIPAA three rules, risk appetite (d1_fc_041–045)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">04 Jul 2026</div>
-    <div class="entry-title">D1 — BCP/DRP, Compliance, Risk Assessment & More</div>
-    <ul>
-      <li>Added 12 questions: RPO, RTO, WRT, MTD formula, MTD scenario, MTBF, MTTR, MOR, MTD synonyms, weekly backup RPO, and BIA criticality (d1_q_051–062)</li>
-      <li>Added 6 questions: hacker types, DDoS vs CIA triad, phishing, BIA, BCP focus, and most critical BCP process (d1_q_045–050)</li>
-      <li>Added 3 questions: compliance definition, compliance as top governance principle, risk assessment vs risk management (d1_q_042–044)</li>
-      <li>Added 3 questions: risk transference, first step in risk management, SLE calculation (d1_q_039–041)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">30 Jun 2026</div>
-    <div class="entry-title">D1 — Quantitative Risk Analysis Calculations</div>
-    <ul>
-      <li>Added 6 calculation-based questions on AV, EF, SLE, ARO, and ALE (d1_q_033–038)</li>
-      <li>Scenarios include laptop theft, data center flooding, DDoS, data breach, and fire with ROI analysis</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">29 Jun 2026</div>
-    <div class="entry-title">D1 — Security Control Types</div>
-    <ul>
-      <li>Added 3 questions on administrative, technical, and physical controls (annual training, highest-level control, background checks)</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">28 Jun 2026</div>
-    <div class="entry-title">D1 — Governance, Policy & Ethics (batch 2)</div>
-    <ul>
-      <li>Added 9 questions covering digital forensics, IP/trademark law, HIPAA, GDPR, and ISC2 ethics canons</li>
-      <li>Added 3 questions on mission statements, security policy purpose, and policy vs guidelines</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">27 Jun 2026</div>
-    <div class="entry-title">PWA — Flashcard & Offline Improvements</div>
-    <ul>
-      <li>Flashcards can now be flipped back by tapping again</li>
-      <li>Switched service worker to network-first for HTML — updates apply automatically on next open</li>
-      <li>Added version/changelog bar at bottom of screen</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">27 Jun 2026</div>
-    <div class="entry-title">D1 — Governance & Risk Management</div>
-    <ul>
-      <li>Added 3 questions on good governance indicators, proactive vs reactive security, and security management function</li>
-      <li>Added 3 questions on IAAA model, authentication vs authorization, and passphrase type</li>
-      <li>Added 3 questions on CIA triad — data deletion, pharmaceutical confidentiality, over-enforcing confidentiality</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">27 Jun 2026</div>
-    <div class="entry-title">PWA Support</div>
-    <ul>
-      <li>Added web app manifest and service worker for offline use</li>
-      <li>Added install banner on mobile devices</li>
-      <li>Added SVG icon for home screen</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-date">21 Jun 2026</div>
-    <div class="entry-title">Initial Release</div>
-    <ul>
-      <li>275 flashcards across all 8 CISSP domains</li>
-      <li>76 quiz questions across all 8 CISSP domains</li>
-      <li>Supabase sync for progress and study time</li>
-      <li>Password-protected via Edge Function</li>
-    </ul>
-  </div>
-
-</div>
 </body>
+
 </html>
