@@ -1917,15 +1917,34 @@
     }
 
     async function initAuth() {
+      let recoveryHandled = false;
       sb.auth.onAuthStateChange((event, session) => {
-        if (event === 'PASSWORD_RECOVERY') { renderAuthView('resetPassword'); showAuthOverlay(); }
-        else if (event === 'SIGNED_OUT') {
+        if (event === 'PASSWORD_RECOVERY') {
+          recoveryHandled = true;
+          renderAuthView('resetPassword'); showAuthOverlay();
+        } else if (event === 'SIGNED_OUT') {
           currentUser = null; currentUserId = null; currentSub = null;
           document.getElementById('trialBar').classList.remove('visible');
           renderAuthView('signin'); showAuthOverlay();
         }
       });
+
+      // A password-reset link logs the visitor in via a session embedded in the URL
+      // (hash for the implicit flow, ?code= for PKCE) — check for that BEFORE the
+      // normal getSession()/onSignedIn() path below, which would otherwise treat
+      // that session as an ordinary sign-in and unlock the app immediately.
+      const qs = new URLSearchParams(window.location.search);
+      const hs = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+      if (qs.get('type') === 'recovery' || hs.get('type') === 'recovery') {
+        recoveryHandled = true;
+        history.replaceState(null, '', window.location.pathname);
+        renderAuthView('resetPassword');
+        showAuthOverlay();
+        return;
+      }
+
       const { data: { session } } = await sb.auth.getSession();
+      if (recoveryHandled) return; // PASSWORD_RECOVERY fired while awaiting getSession() above
       if (!session) { renderAuthView('signin'); showAuthOverlay(); return; }
       await onSignedIn(session);
     }
