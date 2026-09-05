@@ -2001,6 +2001,11 @@
           sessionGen++;
           currentUser = null; currentUserId = null; currentSub = null;
           clearAllLocalCaches();
+          // Signing out from the Profile (or Settings) screen left those flags set,
+          // so the next sign-in's loadProgress() skipped reset() and the outgoing
+          // account's Profile screen (email, subscription status) stayed on screen
+          // underneath the auth overlay instead of being replaced.
+          settingsOpen = false; profileOpen = false;
           document.getElementById('trialBar').classList.remove('visible');
           renderAuthView('signin'); showAuthOverlay();
         }
