@@ -719,6 +719,36 @@
       min-height: 18px
     }
 
+    .auth-links {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px
+    }
+
+    .auth-links a {
+      color: var(--accent);
+      text-decoration: none
+    }
+
+    #trialBar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 51;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 14px 16px;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4)
+    }
+
+    #trialBar.visible {
+      display: flex
+    }
+
     /* ── TEST MODE ─────────────────────────────────────── */
     .test-setup {
       padding: 16px 16px 32px
@@ -1098,14 +1128,14 @@
 
 <body>
   <div id="authOverlay">
-    <div class="auth-box">
-      <div class="auth-title">CISSP Pocket Trainer</div>
-      <div class="auth-sub">Enter your access password to continue.</div>
-      <input class="auth-input" type="password" id="authInput" placeholder="Password"
-        onkeydown="if(event.key==='Enter')submitPassword()">
-      <button class="auth-btn" onclick="submitPassword()">Unlock</button>
-      <div class="auth-error" id="authError"></div>
+    <div class="auth-box" id="authBox"></div>
+  </div>
+  <div id="trialBar">
+    <div class="pwa-text">
+      <div class="pwa-title" id="trialBarTitle"></div>
+      <div class="pwa-sub">Cancel anytime.</div>
     </div>
+    <button class="pwa-install" onclick="startCheckoutOrPortal()">Subscribe</button>
   </div>
   <div id="pwaBar">
     <div class="pwa-icon">
@@ -1210,7 +1240,7 @@
       const localActions = getLocalActions();
       const pending = getPendingIds();
       try {
-        const { data, error } = await sb.from('progress').select('card_id,score,last_action');
+        const { data, error } = await sb.from('progress').select('card_id,score,last_action').eq('user_id', currentUserId);
         if (error) throw error;
         const remote = {};
         const remoteActions = {};
@@ -1257,7 +1287,7 @@
       addPending(cardId);
       setLastAction(cardId, lastAction);
       try {
-        const { error } = await sb.from('progress').upsert({ card_id: cardId, score: score, last_action: lastAction, updated_at: new Date().toISOString() });
+        const { error } = await sb.from('progress').upsert({ user_id: currentUserId, card_id: cardId, score: score, last_action: lastAction, updated_at: new Date().toISOString() }, { onConflict: 'user_id,card_id' });
         if (error) throw error;
         clearPending(cardId);
         syncStatus = getPendingIds().length ? 'offline' : 'synced';
@@ -1304,7 +1334,7 @@
 
     async function loadStudyTime() {
       try {
-        const { data, error } = await sb.from('study_time').select('total_seconds').eq('id', 'total').single();
+        const { data, error } = await sb.from('study_time').select('total_seconds').eq('user_id', currentUserId).single();
         if (error) throw error;
         totalSeconds = data.total_seconds;
         saveLocalTime(totalSeconds);
@@ -1342,7 +1372,7 @@
       saveLocalTime(newTotal);
       renderTime();
       try {
-        const { error } = await sb.from('study_time').upsert({ id: 'total', total_seconds: newTotal, updated_at: new Date().toISOString() });
+        const { error } = await sb.from('study_time').upsert({ user_id: currentUserId, total_seconds: newTotal, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
         if (error) throw error;
       } catch (e) {
         // offline: local total already updated above, will retry next flush/visit
@@ -1362,7 +1392,7 @@
 
     async function loadTestSession() {
       try {
-        const { data, error } = await sb.from('test_session').select('state').eq('id', 'active').maybeSingle();
+        const { data, error } = await sb.from('test_session').select('state').eq('user_id', currentUserId).maybeSingle();
         if (error) throw error;
         savedTestSession = data ? data.state : null;
         saveLocalTestSession(savedTestSession);
@@ -1388,7 +1418,7 @@
       savedTestSession = state;
       saveLocalTestSession(state);
       try {
-        const { error } = await sb.from('test_session').upsert({ id: 'active', state, updated_at: new Date().toISOString() });
+        const { error } = await sb.from('test_session').upsert({ user_id: currentUserId, state, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
         if (error) throw error;
       } catch (e) { /* offline: local copy already saved; next successful save will catch Supabase up */ }
     }
@@ -1396,7 +1426,7 @@
     async function clearTestSession() {
       savedTestSession = null;
       saveLocalTestSession(null);
-      try { await sb.from('test_session').delete().eq('id', 'active'); } catch (e) { }
+      try { await sb.from('test_session').delete().eq('user_id', currentUserId); } catch (e) { }
     }
 
     // ---- Flagged questions (persistent, synced) ----
@@ -1408,7 +1438,7 @@
 
     async function loadFlagged() {
       try {
-        const { data, error } = await sb.from('flagged_questions').select('card_id');
+        const { data, error } = await sb.from('flagged_questions').select('card_id').eq('user_id', currentUserId);
         if (error) throw error;
         flaggedSet = new Set(data.map(r => r.card_id));
         saveLocalFlagged();
@@ -1422,8 +1452,8 @@
       saveLocalFlagged();
       try {
         const { error } = on
-          ? await sb.from('flagged_questions').upsert({ card_id: id, flagged_at: new Date().toISOString() })
-          : await sb.from('flagged_questions').delete().eq('card_id', id);
+          ? await sb.from('flagged_questions').upsert({ user_id: currentUserId, card_id: id, flagged_at: new Date().toISOString() }, { onConflict: 'user_id,card_id' })
+          : await sb.from('flagged_questions').delete().eq('user_id', currentUserId).eq('card_id', id);
         if (error) throw error;
       } catch (e) { /* offline: local set already updated, resyncs on next full load */ }
     }
@@ -1433,7 +1463,7 @@
       if (!ids.length) return;
       flaggedSet = new Set();
       saveLocalFlagged();
-      try { await sb.from('flagged_questions').delete().in('card_id', ids); } catch (e) { }
+      try { await sb.from('flagged_questions').delete().eq('user_id', currentUserId).in('card_id', ids); } catch (e) { }
     }
 
     function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
@@ -1499,6 +1529,13 @@
     </div>`;
       }).join('');
       a.innerHTML = `<div class="test-setup">
+    <div class="test-section" style="margin-bottom:16px">
+      <div class="test-section-label">Account</div>
+      <div style="font-size:13px;color:var(--text);margin-bottom:4px">${currentUser ? currentUser.email : ''}</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px">${subscriptionStatusLabel()}</div>
+      ${currentSub && !currentSub.is_admin ? `<button class="test-start-btn" id="settingsSubBtn" style="margin-bottom:8px" onclick="startCheckoutOrPortal()">${currentSub.stripe_subscription_id ? 'Manage Billing' : 'Subscribe — $9/mo'}</button>` : ''}
+      <button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="doSignOut()">Sign Out</button>
+    </div>
     <div class="test-setup-title">Study Priority</div>
     <div class="test-setup-sub">Higher weight surfaces a domain earlier and more often in Flashcards &amp; Quiz sessions. Default range is 1–3; use 4–5 to push a domain even harder.</div>
     ${rows}
@@ -1541,7 +1578,7 @@
       upd();
       if (reviewMode) showReviewList();
       try {
-        await sb.from('progress').update({ last_action: null }).not('last_action', 'is', null);
+        await sb.from('progress').update({ last_action: null }).eq('user_id', currentUserId).not('last_action', 'is', null);
       } catch (e) {/* local clear already happened; remote will be stale until reconnect */ }
     }
 
@@ -1681,70 +1718,224 @@
       upd();
     }
 
-    const EDGE_FN = 'https://qdcfdppcaoffbkjnfvzd.supabase.co/functions/v1/verify-password';
+    // ── AUTH + SUBSCRIPTION ──────────────────────────────────────────────────
+    let currentUser = null, currentUserId = null, currentSub = null;
 
-    function setAuthCookie(token) {
-      const expires = new Date(Date.now() + 30 * 864e5).toUTCString();
-      document.cookie = 'cissp_token=' + encodeURIComponent(token) + ';expires=' + expires + ';path=/;SameSite=Strict';
-    }
-    function getAuthCookie() {
-      const m = document.cookie.match(/(?:^|;\s*)cissp_token=([^;]+)/);
-      return m ? decodeURIComponent(m[1]) : null;
-    }
+    function showAuthOverlay() { document.getElementById('authOverlay').style.display = 'flex'; }
+    function hideAuthOverlay() { document.getElementById('authOverlay').style.display = 'none'; }
 
-    async function checkAuth() {
-      const token = getAuthCookie();
-      if (token) {
-        try {
-          const r = await fetch(EDGE_FN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) });
-          const d = await r.json();
-          if (d.valid) { unlockApp(); return; }
-        } catch (e) { unlockApp(); return; }
+    function hasAccess() {
+      if (!currentSub) return false;
+      if (currentSub.is_admin) return true;
+      if (currentSub.status === 'active') return true;
+      if (currentSub.status === 'trialing') {
+        return !currentSub.trial_ends_at || new Date(currentSub.trial_ends_at) > new Date();
       }
-      const overlay = document.getElementById('authOverlay');
-      overlay.style.display = 'flex';
-      setTimeout(() => document.getElementById('authInput').focus(), 100);
+      return false;
     }
 
-    async function hashPw(pw) {
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    function setAuthBusy(busy) {
+      const btn = document.querySelector('#authBox .auth-btn');
+      if (btn) btn.disabled = busy;
     }
-    async function submitPassword() {
-      const pw = document.getElementById('authInput').value;
-      const err = document.getElementById('authError');
-      err.textContent = '';
-      if (!pw) return;
-      const btn = document.querySelector('.auth-btn');
-      btn.disabled = true; btn.textContent = 'Checking…';
+
+    function renderAuthView(view, msg) {
+      const b = document.getElementById('authBox');
+      if (view === 'signin') {
+        b.innerHTML = `<div class="auth-title">CISSP Pocket Trainer</div>
+      <div class="auth-sub">Sign in to continue.</div>
+      <input class="auth-input" type="email" id="authEmail" placeholder="Email" autocomplete="email">
+      <input class="auth-input" type="password" id="authPw" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doSignIn()">
+      <button class="auth-btn" onclick="doSignIn()">Sign In</button>
+      <div class="auth-error" id="authError">${msg || ''}</div>
+      <div class="auth-links"><a href="#" onclick="renderAuthView('forgot');return false">Forgot password?</a> · <a href="#" onclick="renderAuthView('signup');return false">Create account</a></div>`;
+      } else if (view === 'signup') {
+        b.innerHTML = `<div class="auth-title">Create your account</div>
+      <div class="auth-sub">Start a 7-day free trial — no card required.</div>
+      <input class="auth-input" type="email" id="authEmail" placeholder="Email" autocomplete="email">
+      <input class="auth-input" type="password" id="authPw" placeholder="Password (min 6 characters)" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSignUp()">
+      <button class="auth-btn" onclick="doSignUp()">Start Free Trial</button>
+      <div class="auth-error" id="authError">${msg || ''}</div>
+      <div class="auth-links"><a href="#" onclick="renderAuthView('signin');return false">Already have an account? Sign in</a></div>`;
+      } else if (view === 'forgot') {
+        b.innerHTML = `<div class="auth-title">Reset your password</div>
+      <div class="auth-sub">We'll email you a link to set a new password.</div>
+      <input class="auth-input" type="email" id="authEmail" placeholder="Email" autocomplete="email" onkeydown="if(event.key==='Enter')doForgot()">
+      <button class="auth-btn" onclick="doForgot()">Send Reset Link</button>
+      <div class="auth-error" id="authError">${msg || ''}</div>
+      <div class="auth-links"><a href="#" onclick="renderAuthView('signin');return false">Back to sign in</a></div>`;
+      } else if (view === 'checkEmail') {
+        b.innerHTML = `<div class="auth-title">Check your email</div>
+      <div class="auth-sub">${msg || 'We sent you a link — open it to continue.'}</div>
+      <div class="auth-links"><a href="#" onclick="renderAuthView('signin');return false">Back to sign in</a></div>`;
+      } else if (view === 'resetPassword') {
+        b.innerHTML = `<div class="auth-title">Set a new password</div>
+      <div class="auth-sub">Choose a new password for your account.</div>
+      <input class="auth-input" type="password" id="authPw" placeholder="New password (min 6 characters)" autocomplete="new-password" onkeydown="if(event.key==='Enter')doResetPassword()">
+      <button class="auth-btn" onclick="doResetPassword()">Update Password</button>
+      <div class="auth-error" id="authError">${msg || ''}</div>`;
+      } else if (view === 'paywall') {
+        renderPaywall(msg);
+      }
+      setTimeout(() => { const f = b.querySelector('input'); if (f) f.focus(); }, 50);
+    }
+
+    function renderPaywall(msg) {
+      const b = document.getElementById('authBox');
+      const sub = currentSub;
+      let headline = 'Subscribe to continue', sub2 = '$9/mo after your free trial — cancel anytime.', cta = 'Subscribe — $9/mo';
+      if (sub && sub.status === 'past_due') {
+        headline = 'Payment failed'; sub2 = 'Update your payment method to keep access.'; cta = 'Update Payment Method';
+      } else if (sub && sub.status === 'canceled') {
+        headline = 'Your subscription has ended'; sub2 = 'Resubscribe for $9/mo to keep studying.';
+      } else if (sub && sub.status === 'trialing') {
+        headline = 'Your free trial has ended'; sub2 = 'Subscribe for $9/mo to keep studying.';
+      }
+      b.innerHTML = `<div class="auth-title">${headline}</div>
+      <div class="auth-sub">${msg || sub2}</div>
+      <button class="auth-btn" onclick="startCheckoutOrPortal()">${cta}</button>
+      <div class="auth-error" id="authError"></div>
+      <div class="auth-links"><a href="#" onclick="doSignOut();return false">Sign out</a></div>`;
+    }
+
+    async function doSignIn() {
+      const email = document.getElementById('authEmail').value.trim();
+      const pw = document.getElementById('authPw').value;
+      if (!email || !pw) return;
+      setAuthBusy(true);
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+      setAuthBusy(false);
+      if (error) { renderAuthView('signin', error.message); return; }
+      await onSignedIn(data.session);
+    }
+
+    async function doSignUp() {
+      const email = document.getElementById('authEmail').value.trim();
+      const pw = document.getElementById('authPw').value;
+      if (!email || !pw) return;
+      if (pw.length < 6) { renderAuthView('signup', 'Password must be at least 6 characters.'); return; }
+      setAuthBusy(true);
+      const { data, error } = await sb.auth.signUp({ email, password: pw });
+      setAuthBusy(false);
+      if (error) { renderAuthView('signup', error.message); return; }
+      if (!data.session) { renderAuthView('checkEmail', 'Confirm your email to activate your account, then sign in.'); return; }
+      await onSignedIn(data.session);
+    }
+
+    async function doForgot() {
+      const email = document.getElementById('authEmail').value.trim();
+      if (!email) return;
+      setAuthBusy(true);
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
+      setAuthBusy(false);
+      if (error) { renderAuthView('forgot', error.message); return; }
+      renderAuthView('checkEmail', 'If that email has an account, a reset link is on its way.');
+    }
+
+    async function doResetPassword() {
+      const pw = document.getElementById('authPw').value;
+      if (!pw || pw.length < 6) { renderAuthView('resetPassword', 'Password must be at least 6 characters.'); return; }
+      setAuthBusy(true);
+      const { error } = await sb.auth.updateUser({ password: pw });
+      setAuthBusy(false);
+      if (error) { renderAuthView('resetPassword', error.message); return; }
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) await onSignedIn(session); else renderAuthView('signin', 'Password updated — please sign in.');
+    }
+
+    function doSignOut() {
+      sb.auth.signOut();
+    }
+
+    async function startCheckoutOrPortal() {
+      const btn = document.querySelector('#authBox .auth-btn, #settingsSubBtn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Redirecting…'; }
       try {
-        const r = await fetch(EDGE_FN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) });
+        const fn = (currentSub && currentSub.stripe_subscription_id) ? 'stripe-portal' : 'stripe-checkout';
+        const { data: { session } } = await sb.auth.getSession();
+        const r = await fetch(SUPABASE_URL + '/functions/v1/' + fn, {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + session.access_token, 'Content-Type': 'application/json' },
+        });
         const d = await r.json();
-        if (d.valid && d.token) {
-          hashPw(pw).then(h => localStorage.setItem('cissp_pw_hash', h));
-          setAuthCookie(d.token);
-          unlockApp();
-        } else {
-          err.textContent = 'Incorrect password.';
-          btn.disabled = false; btn.textContent = 'Unlock';
-        }
+        if (d.url) { window.location.href = d.url; return; }
+        throw new Error(d.error || 'Could not start checkout');
       } catch (e) {
-        const stored = localStorage.getItem('cissp_pw_hash');
-        if (stored) {
-          const h = await hashPw(pw);
-          if (h === stored) { unlockApp(); return; }
-        }
-        err.textContent = 'No connection. Try again when online.';
-        btn.disabled = false; btn.textContent = 'Unlock';
+        if (document.getElementById('authOverlay').style.display === 'flex') renderPaywall('Something went wrong — please try again.');
+        if (btn) { btn.disabled = false; }
       }
+    }
+
+    function subscriptionStatusLabel() {
+      if (!currentSub) return '';
+      if (currentSub.is_admin) return 'Admin — full access, no billing.';
+      if (currentSub.status === 'trialing' && currentSub.trial_ends_at) {
+        const days = Math.max(0, Math.ceil((new Date(currentSub.trial_ends_at) - new Date()) / 86400000));
+        return 'Free trial — ' + days + ' day' + (days === 1 ? '' : 's') + ' left.';
+      }
+      if (currentSub.status === 'active') return 'Active subscription — $9/mo.';
+      if (currentSub.status === 'past_due') return 'Payment failed — please update your card.';
+      return 'No active subscription.';
+    }
+
+    function updateTrialBar() {
+      const el = document.getElementById('trialBar');
+      if (!el) return;
+      if (currentSub && !currentSub.is_admin && currentSub.status === 'trialing' && currentSub.trial_ends_at) {
+        const days = Math.max(0, Math.ceil((new Date(currentSub.trial_ends_at) - new Date()) / 86400000));
+        document.getElementById('trialBarTitle').textContent = 'Free trial — ' + days + ' day' + (days === 1 ? '' : 's') + ' left';
+        el.classList.add('visible');
+      } else {
+        el.classList.remove('visible');
+      }
+    }
+
+    async function onSignedIn(session) {
+      currentUser = session.user;
+      currentUserId = session.user.id;
+      const { data, error } = await sb.rpc('ensure_cissp_subscription');
+      if (error) {
+        await sb.auth.signOut();
+        renderAuthView('signin', 'Something went wrong loading your account — please sign in again.');
+        showAuthOverlay();
+        return;
+      }
+      currentSub = data;
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('billing') === 'success' && !hasAccess()) {
+        for (let i = 0; i < 5 && !hasAccess(); i++) {
+          await new Promise(r => setTimeout(r, 1500));
+          const { data: fresh } = await sb.rpc('ensure_cissp_subscription');
+          if (fresh) currentSub = fresh;
+        }
+        history.replaceState(null, '', window.location.pathname);
+      }
+
+      if (hasAccess()) { hideAuthOverlay(); unlockApp(); }
+      else { renderAuthView('paywall'); showAuthOverlay(); }
+    }
+
+    async function initAuth() {
+      sb.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY') { renderAuthView('resetPassword'); showAuthOverlay(); }
+        else if (event === 'SIGNED_OUT') {
+          currentUser = null; currentUserId = null; currentSub = null;
+          document.getElementById('trialBar').classList.remove('visible');
+          renderAuthView('signin'); showAuthOverlay();
+        }
+      });
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { renderAuthView('signin'); showAuthOverlay(); return; }
+      await onSignedIn(session);
     }
 
     function unlockApp() {
-      document.getElementById('authOverlay').style.display = 'none';
+      updateTrialBar();
       loadProgress();
     }
 
-    checkAuth();
+    initAuth();
 
     // PWA
     let _pwaPrompt = null;
@@ -2128,7 +2319,7 @@
     }
   </script>
   <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px">
-    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 2 Sep 2026 · view changelog</a>
+    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 5 Sep 2026 · view changelog</a>
   </div>
 </body>
 

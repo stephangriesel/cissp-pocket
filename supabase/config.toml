@@ -9,3 +9,18 @@ entrypoint = "./functions/verify-password/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/verify-password/*.html" ]
+
+[functions.stripe-checkout]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/stripe-checkout/index.ts"
+
+[functions.stripe-portal]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/stripe-portal/index.ts"
+
+[functions.stripe-webhook]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/stripe-webhook/index.ts"
