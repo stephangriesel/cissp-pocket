@@ -1718,7 +1718,28 @@
         const isFlash = !!c.front;
         return '<div class="q-card" style="margin-bottom:10px;cursor:pointer" onclick="jumpToReviewCard(\'' + c.id + '\',' + isFlash + ')"><div class="q-domain ' + dc(c.domain) + '">' + c.domain + '</div><div class="q-text" style="margin-bottom:0">' + text + '</div></div>';
       }).join('');
-      a.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:4px 4px 8px">' + reviewCards.length + ' card(s) marked "Again" — tap one to review it now</div>' + items + '<button class="restart-btn" style="margin-top:8px;width:100%" onclick="exitReviewList()">Back to studying</button>';
+      const reviewFlashCt = reviewCards.filter(c => !!c.front).length;
+      const reviewQuizCt = reviewCards.length - reviewFlashCt;
+      const reviewAllBtns =
+        (reviewFlashCt ? '<button class="test-nav-btn" style="width:100%;margin-top:8px" onclick="reviewAllAgain(\'flash\')">Review all ' + reviewFlashCt + ' flashcard(s) in order</button>' : '') +
+        (reviewQuizCt ? '<button class="test-nav-btn" style="width:100%;margin-top:8px" onclick="reviewAllAgain(\'quiz\')">Review all ' + reviewQuizCt + ' question(s) in order</button>' : '');
+      a.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:4px 4px 8px">' + reviewCards.length + ' card(s) marked "Again" — tap one to review it now, or review them all in sequence below</div>' + items + reviewAllBtns + '<button class="restart-btn" style="margin-top:8px;width:100%" onclick="exitReviewList()">Back to studying</button>';
+    }
+
+    // Runs through every "Again"-marked card of one type (flash or quiz) back-to-back,
+    // instead of returning to the review list after each one.
+    function reviewAllAgain(kind) {
+      reviewMode = false;
+      jumpedFromReview = false;
+      const actions = getLocalActions();
+      const src = kind === 'flash' ? DATA.flashcards : DATA.questions;
+      const cards = src.filter(c => actions[c.id] === 'again');
+      if (!cards.length) { showReviewList(); return; }
+      mode = kind;
+      deck = cards; idx = 0; flipped = false; qAnswered = false;
+      document.getElementById('tabFlash').className = 'tab' + (mode === 'flash' ? ' active' : '');
+      document.getElementById('tabQuiz').className = 'tab' + (mode === 'quiz' ? ' active' : '');
+      render();
     }
 
     function jumpToReviewCard(cardId, isFlash) {
