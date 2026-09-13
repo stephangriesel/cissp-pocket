@@ -131,6 +131,17 @@
 
     <div class="entry">
       <div class="entry-date">13 Sep 2026</div>
+      <div class="entry-title">Fix — New accounts could inherit another account's study time</div>
+      <ul>
+        <li>A brand-new account (or one whose study time hadn't synced yet) could show hours logged by whichever
+          account last used that browser, instead of starting from zero</li>
+        <li>The study-time lookup now treats "no record yet" as zero instead of mistaking it for an error and
+          falling back to a locally cached total that may belong to a different account</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">13 Sep 2026</div>
       <div class="entry-title">Content — Domain 6: SOC report types</div>
       <ul>
         <li>D6 (Security Assessment &amp; Testing): +12 flashcards and +8 questions covering SOC 1 vs SOC 2 vs SOC 3,

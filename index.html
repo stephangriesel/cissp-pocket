@@ -1395,10 +1395,14 @@
     async function loadStudyTime(gen) {
       const myGen = gen !== undefined ? gen : sessionGen;
       try {
-        const { data, error } = await sb.from('study_time').select('total_seconds').eq('user_id', currentUserId).single();
+        // maybeSingle(), not single(): a brand-new user has no row yet, and that's
+        // not an error — single() would throw on 0 rows and fall into the catch
+        // below, which reads local storage and could show a stale total left over
+        // from whichever account last used this browser.
+        const { data, error } = await sb.from('study_time').select('total_seconds').eq('user_id', currentUserId).maybeSingle();
         if (error) throw error;
         if (myGen !== sessionGen) return;
-        totalSeconds = data.total_seconds;
+        totalSeconds = data ? data.total_seconds : 0;
         saveLocalTime(totalSeconds);
       } catch (e) {
         if (myGen !== sessionGen) return;
@@ -2495,7 +2499,7 @@
     }
   </script>
   <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px">
-    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 5 Sep 2026 · view changelog</a>
+    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 13 Sep 2026 · view changelog</a>
   </div>
 </body>
 
