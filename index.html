@@ -1219,8 +1219,10 @@
     </div>
   </nav>
   <div id="timeBar"
-    style="display:flex;justify-content:center;padding:8px 16px 0;font-size:11px;color:var(--muted);letter-spacing:0.3px">
+    style="display:flex;justify-content:center;align-items:center;gap:6px;padding:8px 16px 0;font-size:11px;color:var(--muted);letter-spacing:0.3px">
     Total study time: <span id="totalTimeLabel" style="color:var(--accent);font-weight:700;margin-left:4px">0h 0m</span>
+    <button id="timerPauseBtn" onclick="toggleTimerPause()" aria-label="Pause study timer" title="Pause study timer"
+      style="margin-left:2px;font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;line-height:1.5">⏸</button>
   </div>
   <div class="tabs">
     <div class="tab active" id="tabFlash" onclick="switchMode('flash')">Flashcards</div>
@@ -1387,6 +1389,7 @@
     let totalSeconds = 0;       // last known synced/local total, NOT including current running tick
     let pendingSeconds = 0;     // seconds accumulated this active stretch, not yet flushed
     let timerInterval = null;
+    let timerPaused = false;    // manually paused (e.g. stepped away) — resets to false each fresh sign-in
     const FLUSH_EVERY_SEC = 30; // push to Supabase this often
 
     function getLocalTime() { try { return parseInt(localStorage.getItem('studySeconds') || '0', 10) } catch (e) { return 0 } }
@@ -1424,11 +1427,23 @@
     function startTimer() {
       if (timerInterval) return;
       timerInterval = setInterval(() => {
-        if (document.visibilityState !== 'visible') return; // only count active foreground time
+        if (document.visibilityState !== 'visible' || timerPaused) return; // only count active foreground time
         pendingSeconds++;
         renderTime();
         if (pendingSeconds >= FLUSH_EVERY_SEC) flushTime();
       }, 1000);
+    }
+
+    function toggleTimerPause() {
+      timerPaused = !timerPaused;
+      if (timerPaused) flushTime(); // save what's accumulated so far before going idle
+      const b = document.getElementById('timerPauseBtn');
+      if (b) {
+        b.textContent = timerPaused ? '▶' : '⏸';
+        b.title = timerPaused ? 'Resume study timer' : 'Pause study timer';
+        b.setAttribute('aria-label', b.title);
+        b.style.color = timerPaused ? 'var(--accent)' : 'var(--muted)';
+      }
     }
 
     async function flushTime() {
@@ -1866,6 +1881,7 @@
       flaggedSet = new Set();
       savedTestSession = null;
       totalSeconds = 0; pendingSeconds = 0;
+      if (timerPaused) { timerPaused = false; const b = document.getElementById('timerPauseBtn'); if (b) { b.textContent = '⏸'; b.title = 'Pause study timer'; b.setAttribute('aria-label', b.title); b.style.color = 'var(--muted)'; } }
       deck = [];
     }
 
