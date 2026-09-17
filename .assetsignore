@@ -1,0 +1,11 @@
+node_modules
+.git
+supabase
+package.json
+package-lock.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+wrangler.jsonc
+.assetsignore
+.gitignore
+.vscode

@@ -2,3 +2,4 @@ node_modules/
 supabase/.temp/
 .env
 .env.local
+.wrangler/
