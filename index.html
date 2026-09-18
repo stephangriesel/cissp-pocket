@@ -2267,6 +2267,7 @@
       a.innerHTML = `<div class="test-setup">
     <div class="test-setup-title">Practice Exam</div>
     <div class="test-setup-sub">Simulates a CISSP exam — no answer feedback until you submit.</div>
+    <div style="text-align:center;margin:-6px 0 14px"><a href="#" onclick="showTestHistory();return false" style="color:var(--accent);font-size:12px;text-decoration:none;font-weight:600">📜 View Test History</a></div>
     <div class="test-section">
       <div class="test-section-label">Number of questions</div>
       <div class="test-count-row">${countBtns}</div>
@@ -2512,7 +2513,9 @@
       });
       saveP(p);
       const pct = Math.round((correct / testQ.length) * 100);
-      renderTestResults(correct, testQ.length, pct, pct >= 70, ds, timedOut);
+      const passed = pct >= 70;
+      saveTestHistory({ correct, total: testQ.length, pct, passed, timedOut, ds });
+      renderTestResults(correct, testQ.length, pct, passed, ds, timedOut);
     }
 
     function renderTestResults(correct, total, pct, passed, ds, timedOut) {
@@ -2545,6 +2548,7 @@
         ${flaggedCt ? `<button class="test-nav-btn" onclick="reviewFlagged()">Review Flagged (${flaggedCt})</button>` : ''}
       </div>
       <button class="test-start-btn" style="margin-top:0" onclick="enterTestMode()">New Test</button>
+      <div style="text-align:center;margin-top:2px"><a href="#" onclick="showTestHistory();return false" style="color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer">View Test History</a></div>
     </div>
   </div>`;
     }
@@ -2574,9 +2578,84 @@
       mode = 'quiz'; deck = flagged; idx = 0; qAnswered = false;
       render();
     }
+
+    // ---- Test history: last 10 completed exams, synced to Supabase ----
+    async function saveTestHistory(entry) {
+      if (!currentUserId) return;
+      try {
+        const { error } = await sb.from('test_history').insert({
+          user_id: currentUserId,
+          correct: entry.correct,
+          total: entry.total,
+          pct: entry.pct,
+          passed: entry.passed,
+          timed_out: entry.timedOut,
+          domains: entry.ds,
+        });
+        if (error) throw error;
+        // keep only the 10 most recent attempts per user
+        const { data: stale } = await sb.from('test_history').select('id').eq('user_id', currentUserId).order('taken_at', { ascending: false }).range(10, 999);
+        if (stale && stale.length) await sb.from('test_history').delete().in('id', stale.map(r => r.id));
+      } catch (e) {
+        // best-effort — history is a nice-to-have and should never block the results screen
+      }
+    }
+
+    let testHistoryRows = [];
+
+    async function showTestHistory() {
+      const a = document.getElementById('cardArea');
+      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Test History</div><div class="test-setup-sub">Loading…</div></div>';
+      try {
+        const { data, error } = await sb.from('test_history').select('*').eq('user_id', currentUserId).order('taken_at', { ascending: false }).limit(10);
+        if (error) throw error;
+        testHistoryRows = data || [];
+      } catch (e) {
+        testHistoryRows = [];
+      }
+      renderTestHistoryList();
+    }
+
+    function fmtHistoryDate(iso) {
+      return new Date(iso).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function renderTestHistoryList() {
+      const a = document.getElementById('cardArea');
+      if (!testHistoryRows.length) {
+        a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Test History</div><div class="test-setup-sub">No practice exams recorded yet — finish a Test Mode exam and it’ll show up here.</div><button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="renderTestSetup()">Back</button></div>';
+        return;
+      }
+      const items = testHistoryRows.map((r, i) => {
+        const col = r.passed ? 'var(--correct)' : 'var(--wrong)';
+        return '<div class="q-card" style="cursor:pointer;margin-bottom:10px" onclick="renderTestHistoryDetail(' + i + ')"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-size:12px;color:var(--muted)">' + fmtHistoryDate(r.taken_at) + '</div><div style="font-size:14px;font-weight:700;margin-top:2px">' + r.correct + '/' + r.total + ' correct</div></div><div style="text-align:right"><div style="font-size:22px;font-weight:800;color:' + col + '">' + r.pct + '%</div><div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:' + col + '">' + (r.passed ? 'PASS' : 'FAIL') + '</div></div></div></div>';
+      }).join('');
+      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Test History</div><div class="test-setup-sub">Your last ' + testHistoryRows.length + ' practice exam' + (testHistoryRows.length === 1 ? '' : 's') + '. Tap one for the full breakdown.</div>' + items + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="renderTestSetup()">Back</button></div>';
+    }
+
+    function renderTestHistoryDetail(i) {
+      const r = testHistoryRows[i];
+      if (!r) { renderTestHistoryList(); return; }
+      const a = document.getElementById('cardArea');
+      const ds = r.domains || {};
+      const rows = Object.entries(ds).map(function (e) {
+        const d = e[0], s = e[1];
+        const dp = s.t > 0 ? Math.round((s.c / s.t) * 100) : 0;
+        const col = dp >= 70 ? '#27ae60' : dp >= 50 ? '#f39c12' : '#e74c3c';
+        return '<tr><td><strong>' + d + '</strong><br><span style="font-size:11px;color:var(--muted)">' + (DOMAIN_NAMES[d] || '') + '</span></td><td style="text-align:center">' + s.c + '/' + s.t + '</td><td style="text-align:right"><span style="font-weight:700;color:' + col + '">' + dp + '%</span><div class="tbar-wrap"><div class="tbar-fill" style="width:' + dp + '%;background:' + col + '"></div></div></td></tr>';
+      }).join('');
+      a.innerHTML = '<div class="test-results">'
+        + (r.timed_out ? '<div style="text-align:center;padding:8px;background:#e74c3c;color:#fff;border-radius:8px;margin-bottom:16px;font-weight:700">Time expired — auto-submitted</div>' : '')
+        + '<div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:4px">' + fmtHistoryDate(r.taken_at) + '</div>'
+        + '<div class="test-score-hero"><div class="test-score-pct ' + (r.passed ? 'pass' : 'fail') + '">' + r.pct + '%</div><div class="test-score-lbl">' + r.correct + ' correct out of ' + r.total + '</div><div><span class="test-verdict ' + (r.passed ? 'pass' : 'fail') + '">' + (r.passed ? '✓ PASS — Well done!' : '✗ Needs Work') + '</span></div><div style="font-size:12px;color:var(--muted);margin-top:10px">CISSP passing threshold: 70%</div></div>'
+        + '<div class="test-section-label" style="font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:8px 0">Domain Breakdown</div>'
+        + '<table class="test-breakdown"><thead><tr><th>Domain</th><th style="text-align:center">Score</th><th style="text-align:right">%</th></tr></thead><tbody>' + rows + '</tbody></table>'
+        + '<div class="test-actions" style="flex-direction:column"><button class="test-nav-btn" onclick="renderTestHistoryList()">Back to History</button><button class="test-start-btn" style="margin-top:0" onclick="enterTestMode()">New Test</button></div>'
+        + '</div>';
+    }
   </script>
   <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px">
-    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 16 Sep 2026 · view changelog</a>
+    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 18 Sep 2026 · view changelog</a>
   </div>
 </body>
 
