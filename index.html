@@ -652,6 +652,25 @@
       line-height: 1
     }
 
+    #updateBar {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4)
+    }
+
+    #updateBar.visible {
+      display: flex
+    }
+
     #authOverlay {
       position: fixed;
       inset: 0;
@@ -1180,6 +1199,13 @@
 </head>
 
 <body>
+  <div id="updateBar">
+    <div class="pwa-text">
+      <div class="pwa-title">Update available</div>
+      <div class="pwa-sub">A new version is ready.</div>
+    </div>
+    <button class="pwa-install" onclick="location.reload()">Refresh</button>
+  </div>
   <div id="authOverlay">
     <div class="auth-box" id="authBox"></div>
   </div>
@@ -2197,7 +2223,24 @@
     // PWA
     let _pwaPrompt = null;
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+      // A new sw.js on the server only gets noticed on the browser's own
+      // schedule (roughly once a day) unless asked explicitly -- do that on
+      // load and hourly, since an installed PWA can stay open for days.
+      // hadController: was this page already being served by a service
+      // worker when it loaded? If so, a later controllerchange means a NEW
+      // version just took over (skipWaiting + clients.claim) -- the visible
+      // page is now stale until reloaded. If not, this is the very first
+      // install ever, which needs no "update available" prompt.
+      const hadController = !!navigator.serviceWorker.controller;
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+          reg.update();
+          setInterval(() => reg.update(), 60 * 60 * 1000);
+        });
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (hadController) document.getElementById('updateBar').classList.add('visible');
+      });
     }
     window.addEventListener('beforeinstallprompt', e => {
       e.preventDefault();

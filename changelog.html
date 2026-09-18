@@ -131,6 +131,17 @@
 
     <div class="entry">
       <div class="entry-date">18 Sep 2026</div>
+      <div class="entry-title">Fix — PWA not picking up new versions</div>
+      <ul>
+        <li>The offline service worker file hadn't changed since launch, so installed apps never went through an
+          update check no matter how many times the site itself changed</li>
+        <li>Added a visible "Update available" banner with a Refresh button, and the app now checks for a new
+          version on load and hourly instead of relying on the browser's own schedule</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">18 Sep 2026</div>
       <div class="entry-title">Content — Standardised scenario names</div>
       <ul>
         <li>Scenario questions now draw from a consistent cast: Steve, Robin, or Charles for men; Belinda, Heidi,
