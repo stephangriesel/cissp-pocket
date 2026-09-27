@@ -1763,8 +1763,9 @@
       const reviewQuizCt = reviewCards.length - reviewFlashCt;
       const reviewAllBtns =
         (reviewFlashCt ? '<button class="test-nav-btn" style="width:100%;margin-top:8px" onclick="reviewAllAgain(\'flash\')">Review all ' + reviewFlashCt + ' flashcard(s) in order</button>' : '') +
-        (reviewQuizCt ? '<button class="test-nav-btn" style="width:100%;margin-top:8px" onclick="reviewAllAgain(\'quiz\')">Review all ' + reviewQuizCt + ' question(s) in order</button>' : '');
-      a.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:4px 4px 8px">' + reviewCards.length + ' card(s) marked "Again" — tap one to review it now, or review them all in sequence below</div>' + items + reviewAllBtns + '<button class="restart-btn" style="margin-top:8px;width:100%" onclick="exitReviewList()">Back to studying</button>';
+        (reviewQuizCt ? '<button class="test-nav-btn" style="width:100%;margin-top:8px" onclick="reviewAllAgain(\'quiz\')">Review all ' + reviewQuizCt + ' question(s) in order</button>' : '') +
+        '<div style="margin-top:16px"></div>';
+      a.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:4px 4px 8px">' + reviewCards.length + ' card(s) marked "Again" — review them all in sequence below, or tap one to jump straight to it</div>' + reviewAllBtns + items + '<button class="restart-btn" style="margin-top:8px;width:100%" onclick="exitReviewList()">Back to studying</button>';
     }
 
     // Runs through every "Again"-marked card of one type (flash or quiz) back-to-back,
