@@ -2683,6 +2683,18 @@
         });
       });
       const domainEntries = Object.entries(byDomain).sort((a, b) => a[0].localeCompare(b[0]));
+
+      // Quick-glance callout: the domains dragging the average down the most.
+      const weakest = domainEntries
+        .map(function (e) { const d = e[0], s = e[1]; return { d: d, pct: s.t > 0 ? Math.round((s.c / s.t) * 100) : 0 }; })
+        .sort(function (a, b) { return a.pct - b.pct; })
+        .slice(0, 3);
+      const weakestBlocks = domainEntries.length > 1 ? '<div class="test-section-label" style="margin-top:4px">Weakest domains</div><div class="stats-row" style="padding:0;margin-bottom:16px;grid-template-columns:repeat(' + weakest.length + ', 1fr)">' +
+        weakest.map(function (w) {
+          const col = w.pct >= 70 ? 'var(--correct)' : w.pct >= 50 ? '#f39c12' : 'var(--wrong)';
+          return '<div class="stat-card"><div class="stat-num" style="color:' + col + '">' + w.pct + '%</div><div class="stat-label">' + w.d + ' — ' + (DOMAIN_NAMES[w.d] || '') + '</div></div>';
+        }).join('') + '</div>' : '';
+
       const avgTable = domainEntries.length ? '<div class="test-section-label" style="margin-top:4px">Domain averages — last ' + testHistoryRows.length + ' exam' + (testHistoryRows.length === 1 ? '' : 's') + '</div><table class="test-breakdown"><thead><tr><th>Domain</th><th style="text-align:center">Score</th><th style="text-align:right">%</th></tr></thead><tbody>' +
         domainEntries.map(function (e) {
           const d = e[0], s = e[1];
@@ -2699,7 +2711,7 @@
         }).join('') + '</div>' : '';
         return '<div class="q-card" style="cursor:pointer;margin-bottom:10px" onclick="renderTestHistoryDetail(' + i + ')"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-size:12px;color:var(--muted)">' + fmtHistoryDate(r.taken_at) + '</div><div style="font-size:14px;font-weight:700;margin-top:2px">' + r.correct + '/' + r.total + ' correct</div>' + domainsLine + '</div><div style="text-align:right"><div style="font-size:22px;font-weight:800;color:' + col + '">' + r.pct + '%</div><div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:' + col + '">' + (r.passed ? 'PASS' : 'FAIL') + '</div></div></div></div>';
       }).join('');
-      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Test History</div><div class="test-setup-sub">Your last ' + testHistoryRows.length + ' practice exam' + (testHistoryRows.length === 1 ? '' : 's') + '. Tap one for the full breakdown.</div>' + avgTable + '<div class="test-section-label" style="margin-top:20px">Individual attempts</div>' + items + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="renderTestSetup()">Back</button></div>';
+      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Test History</div><div class="test-setup-sub">Your last ' + testHistoryRows.length + ' practice exam' + (testHistoryRows.length === 1 ? '' : 's') + '. Tap one for the full breakdown.</div>' + weakestBlocks + avgTable + '<div class="test-section-label" style="margin-top:20px">Individual attempts</div>' + items + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="renderTestSetup()">Back</button></div>';
     }
 
     function renderTestHistoryDetail(i) {
@@ -2724,7 +2736,7 @@
     }
   </script>
   <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px">
-    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 27 Sep 2026 · view changelog</a>
+    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 28 Sep 2026 · view changelog</a>
   </div>
 </body>
 
