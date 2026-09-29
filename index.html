@@ -2684,14 +2684,16 @@
       });
       const domainEntries = Object.entries(byDomain).sort((a, b) => a[0].localeCompare(b[0]));
 
-      // Quick-glance callout: the domains dragging the average down the most.
+      // Quick-glance callout: every domain still below the 70% passing threshold,
+      // weakest first. A fixed 3-column grid wraps to further rows on its own
+      // once there are more than 3 -- no cap on how many can show.
       const weakest = domainEntries
         .map(function (e) { const d = e[0], s = e[1]; return { d: d, pct: s.t > 0 ? Math.round((s.c / s.t) * 100) : 0 }; })
-        .sort(function (a, b) { return a.pct - b.pct; })
-        .slice(0, 3);
-      const weakestBlocks = domainEntries.length > 1 ? '<div class="test-section-label" style="margin-top:4px">Weakest domains</div><div class="stats-row" style="padding:0;margin-bottom:16px;grid-template-columns:repeat(' + weakest.length + ', 1fr)">' +
+        .filter(function (w) { return w.pct < 70; })
+        .sort(function (a, b) { return a.pct - b.pct; });
+      const weakestBlocks = weakest.length ? '<div class="test-section-label" style="margin-top:4px">Weakest domains</div><div class="stats-row" style="padding:0;margin-bottom:16px;grid-template-columns:repeat(3, 1fr)">' +
         weakest.map(function (w) {
-          const col = w.pct >= 70 ? 'var(--correct)' : w.pct >= 50 ? '#f39c12' : 'var(--wrong)';
+          const col = w.pct >= 50 ? '#f39c12' : 'var(--wrong)';
           return '<div class="stat-card"><div class="stat-num" style="color:' + col + '">' + w.pct + '%</div><div class="stat-label">' + w.d + ' — ' + (DOMAIN_NAMES[w.d] || '') + '</div></div>';
         }).join('') + '</div>' : '';
 
@@ -2736,7 +2738,7 @@
     }
   </script>
   <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px">
-    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 28 Sep 2026 · view changelog</a>
+    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 29 Sep 2026 · view changelog</a>
   </div>
 </body>
 
