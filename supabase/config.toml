@@ -24,3 +24,10 @@ entrypoint = "./functions/stripe-portal/index.ts"
 enabled = true
 verify_jwt = false
 entrypoint = "./functions/stripe-webhook/index.ts"
+
+[functions.notify-signup]
+enabled = true
+# Called by a database trigger (not a signed-in user), so there's no user JWT
+# to verify -- it checks its own shared secret instead (see index.ts).
+verify_jwt = false
+entrypoint = "./functions/notify-signup/index.ts"
