@@ -29,7 +29,7 @@ begin
   end if;
 
   return query
-  select u.id, u.email, u.created_at, coalesce(s.is_admin, false), s.status, s.trial_ends_at
+  select u.id, u.email::text, u.created_at, coalesce(s.is_admin, false), s.status, s.trial_ends_at
   from auth.users u
   left join public.cissp_subscriptions s on s.user_id = u.id
   order by u.created_at desc;

@@ -127,7 +127,17 @@
     <a class="back" href="/">← Back</a>
     <div class="nav-title">Changelog</div>
   </nav>
-  <div class="content">
+  <div id="gateMsg" style="padding:40px 16px;text-align:center;color:var(--muted);font-size:14px">Checking access…</div>
+  <div class="content" id="content" style="display:none">
+
+    <div class="entry">
+      <div class="entry-date">30 Sep 2026</div>
+      <div class="entry-title">Feature — Changelog restricted to admins</div>
+      <ul>
+        <li>This page now checks your account before showing anything — only admin accounts can view it, and the
+          "view changelog" link in the app's footer is hidden for everyone else</li>
+      </ul>
+    </div>
 
     <div class="entry">
       <div class="entry-date">30 Sep 2026</div>
@@ -1859,6 +1869,33 @@
     </div>
 
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    // This page is admin-only. There's no real secret content here, but
+    // access is still gated server-side (is_admin comes back from Supabase,
+    // not something checkable by just editing this page) so the changelog
+    // isn't casually discoverable by signed-in non-admin users.
+    (async () => {
+      const SUPABASE_URL = 'https://qdcfdppcaoffbkjnfvzd.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_zsx00SmyeTkShlzs-_9jjA_GUiXwBcA';
+      const gate = document.getElementById('gateMsg');
+      const content = document.getElementById('content');
+      const deny = (msg) => {
+        gate.innerHTML = msg + '<br><br><a class="back" href="/">← Back to the app</a>';
+      };
+      try {
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { deny('Sign in to the app first.'); return; }
+        const { data: sub, error } = await sb.rpc('ensure_cissp_subscription');
+        if (error || !sub || !sub.is_admin) { deny('This page is only available to admins.'); return; }
+        gate.style.display = 'none';
+        content.style.display = '';
+      } catch (e) {
+        deny('Couldn’t verify access — please try again.');
+      }
+    })();
+  </script>
 </body>
 
 </html>

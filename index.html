@@ -1714,9 +1714,11 @@
     }
 
     function updateAdminNav() {
+      const isAdmin = !!(currentSub && currentSub.is_admin);
       const el = document.getElementById('adminNavBtn');
-      if (!el) return;
-      el.style.display = (currentSub && currentSub.is_admin) ? '' : 'none';
+      if (el) el.style.display = isAdmin ? '' : 'none';
+      const link = document.getElementById('changelogLinkWrap');
+      if (link) link.style.display = isAdmin ? '' : 'none';
     }
 
     function renderProfile() {
@@ -2793,8 +2795,8 @@
         + '</div>';
     }
   </script>
-  <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px">
-    <a href="changelog.html" style="color:var(--muted);text-decoration:none">Updated 30 Sep 2026 · view changelog</a>
+  <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px;color:var(--muted)">
+    Updated 30 Sep 2026<span id="changelogLinkWrap" style="display:none"> · <a href="changelog.html" style="color:var(--muted);text-decoration:none">view changelog</a></span>
   </div>
 </body>
 
