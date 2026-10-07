@@ -1622,6 +1622,57 @@
       return weighted.map(x => x.c);
     }
 
+    function allocateByWeight(items, domains, total) {
+      const dw = getDomainWeights();
+      const avail = {};
+      let active = Array.from(domains).filter(d => {
+        avail[d] = items.filter(q => q.domain === d).length;
+        return avail[d] > 0;
+      });
+      const alloc = {};
+      active.forEach(d => alloc[d] = 0);
+      let remaining = Math.min(total, items.length);
+      while (remaining > 0 && active.length) {
+        const totalW = active.reduce((s, d) => s + (dw[d] || 1), 0);
+        const shares = active.map(d => {
+          const raw = (dw[d] || 1) / totalW * remaining;
+          return { d, raw, floor: Math.floor(raw) };
+        });
+        let floorSum = shares.reduce((s, x) => s + x.floor, 0);
+        let leftover = remaining - floorSum;
+        shares.sort((a, b) => (b.raw - b.floor) - (a.raw - a.floor));
+        shares.forEach((s, i) => { s.give = s.floor + (i < leftover ? 1 : 0); });
+        let overflow = 0;
+        const nextActive = [];
+        shares.forEach(s => {
+          const capacity = avail[s.d] - alloc[s.d];
+          const give = Math.min(s.give, capacity);
+          alloc[s.d] += give;
+          overflow += s.give - give;
+          if (alloc[s.d] < avail[s.d]) nextActive.push(s.d);
+        });
+        remaining = overflow;
+        active = nextActive;
+      }
+      return alloc;
+    }
+
+    function weightedTestPool(items, domains, total) {
+      const alloc = allocateByWeight(items, domains, total);
+      const prog = getP();
+      let pool = [];
+      Object.keys(alloc).forEach(d => {
+        const n = alloc[d];
+        if (!n) return;
+        const dItems = items.filter(q => q.domain === d);
+        const wrong = shuffle(dItems.filter(q => (prog[q.id] || 0) < 0));
+        const unseen = shuffle(dItems.filter(q => (prog[q.id] || 0) === 0));
+        const known = shuffle(dItems.filter(q => (prog[q.id] || 0) > 0));
+        pool = pool.concat(wrong.concat(unseen, known).slice(0, n));
+      });
+      return shuffle(pool);
+    }
+
     function openSettings() {
       settingsOpen = true;
       profileOpen = false;
@@ -1649,7 +1700,7 @@
       }).join('');
       a.innerHTML = `<div class="test-setup">
     <div class="test-setup-title">Study Priority</div>
-    <div class="test-setup-sub">Higher weight surfaces a domain earlier and more often in Flashcards &amp; Quiz sessions. Default range is 1–3; use 4–5 to push a domain even harder.</div>
+    <div class="test-setup-sub">Higher weight surfaces a domain earlier and more often in Flashcards &amp; Quiz sessions, and gives it a bigger share of questions in Test exams. Default range is 1–3; use 4–5 to push a domain even harder.</div>
     ${rows}
     <button class="test-start-btn" style="margin-bottom:10px" onclick="closeSettings()">Done</button>
     <button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="resetDomainWeightsUI()">Reset to Defaults</button>
@@ -2438,8 +2489,9 @@
     }
 
     function startTest() {
-      const pool = shuffle(DATA.questions.filter(q => testCfg.domains.has(q.domain)));
-      beginTest(pool.slice(0, testCfg.count));
+      const items = DATA.questions.filter(q => testCfg.domains.has(q.domain));
+      const pool = weightedTestPool(items, testCfg.domains, testCfg.count);
+      beginTest(pool);
     }
 
     function startFlaggedTest() {
@@ -2796,7 +2848,7 @@
     }
   </script>
   <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px;color:var(--muted)">
-    Updated 04 Oct 2026<span id="changelogLinkWrap" style="display:none"> · <a href="changelog.html" style="color:var(--muted);text-decoration:none">view changelog</a></span>
+    Updated 07 Oct 2026<span id="changelogLinkWrap" style="display:none"> · <a href="changelog.html" style="color:var(--muted);text-decoration:none">view changelog</a></span>
   </div>
 </body>
 
