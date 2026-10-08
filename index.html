@@ -1485,6 +1485,7 @@
       await loadTestSession(myGen);
       await loadFlagged(myGen);
       await loadNotes(myGen);
+      await loadTestHistoryCache(myGen);
       if (myGen !== sessionGen) return;
       // stats are computed live from last_action, no separate load needed
       startTimer();
@@ -2712,6 +2713,7 @@
     <div class="test-setup-title">Practice Exam</div>
     <div class="test-setup-sub">Simulates a CISSP exam — no answer feedback until you submit.</div>
     <div style="text-align:center;margin:-6px 0 14px"><a href="#" onclick="showTestHistory();return false" style="color:var(--accent);font-size:12px;text-decoration:none;font-weight:600">📜 View Test History</a></div>
+    ${weakestDomainsBlock(testHistoryRows)}
     ${coverageTable('Your Coverage', DATA.questions)}
     <div class="test-section" style="margin-top:16px">
       <div class="test-section-label">Number of questions</div>
@@ -3064,21 +3066,49 @@
 
     let testHistoryRows = [];
 
-    async function showTestHistory() {
-      const a = document.getElementById('cardArea');
-      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Test History</div><div class="test-setup-sub">Loading…</div></div>';
+    async function loadTestHistoryCache(gen) {
+      const myGen = gen !== undefined ? gen : sessionGen;
       try {
         const { data, error } = await sb.from('test_history').select('*').eq('user_id', currentUserId).order('taken_at', { ascending: false }).limit(10);
         if (error) throw error;
+        if (myGen !== sessionGen) return;
         testHistoryRows = data || [];
       } catch (e) {
+        if (myGen !== sessionGen) return;
         testHistoryRows = [];
       }
+    }
+
+    async function showTestHistory() {
+      const a = document.getElementById('cardArea');
+      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Test History</div><div class="test-setup-sub">Loading…</div></div>';
+      await loadTestHistoryCache();
       renderTestHistoryList();
     }
 
     function fmtHistoryDate(iso) {
       return new Date(iso).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function weakestDomainsBlock(rows) {
+      const byDomain = {};
+      rows.forEach(r => {
+        Object.entries(r.domains || {}).forEach(([d, s]) => {
+          if (!byDomain[d]) byDomain[d] = { c: 0, t: 0 };
+          byDomain[d].c += s.c;
+          byDomain[d].t += s.t;
+        });
+      });
+      const weakest = Object.entries(byDomain)
+        .map(([d, s]) => ({ d, pct: s.t > 0 ? Math.round((s.c / s.t) * 100) : 0 }))
+        .filter(w => w.pct < 70)
+        .sort((a, b) => a.pct - b.pct);
+      if (!weakest.length) return '';
+      return '<div class="test-section-label" style="margin-top:4px">Weakest domains</div><div class="stats-row" style="padding:0;margin-bottom:16px;grid-template-columns:repeat(3, 1fr)">' +
+        weakest.map(w => {
+          const col = w.pct >= 50 ? '#f39c12' : 'var(--wrong)';
+          return '<div class="stat-card"><div class="stat-num" style="color:' + col + '">' + w.pct + '%</div><div class="stat-label">' + w.d + ' — ' + (DOMAIN_NAMES[w.d] || '') + '</div></div>';
+        }).join('') + '</div>';
     }
 
     function renderTestHistoryList() {
@@ -3104,15 +3134,7 @@
       // Quick-glance callout: every domain still below the 70% passing threshold,
       // weakest first. A fixed 3-column grid wraps to further rows on its own
       // once there are more than 3 -- no cap on how many can show.
-      const weakest = domainEntries
-        .map(function (e) { const d = e[0], s = e[1]; return { d: d, pct: s.t > 0 ? Math.round((s.c / s.t) * 100) : 0 }; })
-        .filter(function (w) { return w.pct < 70; })
-        .sort(function (a, b) { return a.pct - b.pct; });
-      const weakestBlocks = weakest.length ? '<div class="test-section-label" style="margin-top:4px">Weakest domains</div><div class="stats-row" style="padding:0;margin-bottom:16px;grid-template-columns:repeat(3, 1fr)">' +
-        weakest.map(function (w) {
-          const col = w.pct >= 50 ? '#f39c12' : 'var(--wrong)';
-          return '<div class="stat-card"><div class="stat-num" style="color:' + col + '">' + w.pct + '%</div><div class="stat-label">' + w.d + ' — ' + (DOMAIN_NAMES[w.d] || '') + '</div></div>';
-        }).join('') + '</div>' : '';
+      const weakestBlocks = weakestDomainsBlock(testHistoryRows);
 
       const avgTable = domainEntries.length ? '<div class="test-section-label" style="margin-top:4px">Domain averages — last ' + testHistoryRows.length + ' exam' + (testHistoryRows.length === 1 ? '' : 's') + '</div><table class="test-breakdown"><thead><tr><th>Domain</th><th style="text-align:center">Score</th><th style="text-align:right">%</th></tr></thead><tbody>' +
         domainEntries.map(function (e) {
