@@ -3000,36 +3000,41 @@
         <button class="test-nav-btn" onclick="reviewWrong()">Review Incorrect</button>
         ${flaggedCt ? `<button class="test-nav-btn" onclick="reviewFlagged()">Review Flagged (${flaggedCt})</button>` : ''}
       </div>
+      <button class="test-nav-btn" style="margin-top:8px" onclick="reviewAll()">Review All ${total} Questions</button>
       <button class="test-start-btn" style="margin-top:0" onclick="enterTestMode()">New Test</button>
       <div style="text-align:center;margin-top:2px"><a href="#" onclick="showTestHistory();return false" style="color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer">View Test History</a></div>
     </div>
   </div>`;
     }
 
-    function reviewWrong() {
-      const wrong = testQ.filter(q => testUserAns[q.id] !== q._shuf[q._cIdx]);
-      if (wrong.length === 0) {
-        document.getElementById('cardArea').innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:40px">🎯</div><div style="font-size:18px;font-weight:800;margin-top:12px">Perfect score!</div><button class="test-start-btn" onclick="enterTestMode()" style="margin-top:20px;max-width:260px">New Test</button></div>';
-        return;
-      }
-      // clean up test flags before switching to quiz review
-      wrong.forEach(q => { delete q._shuf; delete q._cIdx; });
+    function reviewDeck(questions) {
+      // clean up test-mode-only fields before switching to quiz review
+      questions.forEach(q => { delete q._shuf; delete q._cIdx; });
       exitTestMode();
       document.getElementById('tabTest').className = 'tab';
       document.getElementById('tabQuiz').className = 'tab active';
-      mode = 'quiz'; deck = wrong; idx = 0; qAnswered = false;
+      mode = 'quiz'; deck = questions; idx = 0; qAnswered = false;
       render();
+    }
+
+    function reviewWrong() {
+      const wrong = testQ.filter(q => testUserAns[q.id] !== q._shuf[q._cIdx]);
+      if (wrong.length === 0) {
+        document.getElementById('cardArea').innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:40px">🎯</div><div style="font-size:18px;font-weight:800;margin-top:12px">Perfect score!</div><button class="test-start-btn" onclick="reviewAll()" style="margin-top:20px;max-width:260px">Review All Questions</button><button class="test-start-btn" style="margin-top:10px;max-width:260px;background:var(--surface2);color:var(--muted)" onclick="enterTestMode()">New Test</button></div>';
+        return;
+      }
+      reviewDeck(wrong);
+    }
+
+    function reviewAll() {
+      if (!testQ.length) return;
+      reviewDeck(testQ.slice());
     }
 
     function reviewFlagged() {
       const flagged = testQ.filter(q => isFlagged(q.id));
       if (flagged.length === 0) return;
-      flagged.forEach(q => { delete q._shuf; delete q._cIdx; });
-      exitTestMode();
-      document.getElementById('tabTest').className = 'tab';
-      document.getElementById('tabQuiz').className = 'tab active';
-      mode = 'quiz'; deck = flagged; idx = 0; qAnswered = false;
-      render();
+      reviewDeck(flagged);
     }
 
     // ---- Test history: last 10 completed exams, synced to Supabase ----
