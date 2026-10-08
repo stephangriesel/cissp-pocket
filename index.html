@@ -1429,7 +1429,7 @@
     let testActive = false, testSetup = false, testQ = [], testIdx = 0;
     let testUserAns = {};
     let testTimer = null, testSecsLeft = 0, testTimerOn = false;
-    let testCfg = { count: 75, domains: new Set(['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']) };
+    let testCfg = { count: 75, domains: new Set(['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']), unseenOnly: false };
     // Resumable exam session: testInProgress is true whenever an unfinished exam
     // exists (even if you've switched to another tab); savedTestSession holds the
     // last snapshot fetched from Supabase/localStorage so it can be resumed later
@@ -2692,16 +2692,17 @@
 
     function renderTestSetup() {
       const a = document.getElementById('cardArea');
+      const prog = getP();
       const counts = {};
       ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8'].forEach(d => { counts[d] = DATA.questions.filter(q => q.domain === d).length; });
-      const available = DATA.questions.filter(q => testCfg.domains.has(q.domain)).length;
+      const available = DATA.questions.filter(q => testCfg.domains.has(q.domain) && (!testCfg.unseenOnly || !(q.id in prog))).length;
       const flaggedCount = flaggedQuestions().length;
       const allChecked = testCfg.domains.size === 8;
       const countBtns = [10, 25, 50, 75, 100, 125].map(n => `<button class="test-count-btn${testCfg.count === n ? ' active' : ''}" onclick="setTestCount(${n})">${n}</button>`).join('');
       const domainGrid = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8'].map(d => {
         const chk = testCfg.domains.has(d);
-        return `<label class="test-domain-check${chk ? ' checked' : ''}" onclick="toggleTestDomain('${d}',this)">
-      <input type="checkbox"${chk ? ' checked' : ''} onclick="event.stopPropagation();toggleTestDomain('${d}',this.closest('label'))">
+        return `<label class="test-domain-check${chk ? ' checked' : ''}">
+      <input type="checkbox"${chk ? ' checked' : ''} onchange="toggleTestDomain('${d}')">
       <div><div style="font-size:12px;font-weight:700;color:var(--accent)">${d}</div><div style="font-size:11px;color:var(--muted)">${DOMAIN_NAMES[d]} (${counts[d]})</div></div>
     </label>`;
       }).join('');
@@ -2715,12 +2716,16 @@
     <div class="test-section" style="margin-top:16px">
       <div class="test-section-label">Number of questions</div>
       <div class="test-count-row">${countBtns}</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:8px">${available} questions available from selected domains</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">${available} question${available === 1 ? '' : 's'} available from selected domains${testCfg.unseenOnly ? ' (unseen only)' : ''}</div>
+      <label class="test-all-check${testCfg.unseenOnly ? ' checked' : ''}" style="margin-top:10px">
+        <input type="checkbox"${testCfg.unseenOnly ? ' checked' : ''} onchange="toggleUnseenOnly()">
+        <span style="font-size:13px;font-weight:700">Only questions I haven't seen yet</span>
+      </label>
     </div>
     <div class="test-section">
       <div class="test-section-label">Domains to include</div>
-      <label class="test-all-check${allChecked ? ' checked' : ''}" onclick="toggleAllDomains(this)">
-        <input type="checkbox"${allChecked ? ' checked' : ''} onclick="event.stopPropagation();toggleAllDomains(this.closest('label'))">
+      <label class="test-all-check${allChecked ? ' checked' : ''}">
+        <input type="checkbox"${allChecked ? ' checked' : ''} onchange="toggleAllDomains()">
         <span style="font-size:13px;font-weight:700">All Domains</span>
       </label>
       <div class="test-domain-grid">${domainGrid}</div>
@@ -2747,18 +2752,20 @@
 
     function setTestCount(n) { testCfg.count = n; renderTestSetup(); }
 
-    function toggleTestDomain(d, label) {
+    function toggleTestDomain(d) {
       if (testCfg.domains.has(d)) { if (testCfg.domains.size > 1) testCfg.domains.delete(d); }
       else testCfg.domains.add(d);
       renderTestSetup();
     }
 
-    function toggleAllDomains(label) {
+    function toggleAllDomains() {
       testCfg.domains = testCfg.domains.size === 8 ? new Set(['D1']) : new Set(['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']);
       renderTestSetup();
     }
 
     function toggleTestTimer() { testTimerOn = !testTimerOn; renderTestSetup(); }
+
+    function toggleUnseenOnly() { testCfg.unseenOnly = !testCfg.unseenOnly; renderTestSetup(); }
 
     function beginTest(pool) {
       testQ = pool;
@@ -2780,7 +2787,8 @@
     }
 
     function startTest() {
-      const items = DATA.questions.filter(q => testCfg.domains.has(q.domain));
+      const prog = getP();
+      const items = DATA.questions.filter(q => testCfg.domains.has(q.domain) && (!testCfg.unseenOnly || !(q.id in prog)));
       const pool = weightedTestPool(items, testCfg.domains, testCfg.count);
       beginTest(pool);
     }
