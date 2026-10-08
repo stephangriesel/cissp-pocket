@@ -132,6 +132,19 @@
 
     <div class="entry">
       <div class="entry-date">08 Oct 2026</div>
+      <div class="entry-title">Fix — Practice Exams weren't crediting correct answers</div>
+      <ul>
+        <li>Finishing an exam only ever penalized wrong answers; correct ones weren't recorded at all, so
+          the Coverage view could show lots of "review" and almost nothing "mastered" even after a strong
+          exam score</li>
+        <li>Correct exam answers now count toward mastery exactly like Quiz mode already does. Note: this
+          only fixes it going forward — past exams already scored under the old behavior can't be
+          retroactively corrected, since per-question detail from completed exams isn't stored</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">08 Oct 2026</div>
       <div class="entry-title">Feature — Review all questions after a Practice Exam</div>
       <ul>
         <li>A new "Review All" button on the exam results screen lets you flip back through every question
