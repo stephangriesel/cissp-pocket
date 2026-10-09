@@ -1418,7 +1418,7 @@
     </div>
   </div>
   <div class="card-area" id="cardArea"></div>
-  <button id="notesFab" onclick="toggleNotes()" aria-label="Notes">📝</button>
+  <button id="notesFab" onclick="toggleNotes()" aria-label="Notes" style="display:none">📝</button>
   <div id="notesBackdrop" onclick="closeNotesDrawer()"></div>
   <div id="notesDrawer"></div>
   <script>
@@ -2386,8 +2386,15 @@
       deck = [];
     }
 
-    function showAuthOverlay() { document.getElementById('authOverlay').style.display = 'flex'; }
-    function hideAuthOverlay() { document.getElementById('authOverlay').style.display = 'none'; }
+    function showAuthOverlay() {
+      document.getElementById('authOverlay').style.display = 'flex';
+      document.getElementById('notesFab').style.display = 'none';
+      closeNotesDrawer();
+    }
+    function hideAuthOverlay() {
+      document.getElementById('authOverlay').style.display = 'none';
+      document.getElementById('notesFab').style.display = '';
+    }
 
     function hasAccess() {
       if (!currentSub) return false;
