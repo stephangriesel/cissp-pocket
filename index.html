@@ -1327,7 +1327,9 @@
     #popQuizBackdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
+      background: radial-gradient(circle at center, rgba(91, 141, 214, 0.28), rgba(0, 0, 0, 0.72) 65%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 400;
       display: none;
       align-items: center;
@@ -1343,6 +1345,10 @@
     #popQuizModal {
       width: 100%;
       max-width: 340px
+    }
+
+    #popQuizModal .flashcard {
+      box-shadow: 0 0 0 1px rgba(91, 141, 214, 0.4), 0 0 32px 4px rgba(91, 141, 214, 0.35), 0 12px 40px rgba(0, 0, 0, 0.5)
     }
 
     .pop-quiz-label {
