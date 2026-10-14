@@ -131,6 +131,18 @@
   <div class="content" id="content" style="display:none">
 
     <div class="entry">
+      <div class="entry-date">14 Oct 2026</div>
+      <div class="entry-title">Fix — Pop Quiz interrupting mid-decision in Test mode</div>
+      <ul>
+        <li>Test mode has no "confirm answer" step, so a single tap on an option was being treated as
+          "submitted," letting Pop Quiz interrupt even while you were still comparing choices or about to
+          change your mind</li>
+        <li>It now waits until you've actually navigated away from the question that was on screen when it
+          became due, not just until you've tapped something</li>
+      </ul>
+    </div>
+
+    <div class="entry">
       <div class="entry-date">12 Oct 2026</div>
       <div class="entry-title">Polish — Pop Quiz visuals</div>
       <ul>
