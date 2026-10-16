@@ -1476,6 +1476,7 @@
     let testUserAns = {};
     let testTimer = null, testSecsLeft = 0, testTimerOn = false;
     let testCfg = { count: 75, domains: new Set(['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']), unseenOnly: false };
+    let testDomainsCustomized = false; // true once the user manually touches domain checkboxes for the test being set up now
     // Resumable exam session: testInProgress is true whenever an unfinished exam
     // exists (even if you've switched to another tab); savedTestSession holds the
     // last snapshot fetched from Supabase/localStorage so it can be resumed later
@@ -3021,8 +3022,16 @@
         renderResumePrompt();
       } else {
         testActive = false; testSetup = true;
+        if (!testDomainsCustomized) applyWeakestDomainDefault();
         renderTestSetup();
       }
+    }
+
+    function applyWeakestDomainDefault() {
+      const weakest = weakestDomains(testHistoryRows);
+      testCfg.domains = weakest.length
+        ? new Set(weakest.map(w => w.d))
+        : new Set(['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']);
     }
 
     function exitTestMode() {
@@ -3097,11 +3106,13 @@
     function toggleTestDomain(d) {
       if (testCfg.domains.has(d)) { if (testCfg.domains.size > 1) testCfg.domains.delete(d); }
       else testCfg.domains.add(d);
+      testDomainsCustomized = true;
       renderTestSetup();
     }
 
     function toggleAllDomains() {
       testCfg.domains = testCfg.domains.size === 8 ? new Set(['D1']) : new Set(['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']);
+      testDomainsCustomized = true;
       renderTestSetup();
     }
 
@@ -3118,6 +3129,7 @@
       });
       testIdx = 0; testUserAns = {};
       testActive = true; testSetup = false; testInProgress = true; testStartedAt = Date.now();
+      testDomainsCustomized = false; // next fresh setup screen should default to weakest domains again
       popQuizLastSeenTestIdx = null; // don't carry a stale "last seen" value into a brand-new test
       if (testTimerOn) {
         const n = testQ.length;
@@ -3433,7 +3445,7 @@
       return new Date(iso).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
-    function weakestDomainsBlock(rows) {
+    function weakestDomains(rows) {
       const byDomain = {};
       rows.forEach(r => {
         Object.entries(r.domains || {}).forEach(([d, s]) => {
@@ -3442,10 +3454,14 @@
           byDomain[d].t += s.t;
         });
       });
-      const weakest = Object.entries(byDomain)
+      return Object.entries(byDomain)
         .map(([d, s]) => ({ d, pct: s.t > 0 ? Math.round((s.c / s.t) * 100) : 0 }))
         .filter(w => w.pct < 70)
         .sort((a, b) => a.pct - b.pct);
+    }
+
+    function weakestDomainsBlock(rows) {
+      const weakest = weakestDomains(rows);
       if (!weakest.length) return '';
       return '<div class="test-section-label" style="margin-top:4px">Weakest domains</div><div class="stats-row" style="padding:0;margin-bottom:16px;grid-template-columns:repeat(3, 1fr)">' +
         weakest.map(w => {
@@ -3520,7 +3536,7 @@
     }
   </script>
   <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px;color:var(--muted)">
-    Updated 15 Oct 2026<span id="changelogLinkWrap" style="display:none"> · <a href="changelog.html" style="color:var(--muted);text-decoration:none">view changelog</a></span>
+    Updated 16 Oct 2026<span id="changelogLinkWrap" style="display:none"> · <a href="changelog.html" style="color:var(--muted);text-decoration:none">view changelog</a></span>
   </div>
 </body>
 
