@@ -67,6 +67,12 @@
       letter-spacing: 0.3px
     }
 
+    @media (max-width: 480px) {
+      .sync-label {
+        display: none
+      }
+    }
+
     .nav-badge {
       font-size: 11px;
       padding: 3px 8px;
@@ -1405,7 +1411,7 @@
   <nav>
     <div class="nav-title">CISSP Pocket Trainer</div>
     <div style="display:flex;align-items:center;gap:8px">
-      <span id="syncBadge" style="font-size:10px;color:var(--muted)">● syncing…</span>
+      <span id="syncBadge" style="font-size:10px;color:var(--muted);white-space:nowrap">● <span class="sync-label">syncing…</span></span>
       <div id="navBadge" class="nav-badge badge-all">All Domains</div>
       <button onclick="confirmNewSession()"
         style="font-size:10px;padding:5px 9px;border-radius:14px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-weight:600;cursor:pointer">New
@@ -1596,9 +1602,14 @@
     function updSyncBadge() {
       const el = document.getElementById('syncBadge');
       if (!el) return;
-      if (syncStatus === 'synced') { el.textContent = '● synced'; el.style.color = 'var(--correct)'; }
-      else if (syncStatus === 'offline') { el.textContent = '● offline (saved locally)'; el.style.color = 'var(--wrong)'; }
-      else { el.textContent = '● syncing…'; el.style.color = 'var(--muted)'; }
+      const label = el.querySelector('.sync-label');
+      let text, color;
+      if (syncStatus === 'synced') { text = 'synced'; color = 'var(--correct)'; }
+      else if (syncStatus === 'offline') { text = 'offline (saved locally)'; color = 'var(--wrong)'; }
+      else { text = 'syncing…'; color = 'var(--muted)'; }
+      if (label) label.textContent = text;
+      el.title = text.charAt(0).toUpperCase() + text.slice(1);
+      el.style.color = color;
     }
 
     // ---- Persistent Got/Again counters ----
@@ -2447,7 +2458,7 @@
       reset();
     }
 
-    function reset() { deck = buildDeck(); idx = 0; flipped = false; qAnswered = false; upd(); render(); }
+    function reset() { deck = buildDeck(); idx = 0; flipped = false; qAnswered = false; reviewingRoundMissed = false; upd(); render(); }
 
     function clearAllActions() {
       saveLocalActions({});
@@ -2545,6 +2556,7 @@
       const a = document.getElementById('cardArea');
       if (idx >= deck.length) {
         if (jumpedFromReview) { jumpedFromReview = false; showReviewList(); return; }
+        if (reviewingRoundMissed) { reviewingRoundMissed = false; deck = lastRoundDeck; renderEnd(a); return; }
         renderEnd(a); return;
       }
       if (mode === 'flash') renderFlash(a);
@@ -2552,10 +2564,20 @@
       upd();
     }
 
+    function backToRoundSummary() {
+      reviewingRoundMissed = false;
+      deck = lastRoundDeck;
+      renderEnd(document.getElementById('cardArea'));
+    }
+
+    function backLinkHtml() {
+      return reviewingRoundMissed ? '<div style="text-align:center;margin-bottom:10px"><a href="#" onclick="backToRoundSummary();return false" style="color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer">← Back to round summary</a></div>' : '';
+    }
+
     function renderFlash(a) {
       const c = deck[idx];
       const expHtml = c.explanation ? '<div class="q-explanation" id="flashExp" style="display:none">' + c.explanation + '</div>' : '<div id="flashExp" style="display:none"></div>';
-      a.innerHTML = '<div class="flashcard" id="fc" onclick="flip()"><div class="card-front"><div class="card-domain ' + dc(c.domain) + '">' + c.domain + '</div><div class="card-label">Tap to reveal</div><div class="card-text">' + c.front + '</div></div><div class="card-back"><div class="card-domain ' + dc(c.domain) + '">' + c.domain + '</div><div class="card-label">Tap card to flip back</div><div class="card-text">' + c.back + '</div></div></div><div class="flip-hint" id="fh">Tap card to reveal answer</div>' + expHtml + '<div class="rating-btns" id="rb" style="display:none"><button class="rating-btn btn-again" onclick="rate(-1)">Need to review</button><button class="rating-btn btn-got-it" onclick="rate(1)">Got it ✓</button></div>';
+      a.innerHTML = backLinkHtml() + '<div class="flashcard" id="fc" onclick="flip()"><div class="card-front"><div class="card-domain ' + dc(c.domain) + '">' + c.domain + '</div><div class="card-label">Tap to reveal</div><div class="card-text">' + c.front + '</div></div><div class="card-back"><div class="card-domain ' + dc(c.domain) + '">' + c.domain + '</div><div class="card-label">Tap card to flip back</div><div class="card-text">' + c.back + '</div></div></div><div class="flip-hint" id="fh">Tap card to reveal answer</div>' + expHtml + '<div class="rating-btns" id="rb" style="display:none"><button class="rating-btn btn-again" onclick="rate(-1)">Need to review</button><button class="rating-btn btn-got-it" onclick="rate(1)">Got it ✓</button></div>';
     }
 
     function flip() {
@@ -2581,7 +2603,7 @@
       const newCorrect = shuffled.indexOf(correctText);
       const opts = shuffled.map((o, i) => '<button class="q-option" id="o' + i + '" onclick="ans(' + i + ',' + newCorrect + ',\'' + c.id + '\')">' + String.fromCharCode(65 + i) + '. ' + o + '</button>').join('');
       const fl = isFlagged(c.id);
-      a.innerHTML = '<div class="q-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px"><div class="q-domain ' + dc(c.domain) + '" style="margin-bottom:0">' + c.domain + '</div><button class="test-flag-btn' + (fl ? ' on' : '') + '" id="quizFlagBtn" onclick="toggleQuizFlag(\'' + c.id + '\')">' + (fl ? '⚑ Flagged' : '⚑ Flag') + '</button></div><div class="q-text">' + c.question + '</div><div class="q-options">' + opts + '</div><div id="qe" style="display:none" class="q-explanation"></div></div><button class="q-next" id="qn" style="display:none" onclick="nextQ()">Next question →</button>';
+      a.innerHTML = backLinkHtml() + '<div class="q-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px"><div class="q-domain ' + dc(c.domain) + '" style="margin-bottom:0">' + c.domain + '</div><button class="test-flag-btn' + (fl ? ' on' : '') + '" id="quizFlagBtn" onclick="toggleQuizFlag(\'' + c.id + '\')">' + (fl ? '⚑ Flagged' : '⚑ Flag') + '</button></div><div class="q-text">' + c.question + '</div><div class="q-options">' + opts + '</div><div id="qe" style="display:none" class="q-explanation"></div></div><button class="q-next" id="qn" style="display:none" onclick="nextQ()">Next question →</button>';
       qAnswered = false;
     }
 
@@ -2613,8 +2635,11 @@
     function nextQ() { idx++; qAnswered = false; render(); }
 
     let lastRoundWrong = []; // cards marked "again" in the round that just ended, for the "Review Missed" button
+    let lastRoundDeck = [];  // the full deck from the round that just ended, so "Review Missed" can return to its summary
+    let reviewingRoundMissed = false;
 
     function renderEnd(a) {
+      lastRoundDeck = deck.slice();
       const stats = computeStats();
       const total = stats.got + stats.again;
       const pct = total > 0 ? Math.round((stats.got / total) * 100) : 0;
@@ -2656,6 +2681,7 @@
 
     function reviewRoundWrong() {
       if (!lastRoundWrong.length) return;
+      reviewingRoundMissed = true;
       deck = lastRoundWrong; idx = 0; flipped = false; qAnswered = false;
       render();
     }
