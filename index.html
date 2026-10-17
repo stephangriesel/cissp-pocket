@@ -2387,6 +2387,11 @@
         a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Signups</div><div class="test-setup-sub">Couldn\'t load the signup list. Make sure the admin_list_signups function exists in Supabase and try again.</div><button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="closeAdmin()">Done</button></div>';
         return;
       }
+      let logRows = [];
+      try {
+        const { data, error } = await sb.rpc('admin_list_account_action_log');
+        if (!error) logRows = data || [];
+      } catch (e) { /* log table may not exist yet -- just skip the section */ }
       const items = rows.map(function (u) {
         const created = u.created_at ? new Date(u.created_at).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
         const statusLabel = u.is_admin ? 'Admin' : (u.status || 'no subscription');
@@ -2400,7 +2405,14 @@
         const actions = canAct ? ('<div style="display:flex;gap:8px;margin-top:8px"><button class="test-start-btn" style="flex:1;padding:8px;font-size:12px;background:var(--surface2);color:var(--muted)" onclick="adminUserAction(\'' + u.id + '\',\'revoke\',\'' + safeEmail + '\')">Revoke access</button><button class="test-start-btn" style="flex:1;padding:8px;font-size:12px;background:#e74c3c;color:#fff" onclick="adminUserAction(\'' + u.id + '\',\'delete\',\'' + safeEmail + '\')">Delete permanently</button></div>') : '';
         return '<div class="q-card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="min-width:0"><div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (u.email || '(no email)') + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Signed up ' + created + (expiryText ? ' · ' + expiryText : '') + '</div>' + (payText ? '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + payText + '</div>' : '') + '</div><div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:' + col + ';white-space:nowrap">' + statusLabel.toUpperCase() + '</div></div>' + actions + '</div>';
       }).join('');
-      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Signups</div><div class="test-setup-sub">' + rows.length + ' user' + (rows.length === 1 ? '' : 's') + ' total, newest first.</div>' + (items || '<div class="test-setup-sub">No signups yet.</div>') + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="closeAdmin()">Done</button></div>';
+      const logItems = logRows.map(function (l) {
+        const when = l.created_at ? new Date(l.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+        const verb = l.action === 'delete' ? 'deleted everything' : 'canceled access';
+        const by = l.actor === 'self' ? 'self-service' : ('admin ' + (l.actor_email || ''));
+        return '<div style="font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border)">' + when + ' — <b style="color:var(--text)">' + (l.target_email || l.target_user_id || 'unknown user') + '</b> ' + verb + ' (' + by + ')</div>';
+      }).join('');
+      const logSection = logRows.length ? ('<div class="test-section" style="margin-top:16px"><div class="test-section-label">Recent account removals</div>' + logItems + '</div>') : '';
+      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Signups</div><div class="test-setup-sub">' + rows.length + ' user' + (rows.length === 1 ? '' : 's') + ' total, newest first.</div>' + (items || '<div class="test-setup-sub">No signups yet.</div>') + logSection + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted);margin-top:16px" onclick="closeAdmin()">Done</button></div>';
     }
 
     async function adminUserAction(targetId, action, email) {
@@ -2411,14 +2423,7 @@
         if (typed !== email) { if (typed !== null) alert('Email didn\'t match -- nothing was deleted.'); return; }
       }
       try {
-        const { data: { session } } = await sb.auth.getSession();
-        const r = await fetch(SUPABASE_URL + '/functions/v1/admin-user-action', {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + session.access_token, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ target_user_id: targetId, action: action }),
-        });
-        const d = await r.json();
-        if (!r.ok || d.error) throw new Error(d.error || 'Action failed');
+        await performAccountAction(targetId, action);
         renderAdmin();
       } catch (e) {
         alert('Could not complete that action: ' + e.message);
@@ -2450,13 +2455,46 @@
       ${hasStripeSub ? `<button class="test-start-btn" id="profileCancelBtn" style="background:transparent;border:1px solid var(--wrong);color:var(--wrong)" onclick="confirmCancelSubscription()">Cancel Subscription</button>` : ''}
     </div>` : ''}
     <button class="test-start-btn" style="margin-bottom:10px" onclick="closeProfile()">Done</button>
-    <button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="doSignOut()">Sign Out</button>
+    <button class="test-start-btn" style="background:var(--surface2);color:var(--muted);margin-bottom:16px" onclick="doSignOut()">Sign Out</button>
+    ${canBill ? `<div class="test-section">
+      <div class="test-section-label" style="color:var(--wrong)">Danger Zone</div>
+      <button class="test-start-btn" style="background:transparent;border:1px solid var(--wrong);color:var(--wrong);margin-bottom:8px" onclick="selfAccountAction('revoke')">Cancel Account</button>
+      <button class="test-start-btn" style="background:var(--wrong);color:#fff" onclick="selfAccountAction('delete')">Delete Account &amp; All Data</button>
+    </div>` : ''}
   </div>`;
     }
 
     function confirmCancelSubscription() {
       if (confirm('Cancel your subscription? You\'ll keep access until the end of the current billing period.')) {
         startCheckoutOrPortal('cancel');
+      }
+    }
+
+    async function performAccountAction(targetId, action) {
+      const { data: { session } } = await sb.auth.getSession();
+      const r = await fetch(SUPABASE_URL + '/functions/v1/admin-user-action', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + session.access_token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target_user_id: targetId, action: action }),
+      });
+      const d = await r.json();
+      if (!r.ok || d.error) throw new Error(d.error || 'Action failed');
+    }
+
+    async function selfAccountAction(action) {
+      const email = currentUser ? currentUser.email : '';
+      if (action === 'revoke') {
+        if (!confirm('Cancel your account?\n\nThis cancels your subscription and blocks access right away. Your data (progress, notes, history) is kept — you can get it back by subscribing again.')) return;
+      } else {
+        const typed = prompt('This permanently deletes your account and ALL your data (progress, notes, test history, flags) — this cannot be undone.\n\nType your email to confirm:');
+        if (typed !== email) { if (typed !== null) alert('Email didn\'t match — nothing was deleted.'); return; }
+      }
+      try {
+        await performAccountAction(currentUserId, action);
+        alert(action === 'revoke' ? 'Your account has been canceled.' : 'Your account and all data have been deleted.');
+        doSignOut();
+      } catch (e) {
+        alert('Could not complete that action: ' + e.message);
       }
     }
 

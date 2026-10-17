@@ -1,13 +1,21 @@
 // Supabase Edge Function: admin-user-action
-// Lets a signed-in admin either revoke a user's access (cancel their Stripe
-// subscription, mark them canceled -- their data is kept, they just lose
-// access) or permanently delete a user (cancel their subscription, then
-// delete their auth account; every table with a user_id foreign key cascades
-// on delete, so this also wipes their progress, notes, test history, etc).
+// Handles two account actions, each available two ways:
+//   - "revoke": cancel the Stripe subscription and mark the account
+//     canceled. Access is blocked but the user's data (progress, notes,
+//     test history) is kept.
+//   - "delete": cancel the Stripe subscription, then delete the auth
+//     account outright. Every table with a user_id foreign key cascades on
+//     delete, so this wipes all of that user's data too.
+// A user can call either action on themselves (self-service "cancel
+// account" / "delete account & all data" in their Profile screen). An admin
+// can call either action on any non-admin user from the admin dashboard.
+// Either way the action is written to account_action_log first (while the
+// target's email is still resolvable), so a permanently deleted account
+// still leaves an audit trail an admin can see.
 //
-// Both actions need server-side secrets (STRIPE_SECRET_KEY to cancel billing,
-// SUPABASE_SERVICE_ROLE_KEY to read across users and delete an auth account),
-// so this can't run as client-side JS or a plain Postgres RPC.
+// Needs server-side secrets (STRIPE_SECRET_KEY to cancel billing,
+// SUPABASE_SERVICE_ROLE_KEY to read across users and delete an auth
+// account), so this can't run as client-side JS or a plain Postgres RPC.
 
 import Stripe from "npm:stripe@17";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -47,21 +55,27 @@ Deno.serve(async (req) => {
 
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const { data: callerSub } = await admin
-      .from("cissp_subscriptions")
-      .select("is_admin")
-      .eq("user_id", caller.id)
-      .maybeSingle();
-    if (!callerSub?.is_admin) return json({ error: "not authorized" }, 403);
-
     const body = await req.json().catch(() => ({}));
     const target_user_id = body?.target_user_id;
     const action = body?.action;
     if (!target_user_id || (action !== "revoke" && action !== "delete")) {
       return json({ error: "target_user_id and a valid action are required" }, 400);
     }
-    if (target_user_id === caller.id) {
-      return json({ error: "cannot act on your own account" }, 400);
+
+    const isSelf = target_user_id === caller.id;
+
+    const { data: callerSub } = await admin
+      .from("cissp_subscriptions")
+      .select("is_admin")
+      .eq("user_id", caller.id)
+      .maybeSingle();
+
+    if (isSelf) {
+      if (callerSub?.is_admin) {
+        return json({ error: "admin accounts can't self-service this -- ask another admin" }, 400);
+      }
+    } else if (!callerSub?.is_admin) {
+      return json({ error: "not authorized" }, 403);
     }
 
     const { data: targetSub } = await admin
@@ -69,9 +83,15 @@ Deno.serve(async (req) => {
       .select("is_admin, stripe_subscription_id")
       .eq("user_id", target_user_id)
       .maybeSingle();
-    if (targetSub?.is_admin) {
+    if (!isSelf && targetSub?.is_admin) {
       return json({ error: "cannot act on another admin account" }, 400);
     }
+
+    let targetEmail: string | null = null;
+    try {
+      const { data: targetUser } = await admin.auth.admin.getUserById(target_user_id);
+      targetEmail = targetUser?.user?.email || null;
+    } catch (_e) { /* best-effort for the log entry only */ }
 
     if (targetSub?.stripe_subscription_id) {
       try {
@@ -80,6 +100,14 @@ Deno.serve(async (req) => {
         // Already canceled, or never fully created on Stripe's side -- fine either way.
       }
     }
+
+    await admin.from("account_action_log").insert({
+      target_user_id,
+      target_email: targetEmail,
+      action,
+      actor: isSelf ? "self" : "admin",
+      actor_email: caller.email || null,
+    });
 
     if (action === "revoke") {
       const { error } = await admin

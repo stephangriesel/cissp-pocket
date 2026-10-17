@@ -132,6 +132,19 @@
 
     <div class="entry">
       <div class="entry-date">17 Oct 2026</div>
+      <div class="entry-title">Feature — Self-service account cancel/delete + admin audit log</div>
+      <ul>
+        <li>Added a "Danger Zone" to the Account screen: "Cancel Account" (cancels your subscription and
+          blocks access, keeps your data) and "Delete Account & All Data" (cancels your subscription and
+          permanently deletes everything — requires typing your email to confirm)</li>
+        <li>Every cancel/delete action — self-service or admin-triggered — is now written to an audit log
+          an admin can see on the Signups screen, so a permanently deleted account still leaves a record
+          of who removed it and when</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">17 Oct 2026</div>
       <div class="entry-title">Feature — Admin dashboard: subscription detail + revoke/delete</div>
       <ul>
         <li>The Signups admin screen now shows each user's trial/renewal expiry date and payment status
