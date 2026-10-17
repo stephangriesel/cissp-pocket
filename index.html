@@ -2956,7 +2956,10 @@
         const days = Math.max(0, Math.ceil((new Date(currentSub.trial_ends_at) - new Date()) / 86400000));
         return 'Free trial — ' + days + ' day' + (days === 1 ? '' : 's') + ' left.';
       }
-      if (currentSub.status === 'active') return 'Active subscription — €9/mo.';
+      if (currentSub.status === 'active') {
+        const next = currentSub.current_period_end ? new Date(currentSub.current_period_end).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : null;
+        return 'Active subscription — €9/mo.' + (next ? ' Next payment ' + next + '.' : '');
+      }
       if (currentSub.status === 'past_due') return 'Payment failed — please update your card.';
       return 'No active subscription.';
     }
