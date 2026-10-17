@@ -3641,6 +3641,8 @@
           return '<tr><td><strong>' + d + '</strong><br><span style="font-size:11px;color:var(--muted)">' + (DOMAIN_NAMES[d] || '') + '</span></td><td style="text-align:center">' + s.c + '/' + s.t + '</td><td style="text-align:right"><span style="font-weight:700;color:' + col + '">' + dp + '%</span><div class="tbar-wrap"><div class="tbar-fill" style="width:' + dp + '%;background:' + col + '"></div></div></td></tr>';
         }).join('') + '</tbody></table>' : '';
 
+      const focusSummary = testHistorySummaryBlock(domainEntries);
+
       const items = testHistoryRows.map((r, i) => {
         const col = r.passed ? 'var(--correct)' : 'var(--wrong)';
         const domains = Object.keys(r.domains || {}).sort();
@@ -3649,7 +3651,41 @@
         }).join('') + '</div>' : '';
         return '<div class="q-card" style="cursor:pointer;margin-bottom:10px" onclick="renderTestHistoryDetail(' + i + ')"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-size:12px;color:var(--muted)">' + fmtHistoryDate(r.taken_at) + '</div><div style="font-size:14px;font-weight:700;margin-top:2px">' + r.correct + '/' + r.total + ' correct</div>' + domainsLine + '</div><div style="text-align:right"><div style="font-size:22px;font-weight:800;color:' + col + '">' + r.pct + '%</div><div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:' + col + '">' + (r.passed ? 'PASS' : 'FAIL') + '</div></div></div></div>';
       }).join('');
-      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Test History</div><div class="test-setup-sub">Your last ' + testHistoryRows.length + ' practice exam' + (testHistoryRows.length === 1 ? '' : 's') + '. Tap one for the full breakdown.</div>' + overallBlock + weakestBlocks + avgTable + '<div class="test-section-label" style="margin-top:20px">Individual attempts</div>' + items + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="renderTestSetup()">Back</button></div>';
+      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Test History</div><div class="test-setup-sub">Your last ' + testHistoryRows.length + ' practice exam' + (testHistoryRows.length === 1 ? '' : 's') + '. Tap one for the full breakdown.</div>' + overallBlock + weakestBlocks + avgTable + focusSummary + '<div class="test-section-label" style="margin-top:20px">Individual attempts</div>' + items + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="renderTestSetup()">Back</button></div>';
+    }
+
+    // Prose breakdown of exam-history weak points, domain by domain, each with
+    // concrete "focus points" -- the specific questions the user has missed
+    // most (net-negative progress score), pulled from the same progress data
+    // Your Coverage uses. domainEntries is [domain, {c, t}][] pooled from
+    // every recorded exam attempt.
+    function testHistorySummaryBlock(domainEntries) {
+      const entries = domainEntries
+        .map(([d, s]) => ({ d, c: s.c, t: s.t, pct: s.t > 0 ? Math.round((s.c / s.t) * 100) : 0 }))
+        .filter(e => e.t > 0)
+        .sort((a, b) => a.pct - b.pct);
+      if (!entries.length) return '';
+
+      const prog = getP();
+      const rows = entries.map(e => {
+        const tone = e.pct < 50 ? 'Struggling — this domain needs significant focus.'
+          : e.pct < 70 ? 'Below the 70% passing threshold — keep reviewing this domain.'
+          : e.pct < 85 ? 'Solid, but still worth reinforcing.'
+          : 'Strong — well covered.';
+        const col = e.pct >= 70 ? '#27ae60' : e.pct >= 50 ? '#f39c12' : '#e74c3c';
+        const weakQs = DATA.questions
+          .filter(q => q.domain === e.d && q.id in prog && (prog[q.id] || 0) <= 0)
+          .sort((a, b) => (prog[a.id] || 0) - (prog[b.id] || 0))
+          .slice(0, 3);
+        const focusList = weakQs.length
+          ? '<div style="font-size:12px;color:var(--muted);margin-top:4px">Focus points:</div><ul style="margin:4px 0 0 18px;padding:0;font-size:12px;color:var(--muted)">'
+          + weakQs.map(q => '<li style="margin-bottom:3px">' + escapeHtml(q.question.length > 120 ? q.question.slice(0, 120) + '…' : q.question) + '</li>').join('')
+          + '</ul>'
+          : '';
+        return '<div class="q-card" style="margin-bottom:10px"><div style="font-size:13px"><strong style="color:' + col + '">' + e.d + ' — ' + (DOMAIN_NAMES[e.d] || '') + '</strong> <span style="color:var(--muted)">(' + e.c + '/' + e.t + ', ' + e.pct + '%)</span></div><div style="font-size:12px;color:var(--text);margin-top:4px">' + tone + '</div>' + focusList + '</div>';
+      }).join('');
+
+      return '<div class="test-section-label" style="margin-top:20px">Where to focus</div><div class="test-setup-sub" style="margin-bottom:10px">Weakest domain first. Focus points are the specific questions you\'ve missed most across Flashcards, Quiz, and Test.</div>' + rows;
     }
 
     function renderTestHistoryDetail(i) {
