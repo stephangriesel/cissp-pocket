@@ -2390,10 +2390,39 @@
       const items = rows.map(function (u) {
         const created = u.created_at ? new Date(u.created_at).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
         const statusLabel = u.is_admin ? 'Admin' : (u.status || 'no subscription');
-        const col = u.is_admin ? 'var(--accent)' : u.status === 'active' ? 'var(--correct)' : u.status === 'trialing' ? '#f39c12' : 'var(--muted)';
-        return '<div class="q-card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="min-width:0"><div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (u.email || '(no email)') + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Signed up ' + created + '</div></div><div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:' + col + ';white-space:nowrap">' + statusLabel.toUpperCase() + '</div></div></div>';
+        const col = u.is_admin ? 'var(--accent)' : u.status === 'active' ? 'var(--correct)' : u.status === 'trialing' ? '#f39c12' : u.status === 'past_due' ? '#e74c3c' : 'var(--muted)';
+        const expiryTs = u.status === 'trialing' ? u.trial_ends_at : u.current_period_end;
+        const expiryLabel = expiryTs ? new Date(expiryTs).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+        const expiryText = expiryLabel ? ((u.status === 'trialing' ? 'Trial ends ' : u.status === 'active' ? 'Renews ' : 'Ended ') + expiryLabel) : '';
+        const payText = u.is_admin ? '' : u.stripe_subscription_id ? (u.status === 'past_due' ? 'Last payment failed' : u.status === 'active' ? 'Payments up to date' : '') : 'No payment on file';
+        const safeEmail = (u.email || '(no email)').replace(/'/g, "\\'");
+        const canAct = !u.is_admin && u.id !== currentUserId;
+        const actions = canAct ? ('<div style="display:flex;gap:8px;margin-top:8px"><button class="test-start-btn" style="flex:1;padding:8px;font-size:12px;background:var(--surface2);color:var(--muted)" onclick="adminUserAction(\'' + u.id + '\',\'revoke\',\'' + safeEmail + '\')">Revoke access</button><button class="test-start-btn" style="flex:1;padding:8px;font-size:12px;background:#e74c3c;color:#fff" onclick="adminUserAction(\'' + u.id + '\',\'delete\',\'' + safeEmail + '\')">Delete permanently</button></div>') : '';
+        return '<div class="q-card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="min-width:0"><div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (u.email || '(no email)') + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Signed up ' + created + (expiryText ? ' · ' + expiryText : '') + '</div>' + (payText ? '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + payText + '</div>' : '') + '</div><div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:' + col + ';white-space:nowrap">' + statusLabel.toUpperCase() + '</div></div>' + actions + '</div>';
       }).join('');
       a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Signups</div><div class="test-setup-sub">' + rows.length + ' user' + (rows.length === 1 ? '' : 's') + ' total, newest first.</div>' + (items || '<div class="test-setup-sub">No signups yet.</div>') + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="closeAdmin()">Done</button></div>';
+    }
+
+    async function adminUserAction(targetId, action, email) {
+      if (action === 'revoke') {
+        if (!confirm('Revoke access for ' + email + '?\n\nThis cancels their subscription and blocks app access. Their data (progress, notes, history) is kept, and access can be restored by giving them a new subscription.')) return;
+      } else {
+        const typed = prompt('This permanently deletes ' + email + ' and ALL their data (progress, notes, test history, flags) -- this cannot be undone.\n\nType their email to confirm:');
+        if (typed !== email) { if (typed !== null) alert('Email didn\'t match -- nothing was deleted.'); return; }
+      }
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        const r = await fetch(SUPABASE_URL + '/functions/v1/admin-user-action', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + session.access_token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ target_user_id: targetId, action: action }),
+        });
+        const d = await r.json();
+        if (!r.ok || d.error) throw new Error(d.error || 'Action failed');
+        renderAdmin();
+      } catch (e) {
+        alert('Could not complete that action: ' + e.message);
+      }
     }
 
     function updateAdminNav() {
@@ -3562,7 +3591,7 @@
     }
   </script>
   <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px;color:var(--muted)">
-    Updated 16 Oct 2026<span id="changelogLinkWrap" style="display:none"> · <a href="changelog.html" style="color:var(--muted);text-decoration:none">view changelog</a></span>
+    Updated 17 Oct 2026<span id="changelogLinkWrap" style="display:none"> · <a href="changelog.html" style="color:var(--muted);text-decoration:none">view changelog</a></span>
   </div>
 </body>
 

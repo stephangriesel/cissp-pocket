@@ -20,6 +20,11 @@ enabled = true
 verify_jwt = true
 entrypoint = "./functions/stripe-portal/index.ts"
 
+[functions.admin-user-action]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/admin-user-action/index.ts"
+
 [functions.stripe-webhook]
 enabled = true
 verify_jwt = false
