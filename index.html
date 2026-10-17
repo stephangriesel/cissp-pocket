@@ -3625,6 +3625,14 @@
       // once there are more than 3 -- no cap on how many can show.
       const weakestBlocks = weakestDomainsBlock(testHistoryRows);
 
+      // Overall average pooled across every recorded attempt (same approach as
+      // the domain averages above), not an average of per-exam percentages.
+      const totalC = testHistoryRows.reduce((s, r) => s + r.correct, 0);
+      const totalT = testHistoryRows.reduce((s, r) => s + r.total, 0);
+      const overallPct = totalT > 0 ? Math.round((totalC / totalT) * 100) : 0;
+      const overallCol = overallPct >= 70 ? '#27ae60' : overallPct >= 50 ? '#f39c12' : '#e74c3c';
+      const overallBlock = '<div class="stats-row" style="padding:0;margin-bottom:16px;grid-template-columns:1fr"><div class="stat-card"><div class="stat-num" style="color:' + overallCol + '">' + overallPct + '%</div><div class="stat-label">Overall average — ' + totalC + '/' + totalT + ' across ' + testHistoryRows.length + ' exam' + (testHistoryRows.length === 1 ? '' : 's') + '</div></div></div>';
+
       const avgTable = domainEntries.length ? '<div class="test-section-label" style="margin-top:4px">Domain averages — last ' + testHistoryRows.length + ' exam' + (testHistoryRows.length === 1 ? '' : 's') + '</div><table class="test-breakdown"><thead><tr><th>Domain</th><th style="text-align:center">Score</th><th style="text-align:right">%</th></tr></thead><tbody>' +
         domainEntries.map(function (e) {
           const d = e[0], s = e[1];
@@ -3641,7 +3649,7 @@
         }).join('') + '</div>' : '';
         return '<div class="q-card" style="cursor:pointer;margin-bottom:10px" onclick="renderTestHistoryDetail(' + i + ')"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-size:12px;color:var(--muted)">' + fmtHistoryDate(r.taken_at) + '</div><div style="font-size:14px;font-weight:700;margin-top:2px">' + r.correct + '/' + r.total + ' correct</div>' + domainsLine + '</div><div style="text-align:right"><div style="font-size:22px;font-weight:800;color:' + col + '">' + r.pct + '%</div><div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:' + col + '">' + (r.passed ? 'PASS' : 'FAIL') + '</div></div></div></div>';
       }).join('');
-      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Test History</div><div class="test-setup-sub">Your last ' + testHistoryRows.length + ' practice exam' + (testHistoryRows.length === 1 ? '' : 's') + '. Tap one for the full breakdown.</div>' + weakestBlocks + avgTable + '<div class="test-section-label" style="margin-top:20px">Individual attempts</div>' + items + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="renderTestSetup()">Back</button></div>';
+      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Test History</div><div class="test-setup-sub">Your last ' + testHistoryRows.length + ' practice exam' + (testHistoryRows.length === 1 ? '' : 's') + '. Tap one for the full breakdown.</div>' + overallBlock + weakestBlocks + avgTable + '<div class="test-section-label" style="margin-top:20px">Individual attempts</div>' + items + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="renderTestSetup()">Back</button></div>';
     }
 
     function renderTestHistoryDetail(i) {
