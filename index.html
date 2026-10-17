@@ -3666,6 +3666,10 @@
         .sort((a, b) => a.pct - b.pct);
       if (!entries.length) return '';
 
+      const collapsed = getCoverageCollapsed('Where to focus');
+      const header = '<div class="test-section-label" style="margin-top:20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" onclick="toggleCoverageCollapsed(\'Where to focus\',\'renderTestHistoryList\')"><span>Where to focus</span><span style="color:var(--muted);flex-shrink:0">' + (collapsed ? '▸ Show' : '▾ Hide') + '</span></div>';
+      if (collapsed) return header;
+
       const prog = getP();
       const rows = entries.map(e => {
         const tone = e.pct < 50 ? 'Struggling — this domain needs significant focus.'
@@ -3685,7 +3689,7 @@
         return '<div class="q-card" style="margin-bottom:10px"><div style="font-size:13px"><strong style="color:' + col + '">' + e.d + ' — ' + (DOMAIN_NAMES[e.d] || '') + '</strong> <span style="color:var(--muted)">(' + e.c + '/' + e.t + ', ' + e.pct + '%)</span></div><div style="font-size:12px;color:var(--text);margin-top:4px">' + tone + '</div>' + focusList + '</div>';
       }).join('');
 
-      return '<div class="test-section-label" style="margin-top:20px">Where to focus</div><div class="test-setup-sub" style="margin-bottom:10px">Weakest domain first. Focus points are the specific questions you\'ve missed most across Flashcards, Quiz, and Test.</div>' + rows;
+      return header + '<div class="test-setup-sub" style="margin-bottom:10px">Weakest domain first. Focus points are the specific questions you\'ve missed most across Flashcards, Quiz, and Test.</div>' + rows;
     }
 
     function renderTestHistoryDetail(i) {
