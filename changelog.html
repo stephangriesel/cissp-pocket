@@ -132,6 +132,17 @@
 
     <div class="entry">
       <div class="entry-date">17 Oct 2026</div>
+      <div class="entry-title">Fix — Unescaped signup emails in admin dashboard</div>
+      <ul>
+        <li>The Signups screen rendered each user's email straight into the page, including inside a
+          button's click handler, without escaping it — a crafted signup email could have run script in
+          the admin's browser. Emails and audit log entries are now HTML-escaped and action buttons read
+          the user id/email from data attributes instead of inlining them into JS code</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">17 Oct 2026</div>
       <div class="entry-title">Feature — Self-service account cancel/delete + admin audit log</div>
       <ul>
         <li>Added a "Danger Zone" to the Account screen: "Cancel Account" (cancels your subscription and

@@ -2400,16 +2400,16 @@
         const expiryLabel = expiryTs ? new Date(expiryTs).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : '';
         const expiryText = expiryLabel ? ((u.status === 'trialing' ? 'Trial ends ' : u.status === 'active' ? 'Renews ' : 'Ended ') + expiryLabel) : '';
         const payText = u.is_admin ? '' : u.stripe_subscription_id ? (u.status === 'past_due' ? 'Last payment failed' : u.status === 'active' ? 'Payments up to date' : '') : 'No payment on file';
-        const safeEmail = (u.email || '(no email)').replace(/'/g, "\\'");
+        const safeEmail = escapeHtml(u.email || '(no email)');
         const canAct = !u.is_admin && u.id !== currentUserId;
-        const actions = canAct ? ('<div style="display:flex;gap:8px;margin-top:8px"><button class="test-start-btn" style="flex:1;padding:8px;font-size:12px;background:var(--surface2);color:var(--muted)" onclick="adminUserAction(\'' + u.id + '\',\'revoke\',\'' + safeEmail + '\')">Revoke access</button><button class="test-start-btn" style="flex:1;padding:8px;font-size:12px;background:#e74c3c;color:#fff" onclick="adminUserAction(\'' + u.id + '\',\'delete\',\'' + safeEmail + '\')">Delete permanently</button></div>') : '';
-        return '<div class="q-card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="min-width:0"><div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (u.email || '(no email)') + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Signed up ' + created + (expiryText ? ' · ' + expiryText : '') + '</div>' + (payText ? '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + payText + '</div>' : '') + '</div><div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:' + col + ';white-space:nowrap">' + statusLabel.toUpperCase() + '</div></div>' + actions + '</div>';
+        const actions = canAct ? ('<div style="display:flex;gap:8px;margin-top:8px"><button class="test-start-btn" style="flex:1;padding:8px;font-size:12px;background:var(--surface2);color:var(--muted)" data-uid="' + u.id + '" data-email="' + safeEmail + '" onclick="adminUserAction(this.dataset.uid,\'revoke\',this.dataset.email)">Revoke access</button><button class="test-start-btn" style="flex:1;padding:8px;font-size:12px;background:#e74c3c;color:#fff" data-uid="' + u.id + '" data-email="' + safeEmail + '" onclick="adminUserAction(this.dataset.uid,\'delete\',this.dataset.email)">Delete permanently</button></div>') : '';
+        return '<div class="q-card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="min-width:0"><div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + safeEmail + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Signed up ' + created + (expiryText ? ' · ' + expiryText : '') + '</div>' + (payText ? '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + payText + '</div>' : '') + '</div><div style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:' + col + ';white-space:nowrap">' + statusLabel.toUpperCase() + '</div></div>' + actions + '</div>';
       }).join('');
       const logItems = logRows.map(function (l) {
         const when = l.created_at ? new Date(l.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
         const verb = l.action === 'delete' ? 'deleted everything' : 'canceled access';
-        const by = l.actor === 'self' ? 'self-service' : ('admin ' + (l.actor_email || ''));
-        return '<div style="font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border)">' + when + ' — <b style="color:var(--text)">' + (l.target_email || l.target_user_id || 'unknown user') + '</b> ' + verb + ' (' + by + ')</div>';
+        const by = l.actor === 'self' ? 'self-service' : ('admin ' + escapeHtml(l.actor_email || ''));
+        return '<div style="font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border)">' + when + ' — <b style="color:var(--text)">' + escapeHtml(l.target_email || l.target_user_id || 'unknown user') + '</b> ' + verb + ' (' + by + ')</div>';
       }).join('');
       const logSection = logRows.length ? ('<div class="test-section" style="margin-top:16px"><div class="test-section-label">Recent account removals</div>' + logItems + '</div>') : '';
       a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Signups</div><div class="test-setup-sub">' + rows.length + ' user' + (rows.length === 1 ? '' : 's') + ' total, newest first.</div>' + (items || '<div class="test-setup-sub">No signups yet.</div>') + logSection + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted);margin-top:16px" onclick="closeAdmin()">Done</button></div>';
@@ -2446,7 +2446,7 @@
       a.innerHTML = `<div class="test-setup">
     <div class="test-setup-title">Account</div>
     <div class="test-section" style="margin-bottom:16px">
-      <div style="font-size:14px;color:var(--text);margin-bottom:4px">${currentUser ? currentUser.email : ''}</div>
+      <div style="font-size:14px;color:var(--text);margin-bottom:4px">${currentUser ? escapeHtml(currentUser.email) : ''}</div>
       <div style="font-size:13px;color:var(--muted)">${subscriptionStatusLabel()}</div>
     </div>
     ${canBill ? `<div class="test-section" style="margin-bottom:16px">
