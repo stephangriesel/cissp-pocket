@@ -17,7 +17,8 @@ returns table (
   status text,
   trial_ends_at timestamptz,
   current_period_end timestamptz,
-  stripe_subscription_id text
+  stripe_subscription_id text,
+  signup_ip text
 )
 language plpgsql
 security definer
@@ -33,7 +34,7 @@ begin
 
   return query
   select u.id, u.email::text, u.created_at, coalesce(s.is_admin, false), s.status, s.trial_ends_at,
-         s.current_period_end, s.stripe_subscription_id
+         s.current_period_end, s.stripe_subscription_id, s.signup_ip
   from auth.users u
   left join public.cissp_subscriptions s on s.user_id = u.id
   order by u.created_at desc;
