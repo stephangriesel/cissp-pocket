@@ -1373,6 +1373,17 @@
       pointer-events: none;
       display: none
     }
+
+    @keyframes focusHintPulse {
+      0%, 100% { background: transparent }
+      15%, 45%, 75% { background: rgba(91, 141, 214, 0.16) }
+      30%, 60%, 90% { background: transparent }
+    }
+
+    .focus-hint {
+      animation: focusHintPulse 3s ease-in-out 1;
+      border-radius: 8px
+    }
   </style>
 </head>
 
@@ -3674,7 +3685,7 @@
       if (!entries.length) return '';
 
       const collapsed = getCoverageCollapsed('Where to focus');
-      const header = '<div class="test-section-label" style="margin-top:20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" onclick="toggleCoverageCollapsed(\'Where to focus\',\'renderTestHistoryList\')"><span>Where to focus</span><span style="color:var(--muted);flex-shrink:0">' + (collapsed ? '▸ Show' : '▾ Hide') + '</span></div>';
+      const header = '<div class="test-section-label' + (collapsed ? ' focus-hint' : '') + '" style="margin-top:20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 6px;margin-left:-6px" onclick="toggleCoverageCollapsed(\'Where to focus\',\'renderTestHistoryList\')"><span>Where to focus</span><span style="color:var(--muted);flex-shrink:0">' + (collapsed ? '▸ Show' : '▾ Hide') + '</span></div>';
       if (collapsed) return header;
 
       const prog = getP();
