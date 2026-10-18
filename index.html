@@ -2532,6 +2532,7 @@
       mode = m;
       reviewMode = false;
       jumpedFromReview = false;
+      testReviewMode = false;
       document.getElementById('tabFlash').className = 'tab' + (m === 'flash' ? ' active' : '');
       document.getElementById('tabQuiz').className = 'tab' + (m === 'quiz' ? ' active' : '');
       reset();
@@ -2541,6 +2542,7 @@
       domain = d;
       reviewMode = false;
       jumpedFromReview = false;
+      testReviewMode = false;
       settingsOpen = false;
       profileOpen = false;
       adminOpen = false;
@@ -2709,10 +2711,14 @@
 
     function ans(chosen, correct, cid) {
       if (qAnswered) return; qAnswered = true;
-      const c = deck[idx]; const p = getP(); const ok = chosen === correct;
-      p[cid] = (p[cid] || 0) + (ok ? 1 : -1); saveP(p);
-      const action = ok ? 'got' : 'again';
-      syncCard(cid, p[cid], action);
+      const c = deck[idx]; const ok = chosen === correct;
+      if (!testReviewMode) {
+        // Reviewing a Test's own questions afterward doesn't re-score them --
+        // finishTest() already recorded each one once, when the exam was graded.
+        const p = getP();
+        p[cid] = (p[cid] || 0) + (ok ? 1 : -1); saveP(p);
+        syncCard(cid, p[cid], ok ? 'got' : 'again');
+      }
       c.options.forEach((_, i) => {
         const el = document.getElementById('o' + i);
         if (i === correct) el.className = 'q-option correct';
@@ -2726,6 +2732,14 @@
     }
 
     function nextQ() { idx++; qAnswered = false; render(); }
+
+    // True while reviewing a Test's questions afterward (Review Incorrect/All/Flagged
+    // on the results screen). A Test is graded once, at finishTest() -- every question's
+    // progress score is already updated there. Answering those same questions again
+    // during this read-only-ish review must NOT touch progress a second time, or a
+    // single exam attempt could move a question's score by more than the 1 point it
+    // actually earned, skewing "Your Coverage" away from what the exam really showed.
+    let testReviewMode = false;
 
     let lastRoundWrong = []; // cards marked "again" in the round that just ended, for the "Review Missed" button
     let lastRoundDeck = [];  // the full deck from the round that just ended, so "Review Missed" can return to its summary
@@ -2798,6 +2812,7 @@
       totalSeconds = 0; pendingSeconds = 0;
       if (timerPaused) { timerPaused = false; const b = document.getElementById('timerPauseBtn'); if (b) { b.textContent = '⏸'; b.title = 'Pause study timer'; b.setAttribute('aria-label', b.title); b.style.color = 'var(--muted)'; } }
       deck = [];
+      testReviewMode = false;
     }
 
     function showAuthOverlay() {
@@ -3148,6 +3163,7 @@
       if (testTimer) { clearInterval(testTimer); testTimer = null; }
       settingsOpen = false;
       adminOpen = false;
+      testReviewMode = false;
       ['tabFlash', 'tabQuiz'].forEach(id => document.getElementById(id).className = 'tab');
       document.getElementById('tabTest').className = 'tab active';
       if (testInProgress) {
@@ -3522,6 +3538,7 @@
       document.getElementById('tabTest').className = 'tab';
       document.getElementById('tabQuiz').className = 'tab active';
       mode = 'quiz'; deck = questions; idx = 0; qAnswered = false;
+      testReviewMode = true;
       render();
     }
 
@@ -3732,7 +3749,7 @@
     }
   </script>
   <div style="text-align:center;padding:8px 16px 20px;font-size:10px;letter-spacing:0.4px;color:var(--muted)">
-    Updated 17 Oct 2026<span id="changelogLinkWrap" style="display:none"> · <a href="changelog.html" style="color:var(--muted);text-decoration:none">view changelog</a></span>
+    Updated 18 Oct 2026<span id="changelogLinkWrap" style="display:none"> · <a href="changelog.html" style="color:var(--muted);text-decoration:none">view changelog</a></span>
   </div>
 </body>
 

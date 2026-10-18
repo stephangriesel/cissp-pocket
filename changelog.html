@@ -131,6 +131,17 @@
   <div class="content" id="content" style="display:none">
 
     <div class="entry">
+      <div class="entry-date">18 Oct 2026</div>
+      <div class="entry-title">Fix — Reviewing a Test's questions double-counted progress</div>
+      <ul>
+        <li>"Review Incorrect/All/Flagged" on the exam results screen re-scored each question a second
+          time when answered during review, on top of the result finishTest() already recorded — skewing
+          "Your Coverage" mastery stats. Reviewing a Test's own questions no longer touches progress;
+          normal Flashcards/Quiz sessions (including their own "review missed" flow) are unaffected</li>
+      </ul>
+    </div>
+
+    <div class="entry">
       <div class="entry-date">17 Oct 2026</div>
       <div class="entry-title">Feature — "Where to focus" hint animation</div>
       <ul>
