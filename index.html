@@ -1553,7 +1553,7 @@
       if (myGen !== sessionGen) return;
       // stats are computed live from last_action, no separate load needed
       startTimer();
-      if (!settingsOpen && !profileOpen && !adminOpen) reset();
+      if (!settingsOpen && !profileOpen && !adminOpen && !cheatSheetOpen) reset();
       retryPendingSyncs();
       schedulePopQuiz();
     }
@@ -1998,7 +1998,7 @@
       if (popQuizState) return false; // one is already showing
       if (!DATA.flashcards.length) return false;
       if (document.getElementById('authOverlay').style.display === 'flex') return false;
-      if (settingsOpen || profileOpen || adminOpen || notesOpen) return false;
+      if (settingsOpen || profileOpen || adminOpen || notesOpen || cheatSheetOpen) return false;
       const tabFlash = document.getElementById('tabFlash');
       if (tabFlash && tabFlash.classList.contains('active')) return false; // never interrupt the Flashcards section itself
       if (mode === 'quiz' && !testActive && deck.length && idx < deck.length && !qAnswered) return false; // mid unanswered quiz question
@@ -2257,6 +2257,7 @@
       settingsOpen = true;
       profileOpen = false;
       adminOpen = false;
+      cheatSheetOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
       renderSettings();
@@ -2366,6 +2367,7 @@
       profileOpen = true;
       settingsOpen = false;
       adminOpen = false;
+      cheatSheetOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
       renderProfile();
@@ -2382,6 +2384,7 @@
       adminOpen = true;
       settingsOpen = false;
       profileOpen = false;
+      cheatSheetOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
       renderAdmin();
@@ -2529,6 +2532,7 @@
       settingsOpen = false;
       profileOpen = false;
       adminOpen = false;
+      cheatSheetOpen = false;
       mode = m;
       reviewMode = false;
       jumpedFromReview = false;
@@ -2543,6 +2547,7 @@
       reviewMode = false;
       jumpedFromReview = false;
       testReviewMode = false;
+      cheatSheetOpen = false;
       settingsOpen = false;
       profileOpen = false;
       adminOpen = false;
@@ -3080,7 +3085,7 @@
           // so the next sign-in's loadProgress() skipped reset() and the outgoing
           // account's Profile screen (email, subscription status) stayed on screen
           // underneath the auth overlay instead of being replaced.
-          settingsOpen = false; profileOpen = false; adminOpen = false;
+          settingsOpen = false; profileOpen = false; adminOpen = false; cheatSheetOpen = false;
           document.getElementById('trialBar').classList.remove('visible');
           updateAdminNav();
           renderAuthView('welcome'); showAuthOverlay();
@@ -3163,6 +3168,7 @@
       if (testTimer) { clearInterval(testTimer); testTimer = null; }
       settingsOpen = false;
       adminOpen = false;
+      cheatSheetOpen = false;
       testReviewMode = false;
       ['tabFlash', 'tabQuiz'].forEach(id => document.getElementById(id).className = 'tab');
       document.getElementById('tabTest').className = 'tab active';
@@ -3224,6 +3230,14 @@
     <div style="text-align:center;margin:-6px 0 14px"><a href="#" onclick="showTestHistory();return false" style="color:var(--accent);font-size:12px;text-decoration:none;font-weight:600">📜 View Test History</a></div>
     ${weakestDomainsBlock(testHistoryRows)}
     ${coverageTable('Your Coverage', DATA.questions, 'renderTestSetup')}
+    <div class="test-section" style="margin-top:16px">
+      <div class="test-section-label">Before you test</div>
+      <div style="display:flex;gap:8px">
+        <button class="test-start-btn" style="flex:1;background:var(--surface2);color:var(--text)" onclick="startCramMode()">🔥 Cram Mode</button>
+        <button class="test-start-btn" style="flex:1;background:var(--surface2);color:var(--text)" onclick="openCheatSheet()">📋 Cheat Sheet</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">Cram Mode: a quiz session built from your review and flagged questions, weakest domain first. Cheat Sheet: a quick scan of the key facts behind them — no answering needed.</div>
+    </div>
     <div class="test-section" style="margin-top:16px">
       <div class="test-section-label">Number of questions</div>
       <div class="test-count-row">${countBtns}</div>
@@ -3531,15 +3545,97 @@
       if (passed) fireStarConfetti();
     }
 
-    function reviewDeck(questions) {
+    function reviewDeck(questions, readOnly) {
+      if (readOnly === undefined) readOnly = true; // post-Test review defaults read-only; Cram Mode passes false
       // clean up test-mode-only fields before switching to quiz review
       questions.forEach(q => { delete q._shuf; delete q._cIdx; });
       exitTestMode();
       document.getElementById('tabTest').className = 'tab';
       document.getElementById('tabQuiz').className = 'tab active';
       mode = 'quiz'; deck = questions; idx = 0; qAnswered = false;
-      testReviewMode = true;
+      testReviewMode = readOnly;
       render();
+    }
+
+    // Ranks all 8 domains weakest-first from pooled exam history (same pooling as
+    // weakestDomains()), but unfiltered -- every domain gets a rank, with domains
+    // that have no exam history yet pushed to the end rather than dropped.
+    function domainRankWeakestFirst(rows) {
+      const byDomain = {};
+      rows.forEach(r => {
+        Object.entries(r.domains || {}).forEach(([d, s]) => {
+          if (!byDomain[d]) byDomain[d] = { c: 0, t: 0 };
+          byDomain[d].c += s.c;
+          byDomain[d].t += s.t;
+        });
+      });
+      const ranked = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']
+        .map(d => ({ d, pct: byDomain[d] && byDomain[d].t > 0 ? Math.round((byDomain[d].c / byDomain[d].t) * 100) : null }))
+        .sort((a, b) => (a.pct === null ? 999 : a.pct) - (b.pct === null ? 999 : b.pct));
+      const rank = {};
+      ranked.forEach((r, i) => rank[r.d] = i);
+      return rank;
+    }
+
+    // The combined "weak spot" pool used by both Cram Mode and the Cheat Sheet:
+    // every question currently in the review bucket (net wrong) or flagged,
+    // ordered weakest-domain-first and worst-score-first within a domain.
+    function weakSpotQuestions() {
+      const prog = getP();
+      const reviewIds = new Set(reviewQuestionIds());
+      const rank = domainRankWeakestFirst(testHistoryRows);
+      return DATA.questions
+        .filter(q => reviewIds.has(q.id) || flaggedSet.has(q.id))
+        .sort((a, b) => {
+          const ra = rank[a.domain] !== undefined ? rank[a.domain] : 99;
+          const rb = rank[b.domain] !== undefined ? rank[b.domain] : 99;
+          if (ra !== rb) return ra - rb;
+          return (prog[a.id] || 0) - (prog[b.id] || 0);
+        });
+    }
+
+    function startCramMode() {
+      const cd = weakSpotQuestions().slice(0, 50);
+      if (!cd.length) {
+        alert('No review or flagged questions to cram yet — answer some Quiz questions (a few wrong is fine) or flag a few to build this up.');
+        return;
+      }
+      reviewDeck(cd, false); // false: a real study pass, answers should count toward progress
+    }
+
+    let cheatSheetOpen = false;
+
+    function openCheatSheet() {
+      cheatSheetOpen = true;
+      settingsOpen = false;
+      profileOpen = false;
+      adminOpen = false;
+      if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
+      reviewMode = false;
+      renderCheatSheet();
+    }
+
+    function closeCheatSheet() {
+      cheatSheetOpen = false;
+      reset();
+    }
+
+    function renderCheatSheet() {
+      const a = document.getElementById('cardArea');
+      const candidates = weakSpotQuestions();
+      if (!candidates.length) {
+        a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Cheat Sheet</div><div class="test-setup-sub">Nothing to show yet — once you have some review or flagged questions, your weakest topics will appear here for a quick pre-exam scan.</div><button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="closeCheatSheet()">Done</button></div>';
+        return;
+      }
+      const byDomain = {};
+      candidates.forEach(q => { (byDomain[q.domain] = byDomain[q.domain] || []).push(q); });
+      const rank = domainRankWeakestFirst(testHistoryRows);
+      const domainsOrdered = Object.keys(byDomain).sort((a, b) => (rank[a] !== undefined ? rank[a] : 99) - (rank[b] !== undefined ? rank[b] : 99));
+      const sections = domainsOrdered.map(d => {
+        const items = byDomain[d].slice(0, 15).map(q => '<div style="margin-bottom:10px"><div style="font-size:13px;font-weight:700">' + escapeHtml(q.topic || q.question) + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">' + escapeHtml(q.explanation || '') + '</div></div>').join('');
+        return '<div class="test-section" style="margin-bottom:16px"><div class="test-section-label">' + d + ' — ' + (DOMAIN_NAMES[d] || '') + '</div>' + items + '</div>';
+      }).join('');
+      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Cheat Sheet</div><div class="test-setup-sub">Key facts from your weakest and flagged questions, weakest domain first — a quick scan before you test.</div>' + sections + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="closeCheatSheet()">Done</button></div>';
     }
 
     function reviewWrong() {
