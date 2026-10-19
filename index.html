@@ -3236,7 +3236,7 @@
         <button class="test-start-btn" style="flex:1;background:var(--surface2);color:var(--text)" onclick="startCramMode()">🔥 Cram Mode</button>
         <button class="test-start-btn" style="flex:1;background:var(--surface2);color:var(--text)" onclick="openCheatSheet()">📋 Cheat Sheet</button>
       </div>
-      <div style="font-size:12px;color:var(--muted);margin-top:8px">Cram Mode: a quiz session built from your review and flagged questions, weakest domain first. Cheat Sheet: a quick scan of the key facts behind them — no answering needed.</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">Cram Mode: a quiz session built from your review and flagged questions, weakest domain first — a refresher pass that doesn't affect your scores. Cheat Sheet: a quick scan of the key facts behind them — no answering needed.</div>
     </div>
     <div class="test-section" style="margin-top:16px">
       <div class="test-section-label">Number of questions</div>
@@ -3600,7 +3600,7 @@
         alert('No review or flagged questions to cram yet — answer some Quiz questions (a few wrong is fine) or flag a few to build this up.');
         return;
       }
-      reviewDeck(cd, false); // false: a real study pass, answers should count toward progress
+      reviewDeck(cd); // read-only, like post-Test review: a last-minute refresher, not a new scoring pass
     }
 
     let cheatSheetOpen = false;
