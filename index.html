@@ -3252,10 +3252,10 @@
     <div class="test-section" style="margin-top:16px">
       <div class="test-section-label">Before you test</div>
       <div style="display:flex;gap:8px">
-        <button class="test-start-btn" style="flex:1;background:var(--surface2);color:var(--text)" onclick="startCramMode()">🔥 Cram Mode</button>
-        <button class="test-start-btn" style="flex:1;background:var(--surface2);color:var(--text)" onclick="openCheatSheet()">📋 Cheat Sheet</button>
+        <button class="test-start-btn" style="flex:1;background:var(--surface2);color:var(--text)${limited ? ';opacity:0.5' : ''}" onclick="${limited ? 'showTrialUpsell(\'Cram Mode is available with a subscription.\')' : 'startCramMode()'}">${limited ? '🔒 ' : '🔥 '}Cram Mode</button>
+        <button class="test-start-btn" style="flex:1;background:var(--surface2);color:var(--text)${limited ? ';opacity:0.5' : ''}" onclick="${limited ? 'showTrialUpsell(\'Cheat Sheet is available with a subscription.\')' : 'openCheatSheet()'}">${limited ? '🔒 ' : '📋 '}Cheat Sheet</button>
       </div>
-      <div style="font-size:12px;color:var(--muted);margin-top:8px">Cram Mode: a quiz session built from your review and flagged questions, weakest domain first. Cheat Sheet: a quick scan of the key facts behind them — no answering needed.</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">Cram Mode: a quiz session built from your review and flagged questions, weakest domain first. Cheat Sheet: a quick scan of the key facts behind them — no answering needed.${limited ? ' Subscriber features.' : ''}</div>
     </div>
     <div class="test-section" style="margin-top:16px">
       <div class="test-section-label">Number of questions</div>
@@ -3614,6 +3614,7 @@
     }
 
     function startCramMode() {
+      if (trialLimited()) { showTrialUpsell('Cram Mode is available with a subscription.'); return; }
       const cd = weakSpotQuestions().slice(0, 50);
       if (!cd.length) {
         alert('No review or flagged questions to cram yet — answer some Quiz questions (a few wrong is fine) or flag a few to build this up.');
@@ -3625,6 +3626,7 @@
     let cheatSheetOpen = false;
 
     function openCheatSheet() {
+      if (trialLimited()) { showTrialUpsell('Cheat Sheet is available with a subscription.'); return; }
       cheatSheetOpen = true;
       settingsOpen = false;
       profileOpen = false;
