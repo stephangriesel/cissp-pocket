@@ -1557,7 +1557,7 @@
       if (myGen !== sessionGen) return;
       // stats are computed live from last_action, no separate load needed
       startTimer();
-      if (!settingsOpen && !profileOpen && !adminOpen && !cheatSheetOpen) reset();
+      if (!settingsOpen && !profileOpen && !adminOpen && !cheatSheetOpen && !quickWinsOpen) reset();
       retryPendingSyncs();
       schedulePopQuiz();
     }
@@ -2002,7 +2002,7 @@
       if (popQuizState) return false; // one is already showing
       if (!DATA.flashcards.length) return false;
       if (document.getElementById('authOverlay').style.display === 'flex') return false;
-      if (settingsOpen || profileOpen || adminOpen || notesOpen || cheatSheetOpen) return false;
+      if (settingsOpen || profileOpen || adminOpen || notesOpen || cheatSheetOpen || quickWinsOpen) return false;
       const tabFlash = document.getElementById('tabFlash');
       if (tabFlash && tabFlash.classList.contains('active')) return false; // never interrupt the Flashcards section itself
       if (mode === 'quiz' && !testActive && deck.length && idx < deck.length && !qAnswered) return false; // mid unanswered quiz question
@@ -2262,6 +2262,7 @@
       profileOpen = false;
       adminOpen = false;
       cheatSheetOpen = false;
+      quickWinsOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
       refreshStatsBar();
@@ -2373,6 +2374,7 @@
       settingsOpen = false;
       adminOpen = false;
       cheatSheetOpen = false;
+      quickWinsOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
       refreshStatsBar();
@@ -2391,6 +2393,7 @@
       settingsOpen = false;
       profileOpen = false;
       cheatSheetOpen = false;
+      quickWinsOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
       refreshStatsBar();
@@ -2540,6 +2543,7 @@
       profileOpen = false;
       adminOpen = false;
       cheatSheetOpen = false;
+      quickWinsOpen = false;
       mode = m;
       reviewMode = false;
       jumpedFromReview = false;
@@ -2555,6 +2559,7 @@
       jumpedFromReview = false;
       testReviewMode = false;
       cheatSheetOpen = false;
+      quickWinsOpen = false;
       settingsOpen = false;
       profileOpen = false;
       adminOpen = false;
@@ -3104,7 +3109,7 @@
           // so the next sign-in's loadProgress() skipped reset() and the outgoing
           // account's Profile screen (email, subscription status) stayed on screen
           // underneath the auth overlay instead of being replaced.
-          settingsOpen = false; profileOpen = false; adminOpen = false; cheatSheetOpen = false;
+          settingsOpen = false; profileOpen = false; adminOpen = false; cheatSheetOpen = false; quickWinsOpen = false;
           document.getElementById('trialBar').classList.remove('visible');
           updateAdminNav();
           renderAuthView('welcome'); showAuthOverlay();
@@ -3188,6 +3193,7 @@
       settingsOpen = false;
       adminOpen = false;
       cheatSheetOpen = false;
+      quickWinsOpen = false;
       testReviewMode = false;
       ['tabFlash', 'tabQuiz'].forEach(id => document.getElementById(id).className = 'tab');
       document.getElementById('tabTest').className = 'tab active';
@@ -3255,7 +3261,8 @@
         <button class="test-start-btn" style="flex:1;background:var(--surface2);color:var(--text)${limited ? ';opacity:0.5' : ''}" onclick="${limited ? 'showTrialUpsell(\'Cram Mode is available with a subscription.\')' : 'startCramMode()'}">${limited ? '🔒 ' : '🔥 '}Cram Mode</button>
         <button class="test-start-btn" style="flex:1;background:var(--surface2);color:var(--text)${limited ? ';opacity:0.5' : ''}" onclick="${limited ? 'showTrialUpsell(\'Cheat Sheet is available with a subscription.\')' : 'openCheatSheet()'}">${limited ? '🔒 ' : '📋 '}Cheat Sheet</button>
       </div>
-      <div style="font-size:12px;color:var(--muted);margin-top:8px">Cram Mode: a quiz session built from your review and flagged questions, weakest domain first. Cheat Sheet: a quick scan of the key facts behind them — no answering needed.${limited ? ' Subscriber features.' : ''}</div>
+      <button class="test-start-btn" style="margin-top:8px;background:var(--surface2);color:var(--text)${limited ? ';opacity:0.5' : ''}" onclick="${limited ? 'showTrialUpsell(\'Quick Wins is available with a subscription.\')' : 'openQuickWins()'}">${limited ? '🔒 ' : '⚡ '}Quick Wins</button>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">Cram Mode: a quiz session built from your review and flagged questions, weakest domain first. Cheat Sheet: a quick scan of the key facts behind them. Quick Wins: high-certainty facts and formulas worth memorizing cold, same for everyone.${limited ? ' Subscriber features.' : ''}</div>
     </div>
     <div class="test-section" style="margin-top:16px">
       <div class="test-section-label">Number of questions</div>
@@ -3631,6 +3638,7 @@
       settingsOpen = false;
       profileOpen = false;
       adminOpen = false;
+      quickWinsOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
       refreshStatsBar();
@@ -3639,6 +3647,26 @@
 
     function closeCheatSheet() {
       cheatSheetOpen = false;
+      reset();
+    }
+
+    let quickWinsOpen = false;
+
+    function openQuickWins() {
+      if (trialLimited()) { showTrialUpsell('Quick Wins is available with a subscription.'); return; }
+      quickWinsOpen = true;
+      settingsOpen = false;
+      profileOpen = false;
+      adminOpen = false;
+      cheatSheetOpen = false;
+      if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
+      reviewMode = false;
+      refreshStatsBar();
+      renderQuickWins();
+    }
+
+    function closeQuickWins() {
+      quickWinsOpen = false;
       reset();
     }
 
@@ -3669,6 +3697,178 @@
         return '<div class="test-section" style="margin-bottom:16px"><div class="test-section-label">' + d + ' — ' + (DOMAIN_NAMES[d] || '') + '</div>' + items + '</div>';
       }).join('');
       a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Cheat Sheet</div><div class="test-setup-sub">Key facts from your weakest and flagged questions, weakest domain first — a quick scan before you test. Tap an item for the full question and explanation.</div>' + sections + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="closeCheatSheet()">Done</button></div>';
+    }
+
+    // Static reference material (same for every user, not personalized to
+    // weak spots like Cheat Sheet) -- the high-certainty, easy-points facts,
+    // tables, and formulas worth memorizing cold before the real exam.
+    function renderQuickWins() {
+      const a = document.getElementById('cardArea');
+      const sec = (title, body) => '<div class="test-section" style="margin-bottom:18px"><div class="test-section-label" style="font-size:13px">' + title + '</div>' + body + '</div>';
+      const p = (html) => '<div style="font-size:12.5px;color:var(--text);line-height:1.55;margin-top:6px">' + html + '</div>';
+      const note = (html) => '<div style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px">' + html + '</div>';
+      const table = (headers, rows) => '<table class="test-breakdown"><thead><tr>' + headers.map(h => '<th>' + h + '</th>').join('') + '</tr></thead><tbody>' + rows.map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') + '</tbody></table>';
+
+      const ethics = sec('1. ISC2 Code of Ethics — four canons (in order)',
+        note('When canons conflict, the <strong>earlier one wins</strong>. Order is the whole trick.') +
+        '<ol style="margin:8px 0 0 18px;padding:0;font-size:12.5px;color:var(--text);line-height:1.7">'
+        + '<li>Protect <strong>society</strong>, the common good, necessary public trust &amp; confidence, and the infrastructure.</li>'
+        + '<li>Act <strong>honorably, honestly, justly, responsibly, and legally</strong>.</li>'
+        + '<li>Provide <strong>diligent and competent service to principals</strong> (employer/client).</li>'
+        + '<li>Advance and protect the profession.</li>'
+        + '</ol>' +
+        note('Hook: Society → Act honorably → Principals → Profession. Society always first.'));
+
+      const soc = sec('2. SOC reports — SOC 1 / 2 / 3 and Type I vs II',
+        table(['Report', 'What it covers', 'Audience'], [
+          ['SOC 1', 'Controls over financial reporting (ICFR)', 'User auditors, controller\'s office'],
+          ['SOC 2', 'Security controls vs the 5 Trust Service Criteria. Confidential, shared under NDA', 'Management, regulators, partners'],
+          ['SOC 3', 'Same scope as SOC 2 but general-use, public; opinion only, no detail', 'Anyone (marketing/public)'],
+        ]) +
+        p('<strong>Type I vs Type II</strong> (applies to SOC 1 &amp; 2): Type I = suitability of design at a single point in time (\'snapshot\'). Type II = design + operating effectiveness over a period (min ~6 months) — proves controls actually work; more valuable &amp; costly.') +
+        note('5 Trust Service Criteria (SOC 2): Security, Availability, Processing Integrity, Confidentiality, Privacy. (Security is the only mandatory one.)'));
+
+      const cloud = sec('3. Cloud service models — IaaS / PaaS / SaaS',
+        note('Ascending scale of <strong>provider</strong> responsibility: IaaS → PaaS → SaaS.') +
+        table(['Model', 'You manage', 'Provider manages', 'Examples'], [
+          ['IaaS', 'OS, middleware, runtime, apps, data', 'Physical DC, servers, storage, virtualization', 'AWS EC2, GCP Compute Engine, Azure VMs'],
+          ['PaaS', 'Your app code + data', 'Infra, OS, databases, runtimes', 'App Engine, Heroku, Elastic Beanstalk'],
+          ['SaaS', 'User access, roles, data input', 'Entire stack: app, security, maintenance, updates', 'Gmail, Salesforce, M365, Slack'],
+        ]) +
+        p('<strong>Key facts:</strong> audit focus follows responsibility (IaaS = your OS/patching; SaaS = your access/data). Data protection is <strong>always ultimately the customer\'s</strong>. Deployment models: Public / Private / Community / Hybrid.'));
+
+      const risk = sec('4. Quantitative risk — the formulas',
+        note('AV = Asset Value &nbsp;|&nbsp; EF = Exposure Factor (% lost) &nbsp;|&nbsp; ARO = Annual Rate of Occurrence') +
+        '<div style="font-family:ui-monospace,monospace;font-size:13px;color:var(--accent);margin-top:8px;line-height:1.8">SLE = AV × EF<br>ALE = SLE × ARO &nbsp;(= AV × EF × ARO)<br>Control value/yr = ALE(before) − ALE(after) − cost</div>' +
+        p('SLE = loss from <strong>one</strong> event. ALE = expected loss <strong>per year</strong>. A control that lowers EF or ARO lowers ALE. Worked example: AV €100k, EF 0.4 → SLE €40k; ARO 0.5 → ALE €20k/yr.') +
+        p('<strong>Spend on a control only if its cost &lt; the ALE reduction it buys.</strong> Safeguard value = (ALE before − ALE after) − annual cost.') +
+        note('Qualitative = subjective (High/Med/Low, no numbers). Quantitative = € figures.'));
+
+      const bcp = sec('5. BCP / DRP recovery metrics',
+        '<div style="font-family:ui-monospace,monospace;font-size:13px;color:var(--accent);margin-top:6px">MTD ≥ RTO + WRT</div>' +
+        '<ul style="margin:8px 0 0 18px;padding:0;font-size:12.5px;color:var(--text);line-height:1.7">'
+        + '<li><strong>RPO</strong> = max acceptable data loss (how far back) → drives backup frequency.</li>'
+        + '<li><strong>RTO</strong> = time to restore infrastructure/systems.</li>'
+        + '<li><strong>WRT</strong> = time to verify &amp; resume work after restore. RTO + WRT must fit inside MTD.</li>'
+        + '<li><strong>MTD</strong> = max tolerable downtime before unacceptable business damage.</li>'
+        + '</ul>' +
+        p('<strong>DR sites:</strong> Hot (minutes, full, costly) &gt; Warm (hours, partial) &gt; Cold (days, empty shell, cheap). Also Mobile &amp; Reciprocal agreements.') +
+        note('Order of restore: least-critical FIRST when testing a recovery; in a real DR, most-critical systems first. BIA sets the priority.'));
+
+      const riskResponse = sec('6. Risk response options',
+        '<ul style="margin:6px 0 0 18px;padding:0;font-size:12.5px;color:var(--text);line-height:1.7">'
+        + '<li><strong>Avoid</strong> — eliminate the risk by not doing the risky activity at all.</li>'
+        + '<li><strong>Transfer</strong> — shift it to someone else (insurance, outsourcing, contract terms).</li>'
+        + '<li><strong>Mitigate</strong> — reduce likelihood and/or impact with controls.</li>'
+        + '<li><strong>Accept</strong> — an informed, documented decision to do nothing further.</li>'
+        + '</ul>' +
+        note('"Reject" / ignoring the risk is NOT a valid response — it\'s just accepting it without documenting the decision.'));
+
+      const dueCare = sec('7. Due care vs due diligence',
+        p('<strong>Due diligence</strong> = the research and investigation <em>before</em> acting — "doing the homework" (risk assessments, vetting a vendor, reading the policy).') +
+        p('<strong>Due care</strong> = taking the reasonable actions a prudent person would take — "doing the work" (actually implementing and following through on controls).') +
+        note('Mnemonic: diliGence = investiGate. Care = act.'));
+
+      const controlMatrix = sec('8. Control categories × types',
+        note('Every control has a <strong>category</strong> (how it\'s implemented) and a <strong>type</strong> (what it does). Mix and match.') +
+        '<div style="margin-top:8px"><div style="font-size:12.5px;font-weight:700;color:var(--accent)">Categories</div><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5">Administrative (policies, training, screening) | Technical/Logical (firewalls, encryption, ACLs) | Physical (locks, guards, fencing)</div></div>' +
+        '<div style="margin-top:8px"><div style="font-size:12.5px;font-weight:700;color:var(--accent)">Types</div><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5">Preventive (stop it before) | Detective (notice it happened) | Corrective (fix it after) | Deterrent (discourage it) | Recovery (restore after major loss) | Compensating (alternative when the primary control isn\'t feasible)</div></div>' +
+        p('Examples: security guard = Physical + Preventive/Deterrent. CCTV = Physical + Detective. Firewall = Technical + Preventive. Audit log review = Technical + Detective. Backup restore = Technical + Recovery. Security awareness training = Administrative + Preventive. Separation of duties = Administrative + Preventive.'));
+
+      const osi = sec('9. OSI 7 layers (and TCP/IP mapping)',
+        table(['#', 'Layer', 'Examples / devices'], [
+          ['7', 'Application', 'HTTP, FTP, SMTP, DNS'],
+          ['6', 'Presentation', 'Encryption, encoding, compression (SSL/TLS often cited here)'],
+          ['5', 'Session', 'Session establishment/teardown (NetBIOS)'],
+          ['4', 'Transport', 'TCP, UDP — ports live here'],
+          ['3', 'Network', 'Routers, IP, ICMP'],
+          ['2', 'Data Link', 'Switches, MAC addresses, ARP'],
+          ['1', 'Physical', 'Hubs, cables, NICs'],
+        ]) +
+        note('Top-down mnemonic: "All People Seem To Need Data Processing." Bottom-up: "Please Do Not Throw Sausage Pizza Away."') +
+        p('<strong>TCP/IP 4-layer model</strong> maps onto it: Application (OSI 5–7), Transport (OSI 4), Internet (OSI 3), Network Access/Link (OSI 1–2).'));
+
+      const ports = sec('10. Important port numbers',
+        table(['Port', 'Service', 'Notes'], [
+          ['20 / 21', 'FTP', 'Data / Control — unencrypted'],
+          ['22', 'SSH / SFTP / SCP', 'Encrypted remote access &amp; file transfer'],
+          ['23', 'Telnet', 'Unencrypted — avoid'],
+          ['25', 'SMTP', 'Mail transfer (sending)'],
+          ['53', 'DNS', 'Name resolution (TCP + UDP)'],
+          ['67 / 68', 'DHCP', 'Server / Client'],
+          ['69', 'TFTP', 'Unencrypted, UDP'],
+          ['80', 'HTTP', 'Unencrypted web'],
+          ['110', 'POP3', 'Mail retrieval (download &amp; delete)'],
+          ['123', 'NTP', 'Time sync'],
+          ['143', 'IMAP', 'Mail retrieval (stays on server, syncs)'],
+          ['161 / 162', 'SNMP', 'Network device management'],
+          ['389', 'LDAP', 'Directory access — unencrypted'],
+          ['443', 'HTTPS', 'Encrypted web (TLS)'],
+          ['445', 'SMB', 'Windows file/printer sharing'],
+          ['465 / 587', 'SMTPS / Submission', 'Secure SMTP'],
+          ['636', 'LDAPS', 'Secure LDAP'],
+          ['993', 'IMAPS', 'Secure IMAP'],
+          ['995', 'POP3S', 'Secure POP3'],
+          ['1433', 'MS SQL', 'Database'],
+          ['3306', 'MySQL', 'Database'],
+          ['3389', 'RDP', 'Remote Desktop'],
+        ]) +
+        note('Memory hook: a secure/encrypted variant is usually the same service name + "S". Port ranges: Well-known 0–1023, Registered 1024–49151, Dynamic/Private 49152–65535.'));
+
+      const ipRanges = sec('11. Private IP ranges &amp; subnetting',
+        table(['Range', 'CIDR', 'Notes'], [
+          ['10.0.0.0 – 10.255.255.255', '/8', 'Private — large networks'],
+          ['172.16.0.0 – 172.31.255.255', '/12', 'Private — mid-size networks'],
+          ['192.168.0.0 – 192.168.255.255', '/16', 'Private — small/home networks'],
+          ['127.0.0.0 – 127.255.255.255', '/8', 'Loopback (127.0.0.1 = localhost)'],
+          ['169.254.0.0 – 169.254.255.255', '/16', 'APIPA / link-local (no DHCP found)'],
+        ]) +
+        p('<strong>CIDR quick reference:</strong> /24 = 255.255.255.0 = 256 addresses (254 usable) | /16 = 65,536 addresses | /8 = ~16.7 million addresses.') +
+        note('NAT translates between private and public addresses so private-range hosts can reach the internet.'));
+
+      const wireless = sec('12. Wireless security evolution',
+        table(['Standard', 'Cipher', 'Status'], [
+          ['WEP', 'RC4, static key', 'Broken — avoid'],
+          ['WPA', 'TKIP (patch for WEP hardware)', 'Legacy, still weak'],
+          ['WPA2', 'AES-CCMP', 'Current baseline standard'],
+          ['WPA3', 'AES-GCMP + SAE', 'Current best — SAE replaces the vulnerable 4-way handshake'],
+        ]) +
+        note('Each generation replaced the one before because of a broken handshake or cipher — know the order, not just the names.'));
+
+      const hashCipher = sec('13. Hash / cipher cheat list',
+        '<div style="margin-top:4px"><div style="font-size:12.5px;font-weight:700;color:var(--accent)">Symmetric (same key, fast)</div><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5">DES (56-bit, broken) → 3DES (112–168 bit, legacy) → <strong>AES</strong> (128/192/256-bit, current standard). Also Blowfish/Twofish, RC4 (stream cipher, broken/deprecated).</div></div>' +
+        '<div style="margin-top:8px"><div style="font-size:12.5px;font-weight:700;color:var(--accent)">Asymmetric (key pairs, slower)</div><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5">RSA, ECC (smaller keys, same strength as RSA), Diffie-Hellman (key EXCHANGE only — no encryption or signing), ElGamal.</div></div>' +
+        '<div style="margin-top:8px"><div style="font-size:12.5px;font-weight:700;color:var(--accent)">Hashing</div><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5">MD5 (128-bit, broken — collisions) | SHA-1 (160-bit, broken/deprecated) | <strong>SHA-256 / SHA-512</strong> (SHA-2 family, current standard) | SHA-3 (newer alternative).</div></div>' +
+        note('Broken/legacy: DES, RC4, WEP, MD5, SHA-1. Current standard: AES, SHA-2/SHA-3, WPA2/WPA3.'));
+
+      const grabBagItems = [
+        ['RAID', '0 = stripe (speed, no redundancy) | 1 = mirror | 5 = stripe + parity (1 disk loss) | 6 = double parity (2) | 10 = mirror+stripe.'],
+        ['Fire extinguishers', 'A = common combustibles | B = liquids | C = electrical | D = metals | K = kitchen. Suppression: wet pipe, dry pipe, pre-action, deluge.'],
+        ['Fire needs', 'heat + fuel + oxygen + chemical reaction. Modern clean agents starve O2 / interrupt reaction (no water damage).'],
+        ['Biometrics', 'FAR (Type II) = impostor accepted (worst) | FRR (Type I) = valid user rejected | CER = where they cross (lower = better system).'],
+        ['Access models', 'Confidentiality → MAC | Availability → DAC | Integrity → RBAC/ABAC. Bell-LaPadula = confidentiality (no read up/no write down). Biba = integrity (no write up/no read down). Clark-Wilson = integrity via well-formed transactions.'],
+        ['Crypto', 'Symmetric = confidentiality, fast, shared key (AES). Asymmetric = key exchange + signatures (RSA/ECC). Hashing = integrity (SHA). Digital signature = hash then encrypt with sender\'s private key (integrity + non-repudiation).'],
+        ['Crypto facts', 'Symmetric key count = n(n−1)/2. Encrypt for confidentiality → recipient\'s public key; sign → your private key.'],
+        ['Evidence', 'Best &gt; Real &gt; Documentary &gt; Testimonial. Must be relevant, reliable, legally permissible. Chain of custody preserves integrity.'],
+        ['Incident response (order)', 'Prepare → Detect → Respond → Mitigate → Report → Recover → Remediate → Lessons Learned. RCA after eradication.'],
+        ['Change mgmt', 'Request → Analyse/Impact → Approve (CAB) → Build/Test → Implement → Document. CAB = Change Advisory Board.'],
+        ['Data roles', 'Owner (sets classification/policy) | Custodian (implements/maintains) | Steward (data quality) | Processor (acts on controller\'s behalf) | Controller (decides purpose).'],
+        ['Classification order', 'Classify data FIRST — it drives every downstream control. Accreditation = mgmt formal approval to operate; Certification = the technical evaluation before it.'],
+        ['Regs & standards', 'GDPR breach notice = 72 hours. NIST: 800-53 = controls catalog | 800-37 = RMF (6 steps) | 800-30 = risk assessment.'],
+        ['Pen test / hat types', 'Black box = zero knowledge | White/Crystal = full | Grey = partial. White/Black/Grey HAT = hacker intent, not knowledge — don\'t conflate.'],
+      ];
+      const grabBag = sec('14. Easy-point grab bag (high-certainty recall)',
+        '<div>' + grabBagItems.map(([label, text]) => '<div style="margin-bottom:10px"><div style="font-size:12.5px;font-weight:700;color:var(--accent)">' + label + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5">' + text + '</div></div>').join('') + '</div>');
+
+      const examDay = sec('Exam-day reminders',
+        '<ul style="margin:0 0 0 18px;padding:0;font-size:12.5px;color:var(--text);line-height:1.7">'
+        + '<li>Answer as the <strong>risk manager, not the technician</strong> — the ISC2 "best" answer is policy-first and conservative. When stuck: protect life first, then follow management/policy.</li>'
+        + '<li><strong>Slow down on the first 20–30 questions</strong> on the CAT — it shapes the difficulty curve. Read twice, find the keyword, answer what\'s asked.</li>'
+        + '</ul>');
+
+      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Quick Wins</div><div class="test-setup-sub">The high-certainty, easy-points material — memorize these cold. Same for everyone, not based on your own weak spots.</div>'
+        + ethics + soc + cloud + risk + bcp + riskResponse + dueCare + controlMatrix + osi + ports + ipRanges + wireless + hashCipher + grabBag + examDay
+        + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="closeQuickWins()">Done</button></div>';
     }
 
     function reviewWrong() {
