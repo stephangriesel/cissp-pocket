@@ -1384,6 +1384,10 @@
       animation: focusHintPulse 3s ease-in-out 1;
       border-radius: 8px
     }
+
+    .cheat-item .cheat-full { display: none }
+    .cheat-item.expanded .cheat-preview { display: none }
+    .cheat-item.expanded .cheat-full { display: block }
   </style>
 </head>
 
@@ -3648,10 +3652,21 @@
       const rank = domainRankWeakestFirst(testHistoryRows);
       const domainsOrdered = Object.keys(byDomain).sort((a, b) => (rank[a] !== undefined ? rank[a] : 99) - (rank[b] !== undefined ? rank[b] : 99));
       const sections = domainsOrdered.map(d => {
-        const items = byDomain[d].slice(0, 15).map(q => '<div style="margin-bottom:12px"><div style="font-size:13px;font-weight:700;color:var(--accent)">' + escapeHtml(q.topic || '') + '</div><div style="font-size:12px;color:var(--text);margin-top:3px">' + escapeHtml(truncateAtWord(q.question, 85)) + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">' + escapeHtml(truncateAtWord(q.explanation || '', 100)) + '</div></div>').join('');
+        const items = byDomain[d].slice(0, 15).map(q => {
+          const topic = escapeHtml(q.topic || '');
+          const qShort = escapeHtml(truncateAtWord(q.question, 85));
+          const qFull = escapeHtml(q.question);
+          const eShort = escapeHtml(truncateAtWord(q.explanation || '', 100));
+          const eFull = escapeHtml(q.explanation || '');
+          return '<div class="cheat-item" style="margin-bottom:12px;cursor:pointer" onclick="this.classList.toggle(\'expanded\')">'
+            + '<div style="font-size:13px;font-weight:700;color:var(--accent)">' + topic + '</div>'
+            + '<div class="cheat-preview"><div style="font-size:12px;color:var(--text);margin-top:3px">' + qShort + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">' + eShort + '</div></div>'
+            + '<div class="cheat-full"><div style="font-size:12px;color:var(--text);margin-top:3px">' + qFull + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">' + eFull + '</div></div>'
+            + '</div>';
+        }).join('');
         return '<div class="test-section" style="margin-bottom:16px"><div class="test-section-label">' + d + ' — ' + (DOMAIN_NAMES[d] || '') + '</div>' + items + '</div>';
       }).join('');
-      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Cheat Sheet</div><div class="test-setup-sub">Key facts from your weakest and flagged questions, weakest domain first — a quick scan before you test.</div>' + sections + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="closeCheatSheet()">Done</button></div>';
+      a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Cheat Sheet</div><div class="test-setup-sub">Key facts from your weakest and flagged questions, weakest domain first — a quick scan before you test. Tap an item for the full question and explanation.</div>' + sections + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="closeCheatSheet()">Done</button></div>';
     }
 
     function reviewWrong() {
