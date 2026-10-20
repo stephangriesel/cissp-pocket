@@ -3648,7 +3648,7 @@
       const rank = domainRankWeakestFirst(testHistoryRows);
       const domainsOrdered = Object.keys(byDomain).sort((a, b) => (rank[a] !== undefined ? rank[a] : 99) - (rank[b] !== undefined ? rank[b] : 99));
       const sections = domainsOrdered.map(d => {
-        const items = byDomain[d].slice(0, 15).map(q => '<div style="margin-bottom:14px"><div style="font-size:13px;font-weight:700;color:var(--accent)">' + escapeHtml(q.topic || '') + '</div><div style="font-size:12.5px;color:var(--text);margin-top:4px">' + escapeHtml(q.question) + '</div><div style="font-size:12px;color:var(--muted);margin-top:4px">' + escapeHtml(q.explanation || '') + '</div></div>').join('');
+        const items = byDomain[d].slice(0, 15).map(q => '<div style="margin-bottom:12px"><div style="font-size:13px;font-weight:700;color:var(--accent)">' + escapeHtml(q.topic || '') + '</div><div style="font-size:12px;color:var(--text);margin-top:3px">' + escapeHtml(truncateAtWord(q.question, 85)) + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">' + escapeHtml(truncateAtWord(q.explanation || '', 100)) + '</div></div>').join('');
         return '<div class="test-section" style="margin-bottom:16px"><div class="test-section-label">' + d + ' — ' + (DOMAIN_NAMES[d] || '') + '</div>' + items + '</div>';
       }).join('');
       a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Cheat Sheet</div><div class="test-setup-sub">Key facts from your weakest and flagged questions, weakest domain first — a quick scan before you test.</div>' + sections + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="closeCheatSheet()">Done</button></div>';
