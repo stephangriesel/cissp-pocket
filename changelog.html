@@ -132,6 +132,19 @@
 
     <div class="entry">
       <div class="entry-date">20 Oct 2026</div>
+      <div class="entry-title">Fix — Stale stats bar and missing context in Cheat Sheet</div>
+      <ul>
+        <li>Opening Settings, Profile, Admin, or Cheat Sheet right after finishing a session (e.g. Cram
+          Mode) could leave the top stats bar (card count, got/again, progress) showing numbers from that
+          just-finished deck instead of the real current one — now refreshed on open</li>
+        <li>Cheat Sheet entries showed only the topic label and the answer's explanation, reading like an
+          answer key with no scenario attached. Each entry now also shows the actual question text, so
+          there's context for what's being explained</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">20 Oct 2026</div>
       <div class="entry-title">Change — Cram Mode counts toward progress again</div>
       <ul>
         <li>Cram Mode briefly went read-only; answering a question during Cram Mode now updates "Your

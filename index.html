@@ -2260,6 +2260,7 @@
       cheatSheetOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
+      refreshStatsBar();
       renderSettings();
     }
 
@@ -2370,6 +2371,7 @@
       cheatSheetOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
+      refreshStatsBar();
       renderProfile();
     }
 
@@ -2387,6 +2389,7 @@
       cheatSheetOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
+      refreshStatsBar();
       renderAdmin();
     }
 
@@ -2648,6 +2651,18 @@
       const pct = deck.length > 0 ? Math.round((idx / deck.length) * 100) : 0;
       document.getElementById('progressFill').style.width = pct + '%';
       document.getElementById('progressLabel').textContent = idx + ' / ' + deck.length;
+    }
+
+    // Settings/Profile/Admin/Cheat Sheet render into cardArea but leave the top
+    // stats bar (card count, got/again, progress) alone -- it's driven by the
+    // `deck`/`idx` globals, which otherwise still hold whatever was left over
+    // from the last Flashcards/Quiz/Cram session. Rebuilding the deck (without
+    // rendering it) before showing one of these screens keeps that bar accurate
+    // instead of showing stale numbers from a session that already ended.
+    function refreshStatsBar() {
+      deck = buildDeck();
+      idx = 0;
+      upd();
     }
 
     function dc(d) { return d.toLowerCase(); }
@@ -3612,6 +3627,7 @@
       adminOpen = false;
       if (document.getElementById('tabTest').classList.contains('active')) exitTestMode();
       reviewMode = false;
+      refreshStatsBar();
       renderCheatSheet();
     }
 
@@ -3632,7 +3648,7 @@
       const rank = domainRankWeakestFirst(testHistoryRows);
       const domainsOrdered = Object.keys(byDomain).sort((a, b) => (rank[a] !== undefined ? rank[a] : 99) - (rank[b] !== undefined ? rank[b] : 99));
       const sections = domainsOrdered.map(d => {
-        const items = byDomain[d].slice(0, 15).map(q => '<div style="margin-bottom:10px"><div style="font-size:13px;font-weight:700">' + escapeHtml(q.topic || q.question) + '</div><div style="font-size:12px;color:var(--muted);margin-top:2px">' + escapeHtml(q.explanation || '') + '</div></div>').join('');
+        const items = byDomain[d].slice(0, 15).map(q => '<div style="margin-bottom:14px"><div style="font-size:13px;font-weight:700;color:var(--accent)">' + escapeHtml(q.topic || '') + '</div><div style="font-size:12.5px;color:var(--text);margin-top:4px">' + escapeHtml(q.question) + '</div><div style="font-size:12px;color:var(--muted);margin-top:4px">' + escapeHtml(q.explanation || '') + '</div></div>').join('');
         return '<div class="test-section" style="margin-bottom:16px"><div class="test-section-label">' + d + ' — ' + (DOMAIN_NAMES[d] || '') + '</div>' + items + '</div>';
       }).join('');
       a.innerHTML = '<div class="test-setup"><div class="test-setup-title">Cheat Sheet</div><div class="test-setup-sub">Key facts from your weakest and flagged questions, weakest domain first — a quick scan before you test.</div>' + sections + '<button class="test-start-btn" style="background:var(--surface2);color:var(--muted)" onclick="closeCheatSheet()">Done</button></div>';
